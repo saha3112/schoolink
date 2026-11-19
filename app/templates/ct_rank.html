@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Rank{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Rank entry</h1><p>Type ranks yourself or calculate them from the entered marks.</p></div>
+{% if ready %}<a class="btn" href="{{ url_for('classteacher.rank', class_id=cls, section_id=sec, exam_id=exam, auto=1) }}">Auto calculate</a>{% endif %}</div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if ready %}<form method="post"><div class="table-wrap"><table class="t marks-grid"><thead><tr><th class="num">Roll</th><th>Student</th>{% if auto %}<th class="num">Total</th>{% endif %}<th>Rank</th></tr></thead><tbody>
+{% for s in students %}{% set d = data.get(s.studentId) %}{% set a = auto.get(s.studentId) %}<tr><td class="num">{{ s.student_rollNumber }}</td><td>{{ s.student_name }}</td>
+{% if auto %}<td class="num">{{ a[1] if a else '' }}</td>{% endif %}
+<td><input class="m" name="rank_{{ s.studentId }}" value="{{ a[0] if a else (d['rank'] if d and d['rank'] else '') }}"></td></tr>{% endfor %}</tbody></table></div>
+<p style="margin-top:14px"><button class="btn primary">Save ranks</button></p></form>
+{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

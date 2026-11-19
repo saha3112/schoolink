@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_form.html' import select, trash_tabs, trash_form %}
+{% block heading %}Teacher Mapping{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Teacher mapping</h1><p>One row per teacher — subjects comma separated; each class is written once with its sections.</p></div>
+{% if not trash %}<a class="btn primary" href="{{ url_for('admin.teacher_mapping_edit') }}" data-modal data-modal-whole data-modal-stay data-modal-size="lg">+ New mapping</a>{% endif %}</div>
+{{ trash_tabs(trash, n_trash) }}
+<form class="toolbar" method="get">{% if trash %}<input type="hidden" name="trash" value="1">{% endif %}
+  <label>Teacher {{ select('teacher_id', teachers, 'user_id', 'full_name', tid, 'All teachers', auto=True) }}</label>
+  <label>Class {{ select('class_id', classes, 'classId', 'class_name', cls, 'All', auto=True) }}</label>
+  <label>Section {{ select('section_id', secs_for_filter, 'sectionId', 'section_name', sec, 'All', auto=True) }}</label>
+  <label>Subject {{ select('subject_id', all_subjects, 'subjectId', 'subject_name', sub, 'All', auto=True) }}</label>
+  <label>Search<input name="q" value="{{ q }}" placeholder="Name / mobile"></label><button class="btn">Search</button>
+</form>
+{% if trash and tid and rows %}<div style="display:flex;gap:8px;margin:0 0 12px"><form method="post" onsubmit="return confirm('Restore all removed mappings of this teacher?')"><input type="hidden" name="trash" value="1"><input type="hidden" name="action" value="restore_all"><input type="hidden" name="teacher_id" value="{{ tid }}"><button class="btn">Restore all</button></form>
+<form method="post" onsubmit="return confirm('Delete all removed mappings of this teacher permanently? This cannot be undone.')"><input type="hidden" name="trash" value="1"><input type="hidden" name="action" value="purge_all"><input type="hidden" name="teacher_id" value="{{ tid }}"><button class="btn danger">Delete all permanently</button></form></div>{% endif %}
+{% if trash %}<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Teacher</th><th>Class</th><th>Section</th><th>Subject</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{ r.teacher }}</b></td><td>{{ r.class_name }}</td><td>{{ r.section_name }}</td><td>{{ r.subject_name }}</td><td class="actions">{{ trash_form(r.id, 'mapping') }}</td></tr>
+{% else %}<tr><td colspan="5" class="empty">The Trash is empty.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
+{% else %}<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Teacher</th><th>Subjects</th><th style="min-width:230px">Class : Sections</th><th class="num">Mappings</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr>
+ <td><b>{{ r.teacher }}</b><div class="muted">{{ r.email or '' }}</div></td>
+ <td>{{ r.subjects }}</td><td style="white-space:nowrap">{% for cn, secs in r.sections %}<div><b>{{ cn }}</b> <span class="muted">:</span> {{ secs }}</div>{% endfor %}</td><td class="num">{{ r.total }}</td>
+ <td class="actions"><a class="btn sm" href="{{ url_for('admin.teacher_mapping_edit', teacher_id=r.t_id) }}" data-modal data-modal-whole data-modal-stay data-modal-size="lg">Manage</a>
+ <form method="post" style="display:inline" onsubmit="return confirm('Remove ALL mappings of {{ r.teacher }}? They move to the Trash and can be restored.')"><input type="hidden" name="action" value="delete_all"><input type="hidden" name="teacher_id" value="{{ r.t_id }}"><button class="btn sm danger">Remove all</button></form></td></tr>
+{% else %}<tr><td colspan="5" class="empty">No teacher mappings found.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}{% endif %}
+{% endblock %}

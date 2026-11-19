@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}{% from 'pp_child.html' import child_bar %}
+{% set live_wrap = true %}
+{% block heading %}Report Card{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Report card</h1></div></div>
+{{ child_bar(kids, child, 'parentpanel.card') }}
+{% if child %}{% if released %}
+ {% set u = url_for('parentpanel.card_view', sid=child.studentId) %}
+ <div class="card"><p>The report card of <b>{{ child.student_name }}</b> is ready.</p>
+ <a class="btn primary" href="{{ u }}" data-popup="{{ u }}" data-title="Report card — {{ child.student_name }}">View report card</a>
+ <a class="btn" href="{{ u }}?pdf=1&dl=1" data-download>Download PDF</a></div>
+{% else %}<div class="card empty">The report card has not been released yet. You will get a notification as soon as the school releases it.</div>{% endif %}{% endif %}
+{% endblock %}

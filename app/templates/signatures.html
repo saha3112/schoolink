@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}{% from '_form.html' import select %}{% from '_files.html' import media_picker %}
+{% macro upload_form(kind, replace, teacher_id=None) %}
+<form method="post" class="sig-form" data-sigform>
+  <input type="hidden" name="kind" value="{{ kind }}">{% if teacher_id %}<input type="hidden" name="teacher_id" value="{{ teacher_id }}">{% endif %}
+  <input type="hidden" name="action" value="{{ 'replace' if replace else 'upload' }}">
+  {{ media_picker('media_id', '', 'image', False, 1, '', 'Choose signature image') }}
+  <button class="btn sm primary" disabled data-sigsave>{{ 'Replace' if replace else 'Save' }}</button>
+</form>
+{% endmacro %}
+{% macro remove_form(kind, teacher_id=None) %}
+<form method="post" onsubmit="return confirm('Remove this signature? It stays in history and can be restored.')" style="display:inline">
+  <input type="hidden" name="kind" value="{{ kind }}">{% if teacher_id %}<input type="hidden" name="teacher_id" value="{{ teacher_id }}">{% endif %}
+  <input type="hidden" name="action" value="remove"><button class="btn sm danger">Remove</button></form>
+{% endmacro %}
+{% macro history(kind, items, teacher_id=None) %}
+{% if items %}<div><div class="muted" style="font-size:12px;margin-bottom:4px">Previous versions — click to restore</div><div class="sig-hist">
+{% for h in items %}<form method="post" onsubmit="return confirm('Restore this signature?')"><input type="hidden" name="kind" value="{{ kind }}">{% if teacher_id %}<input type="hidden" name="teacher_id" value="{{ teacher_id }}">{% endif %}
+<input type="hidden" name="action" value="restore"><input type="hidden" name="hid" value="{{ h.id }}"><button title="{{ h.when }}"><img src="{{ h.url }}" alt=""><small>{{ h.when[5:10] }}</small></button></form>{% endfor %}</div></div>{% endif %}
+{% endmacro %}
+
+{% block heading %}Signatures{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Signatures</h1><p>Principal, HOD and class teacher signatures printed on the report cards.</p></div></div>
+
+<h3>Principal &amp; HOD</h3>
+<div class="sig-grid" style="margin-bottom:26px">
+{% for f in fixed %}
+ <div class="sig-card">
+  <div><h4>{{ f.label }}</h4><div class="sub">{{ f.note }}</div></div>
+  <div class="sig-box">{% if f.url %}<span class="chip green tag">Uploaded</span><img src="{{ f.url }}" alt="{{ f.label }}">{% else %}<span class="none">No signature uploaded</span>{% endif %}</div>
+  {{ upload_form(f.kind, f.url is not none) }}
+  {% if f.url %}<div class="sig-actions"><a class="btn sm" href="{{ f.url }}" data-popup="{{ f.url }}" data-title="{{ f.label }}">View</a><a class="btn sm" href="{{ f.url }}&download=1" download>Download</a>{{ remove_form(f.kind) }}</div>{% endif %}
+  {{ history(f.kind, f.history) }}
+ </div>
+{% endfor %}
+</div>
+
+<h3>Class teachers <span class="muted" style="font-weight:400">· {{ stats.done }} of {{ stats.total }} uploaded</span></h3>
+<div class="progress"><i style="width:{{ (stats.done * 100 / stats.total)|round if stats.total else 0 }}%"></i></div>
+<form class="toolbar" method="get" style="margin-top:14px">
+  <label>Class {{ select('class_id', classes, 'classId', 'class_name', cls, 'All classes', auto=True) }}</label>
+  <label>Status <select name="status" onchange="this.form.submit()"><option value="">All</option><option value="uploaded" {{ 'selected' if status=='uploaded' }}>Uploaded</option><option value="missing" {{ 'selected' if status=='missing' }}>Missing</option></select></label>
+  <label>Search<input name="q" value="{{ q }}" placeholder="Teacher / class"></label><button class="btn">Search</button>
+</form>
+<div class="sig-grid">
+{% for t in teachers %}
+ <div class="sig-card">
+  <div><h4>{{ t.name }}</h4><div class="sub">Class teacher of {{ t.sections }}</div></div>
+  <div class="sig-box">
+    {% if t.has %}<span class="chip green tag">Uploaded</span><img src="{{ t.url }}" alt="Signature of {{ t.name }}">
+    {% elif t.missing_file %}<span class="chip red tag">File missing</span><span class="none">Saved file not found — upload again</span>
+    {% else %}<span class="chip gray tag">Missing</span><span class="none">No signature uploaded</span>{% endif %}
+  </div>
+  {{ upload_form('teacher', t.has, t.user_id) }}
+  {% if t.has %}<div class="sig-actions"><a class="btn sm" href="{{ t.url }}" data-popup="{{ t.url }}" data-title="{{ t.name }}">View</a><a class="btn sm" href="{{ t.url }}&download=1" download>Download</a>{{ remove_form('teacher', t.user_id) }}</div>{% endif %}
+  {{ history('teacher', t.history, t.user_id) }}
+ </div>
+{% else %}<div class="card empty" style="grid-column:1/-1">No class teachers match.</div>{% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}<script>
+/* the Save button wakes up once an image has been chosen in the library pop-up */
+document.querySelectorAll('[data-sigform]').forEach(f => {
+  const btn = f.querySelector('[data-sigsave]');
+  f.addEventListener('mp:change', e => { btn.disabled = !(e.detail.items && e.detail.items.length); });
+});
+</script>{% endblock %}

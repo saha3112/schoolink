@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}{% from '_form.html' import select %}
+{% block heading %}Teacher Mapping{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ teacher.full_name if teacher else 'New teacher mapping' }}</h1><p><a href="{{ url_for('admin.teacher_mapping') }}">← All teachers</a></p></div>
+</div>
+{% if not trash %}<div class="card"><h3>Add assignment</h3><form method="post">
+ <div class="step"><div class="step-h"><span class="step-n">1</span> Teacher and class</div>
+  <div class="row-fields"><label>Teacher {% if teacher_id %}<input type="hidden" name="teacher_id" value="{{ teacher_id }}"><input value="{{ teacher.full_name }}" disabled>{% else %}{{ select('teacher_id', teachers, 'user_id', 'full_name', id='tch', required=True) }}{% endif %}</label>
+  <label>Class {{ select('class_id', classes, 'classId', 'class_name', id='cls', required=True) }}</label></div></div>
+ <div class="step"><div class="step-h"><span class="step-n">2</span> Tick the subjects this teacher takes <span class="muted" style="font-weight:400">— section by section</span></div><div id="ssBox"></div></div>
+ <button class="btn primary">Assign</button></form></div>{% endif %}
+{% if rows %}{% for cname, secs in rows.items() %}
+<div class="card" style="padding:0;overflow:hidden"><div style="padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--line)"><b>{{ cname }}</b></div>
+ <div class="table-wrap" style="border:0;border-radius:0"><table class="t"><tbody>
+ {% for sname, subs in secs.items() %}<tr><td style="width:120px">Section <b>{{ sname }}</b></td><td>
+   {% for sb in subs %}{% if false %}{% endif %}<form method="post" onsubmit="return confirm('Remove {{ sb.name }} from {{ cname }} {{ sname }}? It moves to the Trash and can be restored.')" style="display:inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ sb.id }}"><input type="hidden" name="teacher_id" value="{{ teacher_id }}">
+   <span class="chip">{{ sb.name }} <button title="Remove" style="border:0;background:none;color:var(--danger);cursor:pointer;font-size:15px;padding:0 0 0 4px">×</button></span></form>{% endfor %}</td></tr>{% endfor %}
+ </tbody></table></div></div>{% endfor %}{% elif trash %}<div class="card empty">The Trash is empty.</div>{% endif %}
+{% endblock %}
+{% block scripts %}<script>if(document.getElementById('cls'))sectionSubjects({cls:'#cls', box:'#ssBox', all:false, need:['#tch'], hint:'Choose a teacher and a class to see the sections and subjects.'});</script>{% endblock %}

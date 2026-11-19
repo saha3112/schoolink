@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}{% from 'pp_child.html' import child_bar %}{% from '_files.html' import file_list %}
+{% set live_wrap = true %}
+{% block heading %}Classwork & Homework{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Classwork &amp; homework</h1></div></div>
+{{ child_bar(kids, child, 'parentpanel.work') }}
+{% for r in rows if not kind or r.kind == kind %}<div class="post"><h4>{{ r.title }} <span class="chip {{ 'green' if r.kind == 'homework' else '' }}">{{ r.kind|capitalize }}</span></h4>
+ <div class="meta">{{ r.subject_name }} · {{ r.work_date.strftime('%d %b %Y') }}{% if r.due_date %} · due {{ r.due_date.strftime('%d %b %Y') }}{% endif %}</div>
+ {% if r.body %}<div class="body">{{ r.body }}</div>{% endif %}{{ file_list(r.files, furl) }}</div>
+{% else %}{% if child %}<div class="card empty">Nothing posted yet.</div>{% endif %}{% endfor %}
+{% endblock %}

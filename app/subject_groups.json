@@ -1,0 +1,2645 @@
+{
+    "normal": {
+        "junior4": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "EVS": {
+                "subjects": [
+                    "EVS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "GRADED": {
+                "subjects": [
+                    "GENERAL KNOWLEDGE",
+                    "3RD LANGUAGE HINDI / BENGALI",
+                    "COMPUTER SCIENCE",
+                    "READING & ELOCUTION",
+                    "SPELLING AND DICTATION",
+                    "HAND WRITING",
+                    "ART & CRAFT",
+                    "PHYSICAL EDUCATION",
+                    "VALUE EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "junior5": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "EVS": {
+                "subjects": [
+                    "EVS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "GRADED": {
+                "subjects": [
+                    "GENERAL KNOWLEDGE",
+                    "3RD LANGUAGE HINDI / BENGALI",
+                    "COMPUTER SCIENCE",
+                    "READING & ELOCUTION",
+                    "SPELLING AND DICTATION",
+                    "HAND WRITING",
+                    "ART & CRAFT",
+                    "PHYSICAL EDUCATION",
+                    "VALUE EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "junior6": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "SOCIAL STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "GRADED": {
+                "subjects": [
+                    "GENERAL KNOWLEDGE",
+                    "3RD LANGUAGE HINDI / BENGALI",
+                    "COMPUTER SCIENCE",
+                    "READING & ELOCUTION",
+                    "SPELLING AND DICTATION",
+                    "HAND WRITING",
+                    "ART & CRAFT",
+                    "PHYSICAL EDUCATION",
+                    "VALUE EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass6ABCDto9ABSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": true,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "GEN. KNOWLADGE GRADE",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass9CDSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMMERCIAL STUDIES": {
+                "subjects": [
+                    "COMMERCIAL STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass10ABSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": true,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass10CDSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMMERCIAL STUDIES": {
+                "subjects": [
+                    "COMMERCIAL STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass11ASubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass11BSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "GEOMETRICAL & MECHANICAL DRAWING": {
+                "subjects": [
+                    "GEOMETRICAL & MECHANICAL DRAWING"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass11CSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "BUSINESS STUDIES": {
+                "subjects": [
+                    "BUSINESS STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass11DSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "BUSINESS STUDIES": {
+                "subjects": [
+                    "BUSINESS STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ENTREPRENEURSHIP": {
+                "subjects": [
+                    "Entrepreneurship"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass11ESubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "HISTORY": {
+                "subjects": [
+                    "HISTORY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "POLITICAL SCIENCE": {
+                "subjects": [
+                    "POLITICAL SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "SOCIOLOGY": {
+                "subjects": [
+                    "SOCIOLOGY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "Geography": {
+                "subjects": [
+                    "Geography"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass12ASubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass12BSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "GEOMETRICAL & MECHANICAL DRAWING": {
+                "subjects": [
+                    "GEOMETRICAL & MECHANICAL DRAWING"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass12CSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMMERCE": {
+                "subjects": [
+                    "COMMERCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass12DSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "BUSINESS STUDIES": {
+                "subjects": [
+                    "BUSINESS STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMMERCE": {
+                "subjects": [
+                    "COMMERCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass12ESubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "HISTORY": {
+                "subjects": [
+                    "HISTORY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "POLITICAL SCIENCE": {
+                "subjects": [
+                    "POLITICAL SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "SOCIOLOGY": {
+                "subjects": [
+                    "SOCIOLOGY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "Geography": {
+                "subjects": [
+                    "Geography"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "MISC & 3rd LANG": {
+                "subjects": [
+                    "3rd Language Grade",
+                    "Gen. Knowledge Grade",
+                    "Value Edu. Grade",
+                    "Physical Edu. Grade",
+                    "VALUE EDUCATION",
+                    "SUPW"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        }
+    },
+    "weighted": {
+        "junior4": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "EVS": {
+                "subjects": [
+                    "EVS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "GRADED": {
+                "subjects": [
+                    "GENERAL KNOWLEDGE",
+                    "3RD LANGUAGE HINDI / BENGALI",
+                    "COMPUTER SCIENCE",
+                    "READING & ELOCUTION",
+                    "SPELLING AND DICTATION",
+                    "HAND WRITING",
+                    "ART & CRAFT",
+                    "PHYSICAL EDUCATION",
+                    "VALUE EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "junior5": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "EVS": {
+                "subjects": [
+                    "EVS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "GRADED": {
+                "subjects": [
+                    "GENERAL KNOWLEDGE",
+                    "3RD LANGUAGE HINDI / BENGALI",
+                    "COMPUTER SCIENCE",
+                    "READING & ELOCUTION",
+                    "SPELLING AND DICTATION",
+                    "HAND WRITING",
+                    "ART & CRAFT",
+                    "PHYSICAL EDUCATION",
+                    "VALUE EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "junior6": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "SOCIAL STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "SUMMARY": {
+                "subjects": [
+                    "Total",
+                    "%",
+                    "Rank"
+                ],
+                "calculateAvg": false,
+                "color": "th-summary",
+                "partition": false
+            },
+            "ATTENDANCE": {
+                "subjects": [
+                    "Total Session",
+                    "Attended",
+                    "%"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            },
+            "GRADED": {
+                "subjects": [
+                    "GENERAL KNOWLEDGE",
+                    "3RD LANGUAGE HINDI / BENGALI",
+                    "COMPUTER SCIENCE",
+                    "READING & ELOCUTION",
+                    "SPELLING AND DICTATION",
+                    "HAND WRITING",
+                    "ART & CRAFT",
+                    "PHYSICAL EDUCATION",
+                    "VALUE EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": false
+            }
+        },
+        "getClass6ABCDto9ABSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": true,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass9CDSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMMERCIAL STUDIES": {
+                "subjects": [
+                    "COMMERCIAL STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass10ABSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": true,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass10CDSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SOCIAL STUDIES": {
+                "subjects": [
+                    "History & Civics",
+                    "Geography"
+                ],
+                "calculateAvg": true,
+                "color": "th-soc-main",
+                "partition": true
+            },
+            "COMMERCIAL STUDIES": {
+                "subjects": [
+                    "COMMERCIAL STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass11ASubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            }
+        },
+        "getClass11BSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "GEOMETRICAL & MECHANICAL DRAWING": {
+                "subjects": [
+                    "GEOMETRICAL & MECHANICAL DRAWING"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass11CSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "BUSINESS STUDIES": {
+                "subjects": [
+                    "BUSINESS STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass11DSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "BUSINESS STUDIES": {
+                "subjects": [
+                    "BUSINESS STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "ENTREPRENEURSHIP": {
+                "subjects": [
+                    "Entrepreneurship"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass11ESubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "HISTORY": {
+                "subjects": [
+                    "HISTORY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "POLITICAL SCIENCE": {
+                "subjects": [
+                    "POLITICAL SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "SOCIOLOGY": {
+                "subjects": [
+                    "SOCIOLOGY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "Geography": {
+                "subjects": [
+                    "Geography"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ROBOT": {
+                "subjects": [
+                    "ROBOTICS",
+                    "ROBOTICS / AI",
+                    "ROBOTICS AND AI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass12ASubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry",
+                    "Biology"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            }
+        },
+        "getClass12BSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "GEOMETRICAL & MECHANICAL DRAWING": {
+                "subjects": [
+                    "GEOMETRICAL & MECHANICAL DRAWING"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "SCIENCE": {
+                "subjects": [
+                    "Physics",
+                    "Chemistry"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMP": {
+                "subjects": [
+                    "Computer Studies",
+                    "COMP.APPL/TECH.DRG.APPL./PHYSICAL EDU./ECO.APPL.",
+                    "COMPUTER SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            }
+        },
+        "getClass12CSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMMERCE": {
+                "subjects": [
+                    "COMMERCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            }
+        },
+        "getClass12DSubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "BUSINESS STUDIES": {
+                "subjects": [
+                    "BUSINESS STUDIES"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "ECONOMICS": {
+                "subjects": [
+                    "ECONOMICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "COMMERCE": {
+                "subjects": [
+                    "COMMERCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "ACCOUNTS": {
+                "subjects": [
+                    "ACCOUNTS"
+                ],
+                "calculateAvg": false,
+                "color": "th-sci-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            }
+        },
+        "getClass12ESubjectGroup": {
+            "ENGLISH": {
+                "subjects": [
+                    "ENGLISH LANGUAGE",
+                    "ENGLISH LITERATURE"
+                ],
+                "calculateAvg": true,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "2ND LANG": {
+                "subjects": [
+                    "HINDI / BENGALI"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "HISTORY": {
+                "subjects": [
+                    "HISTORY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "MATHEMATICS": {
+                "subjects": [
+                    "MATHEMATICS",
+                    "MATHEMATICS / APPLIED MATHEMATICS"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "POLITICAL SCIENCE": {
+                "subjects": [
+                    "POLITICAL SCIENCE"
+                ],
+                "calculateAvg": false,
+                "color": "th-eng-main",
+                "partition": true
+            },
+            "SOCIOLOGY": {
+                "subjects": [
+                    "SOCIOLOGY"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            },
+            "Geography": {
+                "subjects": [
+                    "Geography"
+                ],
+                "calculateAvg": false,
+                "color": "th-other-main",
+                "partition": true
+            },
+            "PHYSICAL EDUCATION": {
+                "subjects": [
+                    "PHYSICAL EDUCATION"
+                ],
+                "calculateAvg": false,
+                "color": "th-math-main",
+                "partition": true
+            }
+        }
+    }
+}

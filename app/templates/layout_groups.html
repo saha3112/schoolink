@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Subject groups{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow"><i></i> Report setup</div><h1>Subject groups</h1>
+<p>How subjects are grouped (and coloured) on the tabulation and weighted-average sheets. Each set is chosen by a class/section in <a href="{{ url_for('layouts_admin.rules') }}">Report layouts</a>.</p></div></div>
+
+<div class="toolbar">
+  <a class="btn {{ '' if weighted else 'primary' }}" href="?w=0">Tabulation sets</a>
+  <a class="btn {{ 'primary' if weighted }}" href="?w=1">Weighted-average sets</a>
+</div>
+
+<div class="grid" style="grid-template-columns:minmax(240px,300px) minmax(0,1fr);align-items:start">
+  <div class="card" style="margin:0"><h3>Group sets</h3>
+    {% for k in keys %}<a class="quick-action" style="margin-bottom:8px;{{ 'border-color:var(--brand);background:var(--brand-soft)' if k == key }}" href="?w={{ 1 if weighted else 0 }}&key={{ k|urlencode }}">
+      <span style="overflow-wrap:anywhere">{{ k }}<br><small class="muted">{{ used[k]|join(', ') or 'not used' }}</small></span></a>{% endfor %}
+    <details style="margin-top:10px"><summary class="btn sm" style="display:inline-flex">{{ icon('plus', 14) }} New set (copy of current)</summary>
+      <form method="post" style="margin-top:10px;display:grid;gap:8px"><input type="hidden" name="w" value="{{ 1 if weighted else 0 }}">
+        <input type="hidden" name="key" value="{{ key }}"><input name="new_key" placeholder="New set name" required>
+        {% if cfg %}{% for name, g in cfg.items() %}<input type="hidden" name="g_name" value="{{ g.label or name }}"><input type="hidden" name="g_role" value="{{ L.group_role(name) }}"><input type="hidden" name="g_subjects" value="{{ g.subjects|join('\n') }}"><input type="hidden" name="g_color" value="{{ g.color }}">{% if g.calculateAvg %}<input type="hidden" name="g_avg_{{ loop.index0 }}" value="1">{% endif %}{% if g.partition %}<input type="hidden" name="g_part_{{ loop.index0 }}" value="1">{% endif %}{% endfor %}{% endif %}
+        <button class="btn primary sm" {{ 'disabled' if not cfg }}>Create copy</button></form></details>
+  </div>
+
+  <div>
+  {% if cfg %}
+  <form method="post" class="card" style="margin:0" id="gForm">
+    <input type="hidden" name="w" value="{{ 1 if weighted else 0 }}"><input type="hidden" name="key" value="{{ key }}">
+    <div class="card-head"><div><h3>{{ key }}</h3><p class="muted" style="margin:4px 0 0;font-size:12px">Groups appear on the sheet in this order. The <b>Role</b> tells the sheet what a group is (summary, attendance, graded, science…), so you can rename the heading freely. Only one group per role. The heading text of the Junior sheet is fixed by its design.</p></div></div>
+    <div id="gList" style="display:grid;gap:12px">
+    {% for name, g in cfg.items() %}{% set i = loop.index0 %}
+      <div class="ss-card g-row"><div class="ss-head"><input name="g_name" value="{{ g.label or name }}" style="font-weight:700;max-width:240px" required title="Heading shown on the sheet">
+          <select name="g_role" title="Role: what the sheet logic does with this group">{% for rk, rv in L.GROUP_ROLES.items() %}<option value="{{ rk }}" {{ 'selected' if L.group_role(name) == rk }}>{{ rv[0] }}</option>{% endfor %}</select>
+        <span><button type="button" class="btn sm" data-up>↑</button> <button type="button" class="btn sm" data-down>↓</button> <button type="button" class="btn sm danger" data-del>Remove</button></span></div>
+        <div style="padding:12px;display:grid;gap:10px">
+          <label>Subjects in this group (one per line, exactly as the subject name)<textarea name="g_subjects" rows="{{ [g.subjects|length + 1, 3]|max }}" list="">{{ g.subjects|join('\n') }}</textarea></label>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end">
+            <label>Heading colour class<input name="g_color" value="{{ g.color }}" style="max-width:200px"></label>
+            <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="1" data-flag="avg" {{ 'checked' if g.calculateAvg }}> Calculate average</label>
+            <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="1" data-flag="part" {{ 'checked' if g.partition }}> Show marks partition (sub-types)</label>
+          </div></div></div>
+    {% endfor %}</div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="gAdd">{{ icon('plus', 14) }} Add group</button><button class="btn primary">Save changes</button></div>
+  </form>
+  <form method="post" style="margin-top:10px" onsubmit="return confirm('Delete this group set?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="w" value="{{ 1 if weighted else 0 }}"><input type="hidden" name="key" value="{{ key }}"><button class="btn sm danger">Delete this set</button></form>
+  <datalist id="subjList">{% for s in subjects %}<option value="{{ s }}">{% endfor %}</datalist>
+  <details class="card" style="margin-top:14px"><summary class="muted" style="cursor:pointer">Subject names in your school (for copy / paste)</summary><div style="margin-top:10px">{% for s in subjects %}<span class="chip gray">{{ s }}</span>{% endfor %}</div></details>
+  {% else %}<div class="card empty">Select a group set on the left.</div>{% endif %}
+  </div>
+</div>
+<script>
+(function(){
+ var form=document.getElementById('gForm'); if(!form) return;
+ var list=document.getElementById('gList');
+ // checkbox names carry the row index, so renumber them right before submit (keeps order + flags in step)
+ function renumber(){Array.prototype.forEach.call(list.querySelectorAll('.g-row'),function(row,i){
+   row.querySelectorAll('[data-flag]').forEach(function(cb){cb.name='g_'+cb.dataset.flag+'_'+i});});}
+ form.addEventListener('submit',renumber);
+ list.addEventListener('click',function(e){var row=e.target.closest('.g-row'); if(!row) return;
+  if(e.target.matches('[data-del]')){ if(list.children.length>1) slConfirm('Remove this group?').then(function(ok){ if(ok) row.remove(); }); }
+  else if(e.target.matches('[data-up]') && row.previousElementSibling) list.insertBefore(row,row.previousElementSibling);
+  else if(e.target.matches('[data-down]') && row.nextElementSibling) list.insertBefore(row.nextElementSibling,row);});
+ document.getElementById('gAdd').addEventListener('click',function(){
+  var c=list.lastElementChild.cloneNode(true);
+  c.querySelector('[name=g_name]').value=''; c.querySelector('[name=g_subjects]').value=''; c.querySelector('[name=g_color]').value='th-other-main'; c.querySelector('[name=g_role]').value='normal';
+  c.querySelectorAll('[data-flag]').forEach(function(x){x.checked=false}); list.appendChild(c); c.querySelector('[name=g_name]').focus();});
+})();
+</script>
+{% endblock %}

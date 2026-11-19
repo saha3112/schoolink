@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block heading %}Leave Requests{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Leave requests</h1><p>Sent by parents for their children.</p></div></div>
+<div class="toolbar">{% for s, l in [('pending','Pending'),('approved','Approved'),('rejected','Rejected'),('all','All')] %}<a class="btn sm {{ 'primary' if status == s }}" href="?status={{ s }}">{{ l }}</a>{% endfor %}</div>
+<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Student</th><th>Dates</th><th>Reason</th><th>Status</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{ r.student_name }}</b><div class="muted">{{ r.class_name }} {{ r.section_name }} · roll {{ r.student_rollNumber }}</div></td><td>{{ r.from_date.strftime('%d %b') }} – {{ r.to_date.strftime('%d %b %Y') }}</td><td style="max-width:320px;overflow-wrap:anywhere">{{ r.reason }}</td>
+<td><span class="chip {{ 'green' if r.status == 'approved' else 'red' if r.status == 'rejected' else 'gray' }}">{{ r.status|capitalize }}</span></td>
+<td class="actions">{% if r.status == 'pending' %}<form method="post" style="display:flex;gap:6px;justify-content:flex-end"><input type="hidden" name="id" value="{{ r.id }}"><input name="note" placeholder="Note (optional)" style="width:150px">
+<button class="btn sm primary" name="action" value="approve">Approve</button><button class="btn sm danger" name="action" value="reject">Reject</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="5" class="empty">No requests.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}{% from '_selects.html' import grade_select %}
+{% block heading %}Special Subjects{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Special subject marks / grades</h1></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if subjects %}
+<form method="post"><div class="table-wrap"><table class="t marks-grid"><thead><tr><th class="num">Roll</th><th>Student</th>{% for s in subjects %}<th style="text-align:center">{{ s.subject_name }}</th>{% endfor %}</tr></thead><tbody>
+{% for stu in students %}<tr><td class="num">{{ stu.student_rollNumber }}</td><td>{{ stu.student_name }}</td>{% for s in subjects %}{% if (stu.studentId, s.subjectId) in excl %}<td class="na-cell" title="Does not take this subject">—</td>{% else %}<td style="text-align:center">{{ grade_select('m_' ~ s.subjectId ~ '_' ~ stu.studentId, existing.get((stu.studentId, s.subjectId), '')) }}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table></div>
+<p style="margin-top:14px"><button class="btn primary">Save</button></p></form>
+{% elif cls and sec and exam %}<div class="card empty">No special subject is assigned to you for this section.</div>{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

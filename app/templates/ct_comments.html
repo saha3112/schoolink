@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Comments{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Teacher comments</h1><p>Pick a saved comment or type a new one — new comments are added to the shared list.</p></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if ready %}<form method="post"><datalist id="tpl">{% for t in templates %}<option value="{{ t }}">{% endfor %}</datalist>
+ <div class="table-wrap"><table class="t"><thead><tr><th class="num">Roll</th><th>Student</th><th style="width:60%">Comment</th></tr></thead><tbody>
+ {% for s in students %}{% set d = data.get(s.studentId) %}<tr><td class="num">{{ s.student_rollNumber }}</td><td>{{ s.student_name }}</td>
+ <td><input list="tpl" name="comment_{{ s.studentId }}" value="{{ d.comment if d and d.comment else '' }}" style="width:100%"></td></tr>{% endfor %}</tbody></table></div>
+ <p style="margin-top:14px"><button class="btn primary">Save comments</button></p></form>
+{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

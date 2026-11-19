@@ -1,0 +1,113 @@
+{% from '_icons.html' import icon %}
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf" content="{{ csrf_token }}">{% if csv_kind %}
+<meta name="csv-kind" content="{{ csv_kind }}">{% endif %}
+<title>{% block title %}{{ school_name }}{% endblock %} · Schoolink</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<script>
+ // restore sidebar state before paint (no flash)
+ try { document.documentElement.dataset.theme = localStorage.getItem('sl-theme') || 'light'; } catch(e){}
+ try { if (localStorage.getItem('sb-collapsed') === '1' && innerWidth > 992) document.documentElement.classList.add('sb-collapsed'); } catch(e){}
+</script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn" id="sbToggle" aria-label="Toggle sidebar" title="Toggle sidebar">{{ icon('menu', 23) }}</button>
+  <div class="page-path"><span class="path-sub">Workspace / {{ 'Administration' if me.is_admin else me.role_label }}</span><strong class="path-current">{% block heading %}{% endblock %}</strong></div>
+  <div class="header-spacer"></div>
+  {% if me.is_admin or me.is_teacher %}
+  <div class="top-search" id="ts" role="search">
+    {{ icon('search', 16) }}
+    <input id="tsInput" type="search" placeholder="Search students, classes, marks, pages…" autocomplete="off" spellcheck="false" aria-label="Search" aria-controls="tsPanel" aria-expanded="false" maxlength="100">
+    <button type="button" class="ts-clear" id="tsClear" hidden aria-label="Clear search">×</button>
+    <div class="ts-panel" id="tsPanel" role="listbox" hidden></div>
+  </div>
+  <button class="icon-btn ts-open" id="tsOpen" type="button" aria-label="Search">{{ icon('search', 20) }}</button>
+  {% endif %}
+  <div class="header-divider"></div>
+  <button class="theme-switch" id="themeBtn" type="button" aria-label="Toggle dark and light mode" title="Switch between dark and light mode"><span class="ti sun">{{ icon('sun', 16) }}</span><span class="ti moon">{{ icon('moon', 16) }}</span></button>
+  <div class="header-pop bell" id="bell">
+    <button class="icon-btn bell-btn" id="bellBtn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">{{ icon('bell', 20) }}<span class="bell-badge" id="bellBadge" hidden>0</span></button>
+    <div class="bell-menu" id="bellMenu" role="menu">
+      <div class="bm-head"><b>Notifications</b><button type="button" class="bm-clear" id="bellClear">Remove all</button></div>
+      <div class="bm-list" id="bellList"><div class="bm-empty">Loading…</div></div>
+    </div>
+  </div>
+  <div class="header-divider"></div>
+  <div class="header-pop profile" id="profile">
+    <button class="account-button" id="profileBtn" aria-haspopup="true" aria-expanded="false" aria-label="Open account menu">
+      <span class="avatar">{{ me.initials }}</span>
+      <span class="account-copy"><strong class="account-name">{{ me.fname }}</strong><span class="account-role">{{ me.role_label }}</span></span>
+      {{ icon('chevron', 13) }}
+    </button>
+    <div class="profile-menu" id="profileMenu" role="menu">
+      <div class="popup-heading">{{ me.fname }}<span>{{ school_name }}</span></div>
+      {% for p in profile_menu %}<a class="popup-item" href="{{ url_for(p.endpoint) }}" role="menuitem">{{ icon(p.icon, 16) }} {{ p.label }}</a>{% endfor %}
+      <button type="button" class="popup-item" id="themeBtn2">{{ icon('moon', 16) }} <span id="themeLbl">Switch theme</span></button>
+      <button type="button" class="popup-item" id="palBtn2">{{ icon('search', 16) }} Quick navigation</button>
+      <a class="popup-item danger" href="{{ url_for('auth.logout') }}" role="menuitem">{{ icon('logout', 16) }} Sign out</a>
+    </div>
+  </div>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" onerror="this.style.display='none'">
+    <div class="sb-title"><b>{{ school_name }}</b><small>{{ school_tagline }}</small></div>
+  </div>
+  <nav class="sb-nav" data-live-html="nav">
+  {% for m in menu %}
+    {% if loop.first %}<div class="sb-section">Workspace</div>{% elif loop.index0 == 1 %}<div class="sb-section">Management</div>{% endif %}
+    {% if m.children is none %}
+      <a class="sb-link {{ 'active' if current_ep == m.endpoint }}" href="{{ url_for(m.endpoint) }}" title="{{ m.label }}">{{ icon(m.icon) }}<span>{{ m.label }}</span></a>
+    {% else %}
+      {% set open = current_ep in (m.children | map(attribute='endpoint') | list) %}
+      <div class="sb-group {{ 'open' if open }}">
+        <button class="sb-link sb-parent" type="button" title="{{ m.label }}">{{ icon(m.icon) }}<span>{{ m.label }}</span><i class="chev">{{ icon('chevron', 14) }}</i></button>
+        <div class="sb-sub">
+          {% for c in m.children %}
+            <a class="{{ 'active' if current_ep == c.endpoint }}" href="{{ url_for(c.endpoint) }}">{{ c.label }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+  </nav>
+</aside>
+<div id="pageIndex" hidden>
+    {% for m in menu %}{% if m.children is none %}<a href="{{ url_for(m.endpoint) }}" data-t="{{ m.label|lower }}">{{ icon(m.icon, 17) }}{{ m.label }}</a>
+    {% else %}{% for c in m.children %}<a href="{{ url_for(c.endpoint) }}" data-t="{{ (m.label ~ ' ' ~ c.label)|lower }}">{{ icon(m.icon, 17) }}{{ c.label }}<small>{{ m.label }}</small></a>{% endfor %}{% endif %}{% endfor %}
+    </div>
+<div class="sb-backdrop" id="sbBackdrop"></div>
+
+<main class="content" data-live-topics="{{ live_topics }}" data-live-since="{{ live_since }}" data-live-class="{{ request.values.get('class_id', '') }}" data-live-section="{{ request.values.get('section_id', '') }}">
+  {% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}<script type="application/json" id="flashData">{{ msgs|tojson }}</script>{% endif %}{% endwith %}
+  {% if live_wrap %}<div data-live-html="page">{% endif %}{% block content %}{% endblock %}{% if live_wrap %}</div>{% endif %}
+</main>
+<div class="vm" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Document viewer">
+  <div class="vm-bar">
+    <div class="vm-title" id="vmTitle"></div>
+    <div class="vm-tools">
+      <button class="icon-btn sm" id="vmOut" title="Zoom out" aria-label="Zoom out">−</button>
+      <button class="btn sm" id="vmFit" title="Fit to width">Fit <span id="vmPct"></span></button>
+      <button class="icon-btn sm" id="vmIn" title="Zoom in" aria-label="Zoom in">+</button>
+      <button class="btn sm" id="vmPrint">Print</button>
+      <a class="btn sm" id="vmPdf" data-download href="#">Download PDF</a>
+      <button type="button" class="modal-x" id="vmClose" aria-label="Close" title="Close"></button>
+    </div>
+  </div>
+  <div class="vm-body"><div class="vm-loading" id="vmLoading">Loading…</div><iframe id="vmFrame" title="Document"></iframe></div>
+</div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pw.js') }}"></script>
+<script src="{{ url_for('static', filename='js/live.js') }}"></script>
+<script src="{{ url_for('static', filename='js/media.js') }}"></script>
+<script src="{{ url_for('static', filename='js/csv.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

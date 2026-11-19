@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% set live_wrap = true %}
+{% block heading %}Home{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Welcome</h1><p>Your children at {{ school_name }}</p></div></div>
+<div class="grid g2" style="margin-bottom:18px">
+{% for k in kids %}{% set st = stats[k.studentId] %}
+ <div class="kid-card"><h3>{{ k.student_name }}</h3><div class="muted">{{ k.class_name }} · Section {{ k.section_name }} · Roll {{ k.student_rollNumber }}</div>
+  <div class="kid-meta"><div><b>{{ st.att ~ '%' if st.att is not none else '–' }}</b><span>Attendance (30 days)</span></div><div><b>{{ 'Ready' if st.released else '–' }}</b><span>Report card</span></div></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn sm" href="{{ url_for('parentpanel.card', child=k.studentId) }}">Report card</a><a class="btn sm" href="{{ url_for('parentpanel.attendance', child=k.studentId) }}">Attendance</a>
+  <a class="btn sm" href="{{ url_for('parentpanel.work', child=k.studentId) }}">Homework</a><a class="btn sm" href="{{ url_for('parentpanel.timetable', child=k.studentId) }}">Timetable</a></div></div>
+{% else %}<div class="card empty">No child is linked to this account yet. Please contact the school.</div>{% endfor %}
+</div>
+<div class="grid g2">
+ <div class="card" style="margin:0"><h3>Latest announcements</h3>{% for a in ann %}<div class="ev"><div style="flex:1"><b>{{ a.title }}</b><div class="muted" style="font-size:12.5px">{{ a.created_at.strftime('%d %b %Y') }}</div><div style="white-space:pre-wrap;margin-top:2px">{{ a.body[:160] }}{{ '…' if a.body|length > 160 }}</div></div></div>{% else %}<div class="empty">Nothing new.</div>{% endfor %}<a href="{{ url_for('parentpanel.announcements') }}">All announcements →</a></div>
+ <div class="card" style="margin:0"><h3>Coming up</h3>{% for e in events %}<div class="ev {{ e.kind }}"><div class="date"><b>{{ e.start_date.strftime('%d') }}</b>{{ e.start_date.strftime('%b') }}</div><div><b>{{ e.title }}</b><div class="muted">{{ 'Holiday' if e.kind == 'holiday' else 'Event' }}</div></div></div>{% else %}<div class="empty">No upcoming events.</div>{% endfor %}<a href="{{ url_for('parentpanel.events') }}">All events →</a></div>
+</div>
+{% endblock %}

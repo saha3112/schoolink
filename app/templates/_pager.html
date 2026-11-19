@@ -1,0 +1,11 @@
+{% macro pager(p) %}
+{% if p.pages > 1 %}
+<div class="pager no-print">
+  {% if p.page > 1 %}<a href="{{ page_url(p.page-1) }}">‹ Prev</a>{% endif %}
+  {% for n in range([1,p.page-3]|max, [p.pages,p.page+3]|min + 1) %}
+    {% if n == p.page %}<span class="cur">{{ n }}</span>{% else %}<a href="{{ page_url(n) }}">{{ n }}</a>{% endif %}
+  {% endfor %}
+  {% if p.page < p.pages %}<a href="{{ page_url(p.page+1) }}">Next ›</a>{% endif %}
+</div>
+{% endif %}
+{% endmacro %}

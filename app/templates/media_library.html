@@ -1,0 +1,7 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Media Library{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Media library</h1>
+<p>{% if me.is_admin %}Every file and image uploaded by anyone in the school.{% else %}The files and images you uploaded.{% endif %} Remove moves a file to Trash — it can be restored.</p></div></div>
+<div data-library-page class="mp-page"></div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block heading %}Create Parent{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Create parent</h1><p>Create a parent login and optionally link children.</p></div></div>
+<div class="card"><form method="post" data-modal-form autocomplete="off" class="form-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label>First name<input name="fname" value="{{ request.form.get('fname', '') }}" maxlength="150" required></label>
+<label>Middle name (optional)<input name="mname" value="{{ request.form.get('mname', '') }}" maxlength="150"></label>
+<label>Last name (optional)<input name="lname" value="{{ request.form.get('lname', '') }}" maxlength="150"></label>
+<label>Second parent (optional)<input name="secondary_name" value="{{ request.form.get('secondary_name', '') }}" maxlength="150"></label>
+<label>Mobile (login)<input name="mobile" type="tel" autocomplete="off" value="{{ request.form.get('mobile', '') }}" required></label>
+<label>Alternate phone (optional)<input name="phone_2" type="tel" autocomplete="off" data-lpignore="true" value="{{ request.form.get('phone_2', '') }}" maxlength="150"></label>
+<label>Email ID (optional)<input name="email" type="email" autocomplete="off" data-lpignore="true" maxlength="150" value="{{ request.form.get('email', '') }}"></label>
+<label>Occupation (optional)<input name="occupation" maxlength="150" value="{{ request.form.get('occupation', '') }}"></label>
+<label>Initial password<input name="initial_password" type="password" minlength="6" required autocomplete="new-password"></label>
+<label>Address (optional)<textarea name="address" maxlength="500">{{ request.form.get('address', '') }}</textarea></label>
+<div style="grid-column:1/-1"><h3>Children</h3>{% include '_parent_children.html' %}</div>
+<div style="grid-column:1/-1"><button type="submit" class="btn primary">Create parent</button></div>
+</form></div>
+{% endblock %}

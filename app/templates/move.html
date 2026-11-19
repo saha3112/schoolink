@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}{% from '_form.html' import select %}
+{% block heading %}Move / Leave{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Move student / school leave</h1><p>Subject (stream) change or transfer to another class &amp; section, or leaving school.</p></div></div>
+<div class="card"><form method="post" id="mf">
+ <div class="form-grid">
+  <label>Current class {{ select('from_class', classes, 'classId', 'class_name', id='fc') }}</label>
+  <label>Current section <select id="fs"><option value="">Select</option></select></label>
+  <label>Student <select name="student_id" id="st" required><option value="">Select</option></select></label>
+ </div>
+ <div id="after" style="display:none;margin-top:16px">
+  <div class="toolbar"><label style="flex-direction:row;gap:8px;align-items:center"><input type="radio" name="action" value="move" checked> Move to another class / section</label>
+  <label style="flex-direction:row;gap:8px;align-items:center"><input type="radio" name="action" value="leave"> School leave</label></div>
+  <div id="moveBox" class="form-grid">
+   <label>New class {{ select('to_class', classes, 'classId', 'class_name', id='tc') }}</label>
+   <label>New section <select name="to_section" id="ts"><option value="">Select</option></select></label>
+   <label>Roll number in new section<select name="place"><option value="name">Alphabetical position (section renumbered)</option><option value="end">At the end of the list</option></select></label>
+  </div>
+  <label style="margin-top:12px;max-width:520px">Note (optional)<input name="note" maxlength="250" placeholder="Reason — e.g. changed subject to Commerce"></label>
+  <p class="muted">The old section is renumbered automatically so there is no gap left behind by this student.</p>
+  <button class="btn primary" onclick="return confirm('Confirm this change?')">Apply</button>
+ </div>
+</form></div>
+{% if log %}<h3>Recent changes</h3><div class="table-wrap"><table class="t"><thead><tr><th>When</th><th>Student</th><th>Action</th><th>From</th><th>To</th><th>Note</th></tr></thead><tbody>
+{% for l in log %}<tr><td>{{ l.created_at }}</td><td>{{ l.student_name }}</td><td>{{ l.action }}</td><td>{{ l.fc }} {{ l.fs }} (roll {{ l.from_roll }})</td><td>{% if l.tc %}{{ l.tc }} {{ l.ts }} (roll {{ l.to_roll }}){% else %}—{% endif %}</td><td>{{ l.note or '' }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+{% endblock %}
+{% block scripts %}<script>
+const $ = id => document.getElementById(id);
+$('fc').addEventListener('change', e => getJSON('/admin/api/sections?class_id=' + e.target.value).then(r => fillSelect($('fs'), r, 'sectionId', 'section_name')));
+$('fs').addEventListener('change', e => getJSON('/students/api/students?class_id=' + $('fc').value + '&section_id=' + e.target.value).then(r => { fillSelect($('st'), r, 'studentId', 'label'); }));
+$('st').addEventListener('change', e => $('after').style.display = e.target.value ? 'block' : 'none');
+$('tc').addEventListener('change', e => getJSON('/admin/api/sections?class_id=' + e.target.value).then(r => fillSelect($('ts'), r, 'sectionId', 'section_name')));
+document.querySelectorAll('input[name=action]').forEach(r => r.addEventListener('change', () => {
+  const leave = document.querySelector('input[name=action]:checked').value === 'leave';
+  $('moveBox').style.display = leave ? 'none' : 'grid'; $('tc').required = $('ts').required = !leave; }));
+$('tc').required = $('ts').required = true;
+</script>{% endblock %}

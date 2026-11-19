@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}{% from '_selects.html' import grade_select %}
+{% block heading %}Marks Entry{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Marks entry</h1><p>Type a number, or <b>AB</b> (absent), <b>NS</b> (not submitted), <b>NA</b> (not applicable). Graded subjects use a grade dropdown (A+, A, B+ …).</p></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if subjects %}
+<form method="post">
+ <div class="table-wrap"><table class="t marks-grid">
+  <thead><tr><th rowspan="2" class="num">Roll</th><th rowspan="2">Student</th>
+   {% for s in subjects %}<th colspan="{{ s.subtypes|length }}" style="text-align:center;border-left:1px solid var(--line)">{{ s.subject_name }}</th>{% endfor %}</tr>
+   <tr>{% for s in subjects %}{% for st in s.subtypes %}<th style="text-align:center;border-left:{{ '1px solid var(--line)' if loop.first else '0' }}">{{ st.name }}<br><span class="muted">/{{ st.fullmarks }}</span></th>{% endfor %}{% endfor %}</tr></thead>
+  <tbody>{% for stu in students %}<tr><td class="num">{{ stu.student_rollNumber }}</td><td style="white-space:nowrap">{{ stu.student_name }}</td>
+   {% for s in subjects %}{% for st in s.subtypes %}{% if (stu.studentId, s.subjectId) in excl %}<td class="na-cell" title="Does not take this subject">—</td>{% else %}<td style="text-align:center">{% if s.subjectId in graded %}{{ grade_select('m_' ~ s.subjectId ~ '_' ~ st.subtype_id ~ '_' ~ stu.studentId, existing.get((stu.studentId, s.subjectId, st.subtype_id), '')) }}{% else %}<input class="m" name="m_{{ s.subjectId }}_{{ st.subtype_id }}_{{ stu.studentId }}" value="{{ existing.get((stu.studentId, s.subjectId, st.subtype_id), '') }}" autocomplete="off">{% endif %}</td>{% endif %}{% endfor %}{% endfor %}</tr>{% endfor %}</tbody>
+ </table></div>
+ <p style="margin-top:14px"><button class="btn primary">Save marks</button></p>
+</form>
+{% elif cls and sec and exam %}<div class="card empty">No subject with exam sub-types is assigned to you for this class, section and exam.</div>
+{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

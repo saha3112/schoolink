@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}{% from '_form.html' import select %}
+{% block heading %}Roll Numbers{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Roll numbers</h1><p>Check a section and rewrite its roll numbers 1…N.</p></div></div>
+<form class="toolbar" method="get"><label>Class {{ select('class_id', classes, 'classId', 'class_name', cls, auto=True) }}</label>
+<label>Section {{ select('section_id', sections, 'sectionId', 'section_name', sec, auto=True) }}</label></form>
+{% if rows %}
+ <div class="w-narrow">{% if problems %}<div class="alert alert-warning">Roll numbers of this section have gaps or duplicates.</div>{% else %}<div class="alert alert-success">Roll numbers are continuous (1–{{ rows|length }}).</div>{% endif %}
+ <div class="card"><form method="post" class="toolbar" style="margin:0"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}">
+  <label>Rewrite order<select name="mode"><option value="keep">Keep current order (just close the gaps)</option><option value="name">Alphabetical by name</option></select></label>
+  <button class="btn primary">Rewrite roll numbers</button></form></div>
+ <div class="table-wrap"><table class="t roll-table"><thead><tr><th class="num">Roll</th><th>Name</th></tr></thead><tbody>
+ {% for r in rows %}<tr><td class="num">{{ r.student_rollNumber }}</td><td>{{ r.student_name }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% elif cls and sec %}<div class="empty">No students in this section.</div>{% endif %}
+{% endblock %}

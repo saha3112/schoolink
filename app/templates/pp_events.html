@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+{% set live_wrap = true %}
+{% macro item(e) %}<div class="ev {{ e.kind }}"><div class="date"><b>{{ e.start_date.strftime('%d') }}</b>{{ e.start_date.strftime('%b') }}</div><div style="flex:1"><b>{{ e.title }}</b> <span class="chip {{ 'red' if e.kind == 'holiday' else '' }}">{{ 'Holiday' if e.kind == 'holiday' else 'Event' }}</span>
+<div class="muted">{{ e.start_date.strftime('%A, %d %B %Y') }}{% if e.end_date and e.end_date != e.start_date %} → {{ e.end_date.strftime('%d %B %Y') }}{% endif %}</div>{% if e.description %}<div style="white-space:pre-wrap">{{ e.description }}</div>{% endif %}</div></div>{% endmacro %}
+{% block heading %}Events & Holidays{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Events &amp; holidays</h1></div></div>
+<div class="card"><h3>Upcoming</h3>{% for e in upcoming %}{{ item(e) }}{% else %}<div class="empty">Nothing upcoming.</div>{% endfor %}</div>
+{% if past %}<div class="card"><h3>Earlier</h3>{% for e in past %}{{ item(e) }}{% endfor %}</div>{% endif %}
+{% endblock %}

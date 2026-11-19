@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Marks List{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Marks list</h1><p>Entered marks of your subjects.</p></div>
+{% if students %}<a class="btn" href="{{ url_for('marks.entry', class_id=cls, section_id=sec, exam_id=exam) }}">Edit marks</a>{% endif %}</div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if subjects %}<div class="table-wrap" data-live-html="list"><table class="t">
+<thead><tr><th rowspan="2" class="num">Roll</th><th rowspan="2">Student</th>{% for s in subjects %}<th colspan="{{ s.subtypes|length }}" style="text-align:center">{{ s.subject_name }}</th>{% endfor %}</tr>
+<tr>{% for s in subjects %}{% for st in s.subtypes %}<th class="num">{{ st.name }} /{{ st.fullmarks }}</th>{% endfor %}{% endfor %}</tr></thead>
+<tbody>{% for stu in students %}<tr><td class="num">{{ stu.student_rollNumber }}</td><td>{{ stu.student_name }}</td>
+{% for s in subjects %}{% for st in s.subtypes %}{% if (stu.studentId, s.subjectId) in excl %}<td class="na-cell">—</td>{% else %}<td class="num">{{ grid.get((stu.studentId, s.subjectId, st.subtype_id), '–') }}</td>{% endif %}{% endfor %}{% endfor %}</tr>{% endfor %}</tbody></table></div>
+{% elif cls and sec and exam %}<div class="card empty">Nothing to show.</div>{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

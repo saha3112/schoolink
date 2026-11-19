@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block heading %}Leave Request{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Leave request</h1><p>Tell the class teacher your child will be absent.</p></div></div>
+{% if kids %}<div class="card"><form method="post" class="form-grid">
+ <label>Child<select name="student_id">{% for k in kids %}<option value="{{ k.studentId }}">{{ k.student_name }} ({{ k.class_name }} {{ k.section_name }})</option>{% endfor %}</select></label>
+ <label>From<input type="date" name="from_date" value="{{ today.isoformat() }}" required></label><label>To<input type="date" name="to_date" value="{{ today.isoformat() }}" required></label>
+ <label style="grid-column:1/-1">Reason<textarea name="reason" rows="2" maxlength="500" required></textarea></label><div><button class="btn primary">Send request</button></div></form></div>{% endif %}
+<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Child</th><th>Dates</th><th>Reason</th><th>Status</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.student_name }}</td><td>{{ r.from_date.strftime('%d %b') }} – {{ r.to_date.strftime('%d %b %Y') }}</td><td>{{ r.reason }}{% if r.note %}<div class="muted">Teacher: {{ r.note }}</div>{% endif %}</td>
+<td><span class="chip {{ 'green' if r.status == 'approved' else 'red' if r.status == 'rejected' else 'gray' }}">{{ r.status|capitalize }}</span></td></tr>{% else %}<tr><td colspan="4" class="empty">No requests yet.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{# Grade dropdown (A+, A, B+ …) and development-skill dropdown (report-card icons). They stay normal <select> fields. #}
+{% set GRADES = [('A+','top',''),('A','top',''),('B+','good',''),('B','good',''),('C+','mid',''),('C','mid',''),('D','low',''),('E','low',''),('AB','','Absent'),('NS','','Not submitted'),('NA','','Not applicable')] %}
+{% macro grade_select(name, value='') -%}
+{%- set v = (value or '')|string|trim -%}
+<select name="{{ name }}" data-pretty="grade"><option value="">—</option>
+{%- for g, tone, note in GRADES %}<option value="{{ g }}" {% if tone %}data-tone="{{ tone }}"{% endif %} {% if note %}data-note="{{ note }}"{% endif %} {{ 'selected' if v|upper == g }}>{{ g }}</option>{% endfor -%}
+{%- if v and v|upper not in ['A+','A','B+','B','C+','C','D','E','AB','NS','NA'] %}<option value="{{ v }}" selected data-note="Saved earlier">{{ v }}</option>{% endif -%}
+</select>
+{%- endmacro %}
+{% macro dev_select(name, value='') -%}
+{%- set v = (value or '')|string|trim -%}
+{%- set base = url_for('static', filename='assets/reportCardImage/images/') -%}
+<select name="{{ name }}" data-pretty="dev"><option value="">—</option>
+<option value="EXCELLENT" data-icon="{{ base }}EXCELLENT.png" {{ 'selected' if v == 'EXCELLENT' }}>Excellent</option>
+<option value="GOOD" data-icon="{{ base }}tick.png" {{ 'selected' if v == 'GOOD' }}>Good</option>
+<option value="NEEDS IMPROVEMENT" data-icon="{{ base }}tick-single.png" {{ 'selected' if v == 'NEEDS IMPROVEMENT' }}>Needs improvement</option>
+<option value="UNSATISFACTORY" data-icon="{{ base }}cros.png" data-note="Printed as “–” on the report card" {{ 'selected' if v == 'UNSATISFACTORY' }}>Unsatisfactory</option>
+<option value="ABSENT" data-note="Printed as “–” on the report card" {{ 'selected' if v == 'ABSENT' }}>Absent</option>
+{%- if v and v not in ['EXCELLENT','GOOD','NEEDS IMPROVEMENT','UNSATISFACTORY','ABSENT'] %}<option value="{{ v }}" selected>{{ v }}</option>{% endif -%}
+</select>
+{%- endmacro %}

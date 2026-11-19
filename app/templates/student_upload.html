@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Student CSV Upload{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Student CSV upload</h1><p>Add many students at once. Students whose code already exists are skipped; a blank roll gets the next free roll number.</p></div>
+ <div class="h-actions"><button type="button" class="btn primary" data-csv-open="students" data-csv-auto>{{ icon('plus', 16) }} Import students from CSV</button></div></div>
+<div class="card csv-card"><h3>How it works</h3>
+ <div class="grid g2" style="margin-top:10px">
+  <div><b>1 · Download the sample</b><p class="muted">A ready CSV with the right columns (student_id, student_code, first_name, last_name, roll, class_name, section_name).</p></div>
+  <div><b>2 · Fill it in &amp; upload</b><p class="muted">Drag the file into the pop-up. It is checked first — if anything is wrong nothing is added — and the file is deleted right after the import.</p></div>
+ </div>
+ <p style="margin-top:6px"><button type="button" class="btn" data-csv-open="students">Open the upload pop-up</button></p></div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Report layouts{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow"><i></i> Report setup</div><h1>Report layouts</h1>
+<p>Choose, for every class (or one section of it), the report card design, the subject grouping used on the sheets and how ranks are totalled.
+A section-specific rule overrides the class-wide rule, which overrides the <b>default</b> rule. A new class or section automatically follows the default — give the default a card design to have report cards for new classes without any extra setup.</p></div></div>
+
+<div class="card">
+  <h3>{{ 'Edit rule' if edit else 'Add / replace a rule' }}</h3>
+  <form method="post" id="ruleForm" data-modal-form>
+    <div class="form-grid">
+      <label>Class<select name="class_id" id="rClass" required><option value="0" {{ 'selected' if edit and edit.class_id == 0 }}>All other classes (default)</option>{% for c in classes %}<option value="{{ c.classId }}" {{ 'selected' if edit and edit.class_id == c.classId }}>{{ c.class_name }}</option>{% endfor %}</select></label>
+      <label>Section<select name="section_id" id="rSec"><option value="0">All sections of the class</option>
+        {% for s in sections %}<option value="{{ s.sectionId }}" data-class="{{ s.class_id }}" {{ 'selected' if edit and edit.section_id == s.sectionId }}>{{ s.section_name }}</option>{% endfor %}</select></label>
+      <label>Sheet type<select name="kind">{% for k, t in L.KINDS.items() %}<option value="{{ k }}" {{ 'selected' if edit and edit.kind == k }}>{{ t }}</option>{% endfor %}</select></label>
+      <label>Report card design<select name="card_view"><option value="">— none (no report card) —</option>
+        {% for k, t in card_views.items() %}<option value="{{ k }}" {{ 'selected' if edit and edit.card_view == k }}>{{ t }}</option>{% endfor %}</select></label>
+      <label>Subject group set<select name="subject_group"><option value="">Default ({{ L.DEFAULT_GROUP }})</option>
+        {% for g in groups %}<option value="{{ g }}" {{ 'selected' if edit and edit.subject_group == g }}>{{ g }}</option>{% endfor %}</select></label>
+      <label>Rank total<select name="rank_mode">{% for k, t in formulas.items() %}<option value="{{ k }}" {{ 'selected' if edit and edit.rank_mode == k }}>{{ t }}</option>{% endfor %}</select></label>
+      <label>Subject order on card<select name="slno_mode">{% for k, t in L.SLNO.items() %}<option value="{{ k }}" {{ 'selected' if edit and edit.slno_mode == k }}>{{ t }}</option>{% endfor %}</select></label>
+    </div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;margin:14px 0">
+      <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="strength" {{ 'checked' if edit and edit.strength }}> Show class strength</label>
+      <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="wrank" {{ 'checked' if edit and edit.wrank }}> Show weighted rank</label>
+      <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="prune" {{ 'checked' if edit and edit.prune }}> Hide sub-types with no marks, sort by full marks</label>
+    </div>
+    <details {{ 'open' if edit and (edit.reorder_list or edit.move_list) }}><summary class="muted" style="cursor:pointer;margin-bottom:10px">Advanced: subject order on the card</summary>
+      <div class="form-grid">
+        <label>Exact subject order (one per line, optional)<textarea name="reorder_exact" rows="6">{{ edit.reorder_list if edit }}</textarea></label>
+        <label>Move these subjects (one per line, optional)<textarea name="move_names" rows="3">{{ edit.move_list if edit }}</textarea></label>
+        <label>…to just after this subject<input name="move_after" value="{{ edit.move_after or '' if edit }}"></label>
+      </div></details>
+    <div style="margin-top:14px;display:flex;gap:8px"><button class="btn primary">Save rule</button>{% if edit %}<a class="btn" href="{{ url_for('layouts_admin.rules') }}" data-cancel>Cancel</a>{% endif %}</div>
+    <p class="muted" style="margin:12px 0 0;font-size:12px">Saving a class + section that already has a rule replaces it. New card designs themselves are page templates; this screen picks which existing design a class uses.</p>
+  </form>
+</div>
+
+<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Class</th><th>Section</th><th>Sheet</th><th>Card design</th><th>Subject group</th><th>Rank total</th><th>Options</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr>
+  <td><b>{{ r.class_name }}</b></td><td>{{ r.section_name }}</td>
+  <td><span class="chip {{ 'green' if r.kind == 'junior' }}">{{ r.kind }}</span></td>
+  <td>{% if r.card_view %}{{ card_views.get(r.card_view, r.card_view) }}{% else %}<span class="muted">none</span>{% endif %}</td>
+  <td>{{ r.subject_group or 'default' }}</td><td>{{ r.rank_mode }}</td>
+  <td>{% if r.strength %}<span class="chip gray">strength</span>{% endif %}{% if r.wrank %}<span class="chip gray">w-rank</span>{% endif %}{% if r.prune %}<span class="chip gray">prune</span>{% endif %}{% if r.slno_mode != 'none' %}<span class="chip gray">order:{{ r.slno_mode }}</span>{% endif %}</td>
+  <td class="actions"><a class="btn sm" href="?edit={{ r.class_id }}-{{ r.section_id }}" data-modal data-modal-size="lg">Edit</a>
+    <form method="post" style="display:inline" onsubmit="return confirm('Delete this rule?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="class_id" value="{{ r.class_id }}"><input type="hidden" name="section_id" value="{{ r.section_id }}"><button class="btn sm danger">Delete</button></form></td>
+</tr>{% else %}<tr><td colspan="8" class="empty">No rules.</td></tr>{% endfor %}
+</tbody></table></div>
+<script>
+(function(){var c=document.getElementById('rClass'),s=document.getElementById('rSec');
+ function f(){Array.prototype.forEach.call(s.options,function(o){if(o.value==='0')return;o.hidden=o.disabled=(o.dataset.class!==c.value)});if(s.selectedOptions[0]&&s.selectedOptions[0].disabled)s.value='0'}
+ c.addEventListener('change',f);f();})();
+</script>
+{% endblock %}

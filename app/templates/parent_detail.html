@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block heading %}Parent{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ p.name or 'Parent' }}</h1><p><a href="{{ url_for('parents.all_parents') }}">← All parents</a> · login: <b>{{ p.phone_1 }}</b></p></div></div>
+<div class="grid g2">
+ <div class="card" style="margin:0"><h3>Details</h3>
+  <form method="post" class="form-grid" style="grid-template-columns:1fr 1fr">{% set ro = '' if me.is_admin else 'disabled' %}<input type="hidden" name="action" value="save">
+   <label>First name<input name="fname" required maxlength="150" value="{{ p.fname or '' }}" {{ ro }}></label><label>Middle name<input name="mname" value="{{ p.mname or '' }}" {{ ro }}></label>
+   <label>Last name<input name="lname" value="{{ p.lname or '' }}" {{ ro }}></label><label>Second parent<input name="secondary_name" value="{{ p.secondary_name or '' }}" {{ ro }}></label>
+   <label>Mobile (login)<input name="mobile" type="tel" value="{{ p.phone_1 }}" required {{ ro }}></label><label>Alternate phone<input type="tel" name="phone_2" value="{{ p.phone_2 or '' }}" {{ ro }}></label>
+   <label>Email ID (optional)<input type="email" name="email" maxlength="150" value="{{ p.email or '' }}" {{ ro }}></label>
+   <label>Occupation<input name="occupation" value="{{ p.occupation or '' }}" {{ ro }}></label><label style="grid-column:1/-1">Address<textarea name="address" rows="2" {{ ro }}>{{ p.address or '' }}</textarea></label>
+   {% if me.is_admin %}<div style="grid-column:1/-1"><button class="btn primary">Save</button></div>{% endif %}</form></div>
+ <div class="card" style="margin:0"><h3>Children</h3>
+  {% for k in kids %}<div class="ev"><div class="date"><b>{{ k.student_rollNumber }}</b>roll</div><div><b>{{ k.student_name }}</b><div class="muted">{{ k.class_name }} · Section {{ k.section_name }}<br>Student code: {{ k.student_code or '—' }} · Adm. no: {{ k.ADMNO or '—' }}</div></div></div>{% else %}<div class="empty">No children linked.</div>{% endfor %}
+  {% if me.is_admin %}<h3 style="margin-top:16px">Link children</h3><form method="post"><input type="hidden" name="action" value="link">{% include '_parent_children.html' %}<button class="btn primary" style="margin-top:12px">Link selected children</button></form><h3 style="margin-top:16px">Reset password</h3><form method="post" class="toolbar" style="margin:0"><input type="hidden" name="action" value="reset"><label>New password<input type="password" name="new_password" minlength="6" required></label><button class="btn">Set</button></form>{% endif %}</div>
+</div>
+{% endblock %}

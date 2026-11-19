@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="hero">
+  <div class="hero-left"><p class="hi">✦ {{ me.role_label }}</p><h1>Welcome back, <span>{{ me.fname }}</span>! 👋</h1>
+    <p class="sub">Here's your overview at {{ school_name }}. Everything you need to run marks, report cards and school life is one click away.</p>
+    <button class="btn" type="button" onclick="var i=document.getElementById('tsInput');if(i){i.focus()}">{{ icon('search', 16) }} Search anything (⌘ K)</button></div>
+  <div class="hero-art"><div class="circ">{{ icon('school', 72) }}</div></div>
+</div>
+{% if dash %}
+<div data-live-html="dash">
+<form method="get" class="toolbar" style="margin:0 0 14px"><label>Exam<select name="exam" onchange="this.form.submit()">{% for e in dash.exams %}<option value="{{ e.examId }}" {{ 'selected' if e.examId == dash.exam }}>{{ e.exam_name }}</option>{% endfor %}</select></label></form>
+<div class="grid g4" style="margin-bottom:19px">
+  {% for label, val, ic, foot in dash.counts %}<div class="card stat c{{ loop.index }}" style="margin:0"><div class="si">{{ icon(ic, 21) }}</div><b class="countup" data-to="{{ val }}">{{ val }}</b><span>{{ label }}</span><small class="muted" style="margin-top:12px;font-size:10.5px">{{ foot }}</small></div>{% endfor %}
+</div>
+<div class="grid dash-lower" style="margin-bottom:18px">
+  <section class="card" style="margin:0"><div class="card-head"><div><h3>Students &amp; marks entry by class</h3><p class="muted" style="margin:4px 0 0;font-size:11.5px">Enrolment per class, and how much of its marks entry is done</p></div></div>
+    {% set mx = (dash.bars | map(attribute='students') | max) or 1 %}
+    <div class="bar-chart">{% for b in dash.bars %}<div class="chart-group" title="{{ b.label }}: {{ b.students }} students · marks entry {{ b.entry }}%"><div class="chart-bar" style="--h:{{ (b.students * 100 / mx)|round|int }}%"><em>{{ b.students }}</em></div><div class="chart-bar secondary" style="--h:{{ b.entry }}%"></div><span class="chart-label">{{ b.label|replace('Class ', '') }}</span></div>{% endfor %}</div>
+    <div class="chart-legend"><span><i class="legend-dot"></i> Students</span><span><i class="legend-dot mint"></i> Marks entry %</span></div>
+  </section>
+  <section class="card" style="margin:0"><div class="card-head"><div><h3>Academic progress</h3><p class="muted" style="margin:4px 0 0;font-size:11.5px">Live completion status</p></div></div>
+    {% for p in dash.progress %}<div class="progress-row" title="{{ p.note }}"><div class="progress-top"><span>{{ p.label }}</span><b class="countup" data-to="{{ p.pct }}" data-suffix="%">{{ p.pct }}%</b></div><div class="progress-track"><div class="progress-fill" style="--w:{{ p.pct }}%;--p:{{ p.color }}"></div></div><small class="muted">{{ p.note }}</small></div>{% endfor %}
+  </section>
+</div>
+<div class="grid g2" style="margin-bottom:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+  <section class="card" style="margin:0"><h3>Recent activity</h3>
+    {% if dash.activity %}<div class="timeline">{% for a in dash.activity %}<div class="timeline-row"><div class="timeline-marker">{{ icon(a.icon, 17) }}</div><div><div class="timeline-title">{{ a.title }}</div><div class="timeline-desc">{{ a.when.strftime('%d %b %Y, %H:%M') }}{% if a.desc %} · {{ a.desc }}{% endif %}</div></div></div>{% endfor %}</div>
+    {% else %}<div class="empty">No activity yet.</div>{% endif %}</section>
+  <section class="card" style="margin:0"><h3>School highlights</h3>
+    <div class="hl-row"><span>Active sections</span><b class="countup" data-to="{{ dash.hl.sections }}">{{ dash.hl.sections }}</b></div>
+    <div class="hl-row"><span>Exams running</span><b class="countup" data-to="{{ dash.hl.exams }}">{{ dash.hl.exams }}</b></div>
+    <div class="hl-row"><span>Report cards generated</span><b class="countup" data-to="{{ dash.hl.generated }}">{{ dash.hl.generated }}</b></div>
+    <div class="hl-row"><span>Report cards released</span><b class="countup" data-to="{{ dash.hl.released }}">{{ dash.hl.released }}</b></div>
+    <div class="hl-row"><span>Leave requests pending</span><span class="chip {{ 'orange' if dash.hl.leave_pending else 'green' }}">{{ dash.hl.leave_pending }}</span></div>
+  </section>
+</div>
+</div>
+{% endif %}
+{% set quick = [] %}{% for m in menu %}{% if m.children is none %}{% if m.endpoint != 'main.dashboard' %}{% set _ = quick.append((m.label, m.endpoint, m.icon)) %}{% endif %}{% else %}{% for c in m.children[:2] %}{% set _ = quick.append((c.label, c.endpoint, m.icon)) %}{% endfor %}{% endif %}{% endfor %}
+{% if quick %}<div class="card"><h3>Quick actions</h3><div class="quick-grid">{% for l, e, i in quick[:8] %}<a class="quick-action" href="{{ url_for(e) }}">{{ icon(i, 18) }}<span>{{ l }}</span></a>{% endfor %}</div></div>{% endif %}
+<div data-live-html="mine">
+{% if me.is_teacher %}
+  {% if class_teacher_of %}<div class="card"><h3>You are class teacher of</h3>
+    {% for c in class_teacher_of %}<span class="chip green">{{ c.class_name }} · {{ c.section_name }}</span>{% endfor %}</div>{% endif %}
+  <div class="card"><h3>My classes &amp; subjects</h3>
+  {% if mine %}<div class="table-wrap"><table class="t"><thead><tr><th>Class</th><th>Section</th><th>Subjects</th></tr></thead><tbody>
+    {% for r in mine %}<tr><td>{{ r.class_name }}</td><td>{{ r.section_name }}</td><td>{{ r.subjects }}</td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<div class="empty">No classes assigned yet. Please contact the administrator.</div>{% endif %}</div>
+{% elif not me.is_admin %}
+  <div class="card">You can change your password from the profile menu (top right).</div>
+{% endif %}
+</div>
+{% endblock %}

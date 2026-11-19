@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block heading %}Edit Student{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ st.student_name }}</h1><p>{{ st.class_name }} · {{ st.section_name }} · Roll {{ st.student_rollNumber }}</p></div></div>
+<div class="card" style="max-width:720px"><form method="post" class="form-grid" data-modal-form>
+ <label>Name<input name="student_name" value="{{ st.student_name }}" required></label>
+ <label>Student code<input name="student_code" value="{{ st.student_code or '' }}"></label>
+ <label>Admission no<input name="ADMNO" value="{{ st.ADMNO or '' }}"></label>
+ <label>UID<input name="studentUID" value="{{ st.studentUID or '' }}"></label>
+ <label>Date of birth<input name="DOB" value="{{ st.DOB or '' }}" placeholder="22-May-19"></label>
+ <div style="grid-column:1/-1"><button class="btn primary">Save</button> <a class="btn" href="{{ url_for('students.student_list') }}" data-cancel>Cancel</a>
+  <a class="btn" href="{{ url_for('students.move') }}" data-modal data-modal-whole data-modal-stay>Move / Leave…</a></div>
+</form></div>
+{% endblock %}

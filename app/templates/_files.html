@@ -1,0 +1,20 @@
+{% macro file_list(files, furl, deletable=False) %}
+{% if files %}<div class="files">{% for f in files %}
+  <span class="file-chip">
+    {% if f.is_image %}<a href="{{ furl(f.path) }}" data-popup="{{ furl(f.path) }}" data-title="{{ f.name }}"><img src="{{ furl(f.path) }}" alt="{{ f.name }}" loading="lazy"></a>{% endif %}
+    <a href="{{ furl(f.path) }}" {% if not f.is_image %}data-popup="{{ furl(f.path) }}" data-title="{{ f.name }}"{% endif %} class="fname" title="View">{{ f.name }}</a>
+    <a href="{{ furl(f.path, True) }}" download class="dl" title="Download">⬇</a>
+    {% if deletable %}<form method="post" action="{{ url_for('school.attachment_delete', fid=f.id) }}" onsubmit="return confirm('Remove this file?')" style="display:inline"><button class="x" title="Remove">×</button></form>{% endif %}
+  </span>{% endfor %}</div>{% endif %}
+{% endmacro %}
+{% macro media_picker(name='media_ids', label='Attach files', accept='any', multiple=True, max=6, hint='', button='') %}
+<div class="mp-field" data-media-picker data-name="{{ name }}" data-accept="{{ accept }}" data-multiple="{{ 1 if multiple else 0 }}" data-max="{{ max }}"{% if button %} data-button="{{ button }}"{% endif %}>
+  {% if label %}<span class="mp-label">{{ label }}</span>{% endif %}
+  <div class="mp-box-row"><button type="button" class="btn" data-mp-open>Choose from library or upload</button></div>
+  <div class="mp-chosen" data-mp-chosen></div>
+  {% if hint %}<small class="muted" style="font-size:12px">{{ hint }}</small>{% endif %}
+</div>
+{% endmacro %}
+{% macro file_input(label='Attach files (images, PDF, Word, Excel…)', accept='') %}
+{{ media_picker('media_ids', label, 'image' if accept == 'image/*' else 'any', True, 6, 'Up to 6 files, 8 MB each. Pick files you already uploaded, or upload new ones — they stay in your library.') }}
+{% endmacro %}

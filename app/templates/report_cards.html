@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block heading %}Report Cards{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Report cards</h1>
+<p>A4. Open or download a whole section as <b>one PDF</b>, a single student, or ZIPs for a class / the whole school.</p></div></div>
+<form class="toolbar" method="get">
+  {% if classes|length == 1 %}<label>Class<span class="fixed-val">{{ classes[0].class_name }}</span><input type="hidden" name="class_id" value="{{ classes[0].classId }}"></label>
+  {% else %}<label>Class <select name="class_id" onchange="this.form.submit()"><option value="">All classes</option>{% for c in classes %}<option value="{{ c.classId }}" {{ 'selected' if cls == c.classId }}>{{ c.class_name }}</option>{% endfor %}</select></label>{% endif %}
+  {% if groups %}
+  <button type="button" class="btn primary" data-bulk data-kind="cardbook" data-class="{{ cls or '' }}">{{ 'Class' if cls else 'All classes' }} · one PDF per section (ZIP)</button>
+  <button type="button" class="btn" data-bulk data-kind="cards" data-class="{{ cls or '' }}">{{ 'Class' if cls else 'All classes' }} · every student's PDF (ZIP)</button>{% endif %}
+</form>
+{% for (cid, cname), secs in groups.items() %}
+<div class="card" style="padding:0;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--line)">
+    <b>{{ cname }}</b>
+    {% if secs|length > 1 %}<span style="display:flex;gap:6px;flex-wrap:wrap">
+      <button type="button" class="btn sm" data-bulk data-kind="cardbook" data-class="{{ cid }}">All {{ secs|length }} sections · one PDF each (ZIP)</button>
+      <button type="button" class="btn sm" data-bulk data-kind="cards" data-class="{{ cid }}">Every student (ZIP)</button></span>{% endif %}
+  </div>
+  <div class="table-wrap" style="border:0;border-radius:0"><table class="t"><tbody>
+  {% for s in secs %}{% set u = url_for('reports.section_cards', cid=cid, sid=s.sid) %}
+    <tr><td style="width:150px">Section <b>{{ s.name }}</b></td><td class="muted">{{ s.students }} students</td>
+    <td class="actions">
+      <a class="btn sm" href="{{ u }}" data-popup="{{ u }}" data-title="{{ cname }} {{ s.name }} — all report cards">View all</a>
+      <a class="btn sm primary" data-download href="{{ u }}?pdf=1&dl=1">All students · one PDF</a>
+      <button type="button" class="btn sm js-students" data-class="{{ cid }}" data-section="{{ s.sid }}" data-name="{{ cname }} {{ s.name }}">Students ▾</button></td></tr>
+    <tr class="stu-row" hidden><td colspan="3" style="background:var(--surface2)"><div class="stu-box muted">Loading…</div></td></tr>
+  {% endfor %}
+  </tbody></table></div>
+</div>
+{% else %}<div class="card empty">No class sections have report cards.</div>{% endfor %}
+{% endblock %}
+{% block scripts %}<script>
+document.querySelectorAll('.js-students').forEach(b => b.addEventListener('click', async () => {
+  const row = b.closest('tr').nextElementSibling, box = row.querySelector('.stu-box');
+  row.hidden = !row.hidden; b.textContent = row.hidden ? 'Students ▾' : 'Students ▴';
+  if (row.hidden || row.dataset.loaded) return; row.dataset.loaded = '1';
+  const list = await (await fetch('/reports/section-students?class_id=' + b.dataset.class + '&section_id=' + b.dataset.section)).json();
+  box.className = 'stu-box'; box.innerHTML = '<div class="stu-grid"></div>'; const g = box.firstChild;
+  list.forEach(s => { const d = document.createElement('div'); d.className = 'stu-item';
+    const name = document.createElement('span'); name.textContent = s.roll + '. ' + s.name; d.appendChild(name);
+    const v = document.createElement('a'); v.className = 'btn sm'; v.textContent = 'View'; v.href = '/reports/card/' + s.id; v.dataset.popup = v.href; v.dataset.title = 'Report card — ' + s.name;
+    const p = document.createElement('a'); p.className = 'btn sm'; p.textContent = 'PDF'; p.href = '/reports/card/' + s.id + '?pdf=1&dl=1'; p.setAttribute('data-download', '');
+    d.appendChild(v); d.appendChild(p); g.appendChild(d); });
+}));
+</script>{% endblock %}

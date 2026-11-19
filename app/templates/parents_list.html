@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_form.html' import select %}
+{% block heading %}All Parents{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>All parents</h1><p>{{ p.total }} parent(s) · login is the parent's mobile number.</p></div>
+<div class="h-actions">{% if me.is_admin %}<a class="btn primary" href="{{ url_for('parents.create') }}" data-modal data-modal-size="lg">Create parent</a>{% endif %}<a class="btn" href="{{ url_for('parents.export', class_id=cls or '', section_id=sec or '', q=q) }}">Export CSV</a></div></div>
+<form class="toolbar" method="get">
+ <label>Class {{ select('class_id', classes, 'classId', 'class_name', cls, 'All classes', auto=True) }}</label>
+ <label>Section {{ select('section_id', sections, 'sectionId', 'section_name', sec, 'All', auto=True) }}</label>
+ <label>Search<input name="q" value="{{ q }}" placeholder="Parent / mobile / child / address"></label><button class="btn">Search</button></form>
+<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Parent</th><th>Second parent</th><th>Email ID</th><th>Mobile (login)</th><th>Alternate phone</th><th>Children</th><th>Occupation</th><th>Address</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr>
+ <td><b>{{ r.name or r.code or 'Parent record' }}</b>{% if r.name and r.code %}<div class="muted" style="font-size:12px">{{ r.code }}</div>{% endif %}</td>
+ <td>{{ r.secondary_name or '—' }}</td>
+ <td style="overflow-wrap:anywhere">{{ r.email or '—' }}</td>
+ <td>{{ r.phone_1 }}</td>
+ <td>{{ r.phone_2 or '—' }}</td>
+ <td>{% for k in r.children %}<div><span class="chip">{{ k.student_name }}</span> <span class="muted">{{ k.class_name }} {{ k.section_name }} · roll {{ k.student_rollNumber }}</span><div class="muted" style="font-size:12px">Student code: {{ k.student_code or '—' }} · Adm. no: {{ k.ADMNO or '—' }}</div></div>{% endfor %}</td>
+ <td>{{ r.occupation or '—' }}</td>
+ <td style="max-width:320px;overflow-wrap:anywhere">{{ r.address or '' }}</td>
+ <td class="actions"><a class="btn sm" href="{{ url_for('parents.detail', pid=r.id) }}" data-modal data-modal-whole data-modal-size="lg">Open</a></td></tr>
+{% else %}<tr><td colspan="9" class="empty">No parents found.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
+{% endblock %}

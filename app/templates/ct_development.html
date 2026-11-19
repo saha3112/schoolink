@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}{% from '_selects.html' import dev_select %}
+{% block heading %}Development Skills{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Development skills</h1></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if ready and skills %}<div class="dev-key"><b>Report card key</b>
+ <span><img src="{{ url_for('static', filename='assets/reportCardImage/images/EXCELLENT.png') }}" alt=""> Excellent</span>
+ <span><img src="{{ url_for('static', filename='assets/reportCardImage/images/tick.png') }}" alt=""> Good</span>
+ <span><img src="{{ url_for('static', filename='assets/reportCardImage/images/tick-single.png') }}" alt=""> Needs improvement</span>
+ <span class="muted">Unsatisfactory / Absent print as “–”</span></div>
+<form method="post"><div class="table-wrap"><table class="t marks-grid"><thead><tr><th class="num">Roll</th><th>Student</th>{% for k in skills %}<th>{{ k.skillName }}</th>{% endfor %}</tr></thead><tbody>
+{% for s in students %}<tr><td class="num">{{ s.student_rollNumber }}</td><td style="white-space:nowrap">{{ s.student_name }}</td>
+{% for k in skills %}{% set v = existing.get((s.studentId, k.id), '') %}<td>{{ dev_select('g_' ~ k.id ~ '_' ~ s.studentId, v) }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+<p style="margin-top:14px"><button class="btn primary">Save grades</button></p></form>
+{% elif ready %}<div class="card empty">No development skills are configured for this section.</div>{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Rank formulas{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow"><i></i> Report setup</div><h1>Rank formulas</h1>
+<p>How a student's total is calculated for automatic ranking. A total is the sum of <b>components</b> (marks of the listed subjects ÷ divisor, optionally rounded) plus the <b>other subjects</b>. A formula is chosen per class in <a href="{{ url_for('layouts_admin.rules') }}">Report layouts</a>.</p></div></div>
+<div class="grid" style="grid-template-columns:minmax(240px,300px) minmax(0,1fr);align-items:start">
+  <div class="card" style="margin:0"><h3>Formulas</h3>
+    {% for n in names %}<a class="quick-action" style="margin-bottom:8px;{{ 'border-color:var(--brand);background:var(--brand-soft)' if n == name }}" href="?name={{ n|urlencode }}"><span>{{ n }}<br><small class="muted">{{ used[n]|join(', ') or 'not used' }}</small></span></a>{% endfor %}
+    <a class="btn sm" href="?name=sum&new=1">{{ icon('plus', 14) }} New formula</a></div>
+  <div>
+  {% if cfg or request.args.get('new') %}
+  {% set cfg = cfg or {'title': '', 'components': [], 'rest': 'sum'} %}
+  <form method="post" class="card" style="margin:0" id="rForm">
+    <input type="hidden" name="name" value="{{ name if not request.args.get('new') else '' }}">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <label>Name (letters / numbers / _){% if request.args.get('new') %}<input name="new_name" required placeholder="e.g. class9_custom">{% else %}<input name="new_name" value="{{ name }}" readonly>{% endif %}</label>
+      <label>Description<input name="title" value="{{ cfg.title }}"></label>
+    </div>
+    <h3 style="margin-top:16px">Components (added in this order)</h3>
+    <div id="cList" style="display:grid;gap:10px">
+    {% for c in cfg.components %}
+      <div class="ss-card c-row"><div style="padding:12px;display:grid;gap:10px;grid-template-columns:minmax(0,1fr) 140px auto">
+        <label>Subjects (one per line)<textarea name="c_subjects" rows="3">{{ c.subjects|join('\n') }}</textarea></label>
+        <label>Divide by<input name="c_divisor" value="{{ c.divisor }}" inputmode="decimal"></label>
+        <div style="display:grid;gap:8px;align-content:end"><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="1" data-round {{ 'checked' if c.round }}> Round</label><button type="button" class="btn sm danger" data-del>Remove</button></div></div></div>
+    {% endfor %}</div>
+    <div style="margin:12px 0"><button type="button" class="btn sm" id="cAdd">{{ icon('plus', 14) }} Add component</button></div>
+    <label>Other subjects (not in any component)<select name="rest">{% for k, t in L.REST_MODES.items() %}<option value="{{ k }}" {{ 'selected' if cfg.rest == k }}>{{ t }}</option>{% endfor %}</select></label>
+    <div style="margin-top:14px"><button class="btn primary">Save formula</button></div>
+  </form>
+  {% if not request.args.get('new') and name != 'sum' %}<form method="post" style="margin-top:10px" onsubmit="return confirm('Delete this formula?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="name" value="{{ name }}"><button class="btn sm danger">Delete formula</button></form>{% endif %}
+  <details class="card" style="margin-top:14px"><summary class="muted" style="cursor:pointer">Subject names in your school</summary><div style="margin-top:10px">{% for s in subjects %}<span class="chip gray">{{ s }}</span>{% endfor %}</div></details>
+  {% else %}<div class="card empty">Select a formula on the left.</div>{% endif %}
+  </div>
+</div>
+<script>
+(function(){var f=document.getElementById('rForm'); if(!f) return; var l=document.getElementById('cList');
+ f.addEventListener('submit',function(){Array.prototype.forEach.call(l.querySelectorAll('.c-row'),function(r,i){r.querySelector('[data-round]').name='c_round_'+i})});
+ l.addEventListener('click',function(e){if(e.target.matches('[data-del]'))e.target.closest('.c-row').remove()});
+ document.getElementById('cAdd').addEventListener('click',function(){
+  var d=document.createElement('div');d.className='ss-card c-row';
+  d.innerHTML='<div style="padding:12px;display:grid;gap:10px;grid-template-columns:minmax(0,1fr) 140px auto"><label>Subjects (one per line)<textarea name="c_subjects" rows="3"></textarea></label><label>Divide by<input name="c_divisor" value="1" inputmode="decimal"></label><div style="display:grid;gap:8px;align-content:end"><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="1" data-round> Round</label><button type="button" class="btn sm danger" data-del>Remove</button></div></div>';
+  l.appendChild(d);});})();
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}{% from 'pp_child.html' import child_bar %}
+{% set live_wrap = true %}
+{% block heading %}Timetable{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Timetable</h1></div></div>
+{{ child_bar(kids, child, 'parentpanel.timetable') }}
+{% if child and cells %}<div class="table-wrap"><table class="t tt"><thead><tr><th>Period</th>{% for d in days %}<th>{{ d }}</th>{% endfor %}</tr></thead><tbody>
+{% for p in range(1, periods + 1) %}<tr><th>{{ p }}</th>{% for d in range(days|length) %}{% set c = cells.get((d, p)) %}<td>{% if c %}<b>{{ c.subject_name }}</b><small>{{ c.teacher or '' }}</small>{% else %}–{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+{% elif child %}<div class="card empty">The timetable has not been published yet.</div>{% endif %}
+{% endblock %}

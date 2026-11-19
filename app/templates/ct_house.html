@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}House Points{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>House points</h1></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if ready %}<form method="post"><datalist id="hs">{% for h in houses %}<option value="{{ h }}">{% endfor %}</datalist>
+<div class="table-wrap"><table class="t marks-grid"><thead><tr><th class="num">Roll</th><th>Student</th><th>House</th><th>Points</th></tr></thead><tbody>
+{% for s in students %}{% set d = data.get(s.studentId) %}<tr><td class="num">{{ s.student_rollNumber }}</td><td>{{ s.student_name }}</td>
+<td><input list="hs" name="house_{{ s.studentId }}" value="{{ d.houseName if d else '' }}"></td><td><input class="m" type="number" name="points_{{ s.studentId }}" value="{{ d.housePoints if d and d.housePoints is not none else '' }}"></td></tr>{% endfor %}</tbody></table></div>
+<p style="margin-top:14px"><button class="btn primary">Save</button></p></form>
+{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

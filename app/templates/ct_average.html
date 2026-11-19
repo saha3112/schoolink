@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Average & Award{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Average rank, award &amp; promotion</h1><p>Printed on the final report card.</p></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam, need_exam=False) }}
+{% if ready %}<form method="post"><div class="table-wrap"><table class="t marks-grid"><thead><tr><th class="num">Roll</th><th>Student</th><th>Average rank</th><th>Prize awarded</th><th>Promotion</th></tr></thead><tbody>
+{% for s in students %}{% set d = data.get(s.studentId) %}<tr><td class="num">{{ s.student_rollNumber }}</td><td>{{ s.student_name }}</td>
+<td><input class="m" name="avg_{{ s.studentId }}" value="{{ d.rankAvarage if d else '' }}"></td><td><input name="award_{{ s.studentId }}" value="{{ d.award if d else '' }}"></td><td><input name="promo_{{ s.studentId }}" value="{{ d.promotion if d else '' }}"></td></tr>{% endfor %}</tbody></table></div>
+<p style="margin-top:14px"><button class="btn primary">Save</button></p></form>
+{% else %}<div class="card empty">Select class and section.</div>{% endif %}
+{% endblock %}

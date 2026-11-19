@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_form.html' import select, trash_tabs, trash_form %}
+{% block heading %}Class · Section · Subject{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Class · Section · Subject mapping</h1><p>Which subjects each class section studies.</p></div></div>
+{% if not trash %}<div class="card"><h3>Create mapping</h3><form method="post">
+ <div class="step"><div class="step-h"><span class="step-n">1</span> Class</div>
+  <div class="row-fields"><label style="max-width:320px">Class {{ select('class_id', classes, 'classId', 'class_name', cls, id='cls', required=True) }}</label>
+  <label style="flex:0 0 auto;flex-direction:row;align-items:center;gap:8px;padding-bottom:10px"><input type="checkbox" name="special" value="1" style="width:auto"> Special subject (separate marks entry)</label></div></div>
+ <div class="step"><div class="step-h"><span class="step-n">2</span> Tick the subjects each section studies <span class="muted" style="font-weight:400">— already mapped ones are greyed out</span></div><div id="ssBox"></div></div>
+ <button class="btn primary">Create</button></form></div>{% endif %}
+{{ trash_tabs(trash, n_trash) }}
+<form class="toolbar" method="get">{% if trash %}<input type="hidden" name="trash" value="1">{% endif %}
+  <label>Class {{ select('class_id', classes, 'classId', 'class_name', cls, 'All', auto=True) }}</label>
+  <label>Section {{ select('section_id', secs_for_filter, 'sectionId', 'section_name', sec, 'All', auto=True) }}</label>
+</form>
+<div class="table-wrap"><table class="t"><thead><tr><th>Class</th><th>Section</th><th>Subject</th><th>Type</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.class_name }}</td><td>{{ r.section_name }}</td><td>{{ r.subject_name }}</td>
+<td>{% if r.isSpecialSubject == '1' %}<span class="chip">Special</span>{% else %}<span class="chip gray">Normal</span>{% endif %}</td>
+<td class="actions">{% if trash %}{{ trash_form(r.assignSubjectId, 'mapping') }}{% else %}
+<form method="post" style="display:inline"><input type="hidden" name="action" value="special"><input type="hidden" name="id" value="{{ r.assignSubjectId }}"><input type="hidden" name="value" value="{{ '0' if r.isSpecialSubject == '1' else '1' }}"><button class="btn sm">Make {{ 'normal' if r.isSpecialSubject == '1' else 'special' }}</button></form>
+<form method="post" style="display:inline" onsubmit="return confirm('Remove mapping?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ r.assignSubjectId }}"><button class="btn sm danger">Delete</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="5" class="empty">{{ 'The Trash is empty.' if trash else 'No mappings.' }}</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
+{% endblock %}
+{% block scripts %}<script>if(document.getElementById('cls'))sectionSubjects({cls:'#cls', box:'#ssBox', all:true});</script>{% endblock %}

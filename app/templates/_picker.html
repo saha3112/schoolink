@@ -1,0 +1,27 @@
+{# class / section / exam picker (GET). A single choice is shown as plain text instead of a one-item dropdown. #}
+{% macro picker(classes, sections, exams, cls, sec, exam, need_exam=True) %}
+<form class="toolbar" method="get" id="picker">
+  {% if classes|length == 1 %}
+    <label>Class<span class="fixed-val">{{ classes[0].class_name }}</span><input type="hidden" name="class_id" value="{{ classes[0].classId }}"></label>
+  {% else %}
+    <label>Class <select name="class_id" onchange="if(this.form.section_id)this.form.section_id.value='';this.form.submit()"><option value="">Select</option>
+      {% for c in classes %}<option value="{{ c.classId }}" {{ 'selected' if cls == c.classId }}>{{ c.class_name }}</option>{% endfor %}</select></label>
+  {% endif %}
+  {% if cls or classes|length == 1 %}
+    {% if sections|length == 1 %}
+      <label>Section<span class="fixed-val">{{ sections[0].section_name }}</span><input type="hidden" name="section_id" value="{{ sections[0].sectionId }}"></label>
+    {% else %}
+      <label>Section <select name="section_id" onchange="this.form.submit()"><option value="">Select</option>
+        {% for s in sections %}<option value="{{ s.sectionId }}" {{ 'selected' if sec == s.sectionId }}>{{ s.section_name }}</option>{% endfor %}</select></label>
+    {% endif %}
+  {% endif %}
+  {% if need_exam %}
+    {% if exams|length == 1 %}
+      <label>Exam<span class="fixed-val">{{ exams[0].exam_name }}</span><input type="hidden" name="exam_id" value="{{ exams[0].examId }}"></label>
+    {% else %}
+      <label>Exam <select name="exam_id" onchange="this.form.submit()"><option value="">Select</option>
+        {% for e in exams %}<option value="{{ e.examId }}" {{ 'selected' if exam == e.examId }}>{{ e.exam_name }}</option>{% endfor %}</select></label>
+    {% endif %}
+  {% endif %}
+</form>
+{% endmacro %}

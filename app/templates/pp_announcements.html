@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}{% from '_files.html' import file_list %}
+{% set live_wrap = true %}
+{% block heading %}Announcements{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Announcements</h1></div></div>
+{% for r in rows %}<div class="post"><h4>{{ r.title }}</h4><div class="meta">{{ r.author or 'School' }} · {{ r.created_at.strftime('%d %b %Y, %H:%M') }}</div><div class="body">{{ r.body }}</div>{{ file_list(r.files, furl) }}</div>
+{% else %}<div class="card empty">No announcements yet.</div>{% endfor %}
+{% endblock %}

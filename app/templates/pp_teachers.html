@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}{% from 'pp_child.html' import child_bar %}
+{% set live_wrap = true %}
+{% block heading %}Teachers{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Teachers</h1></div></div>
+{{ child_bar(kids, child, 'parentpanel.teachers') }}
+{% if rows %}<div class="table-wrap"><table class="t"><thead><tr><th>Teacher</th><th>Subjects</th><th>Phone</th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{ r.name }}</b>{% if r.is_class_teacher %} <span class="chip green">Class teacher</span>{% endif %}</td><td>{{ r.subjects }}</td><td>{{ r.phone_1 or '' }}</td></tr>{% endfor %}</tbody></table></div>{% elif child %}<div class="card empty">No teachers listed.</div>{% endif %}
+{% endblock %}

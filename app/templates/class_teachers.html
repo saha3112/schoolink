@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}{% from '_form.html' import select, del_form, trash_tabs, trash_form %}
+{% block heading %}Class Teacher{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Class teachers</h1><p>One class teacher per section. {{ 'Editing the highlighted row.' if edit else 'Assigning again to a section replaces its current teacher.' }}</p></div></div>
+{% if not trash %}<div class="card"><h3>{{ 'Edit class teacher' if edit else 'Assign class teacher' }}</h3>
+<form method="post" class="row-fields" data-modal-form>
+ {% if edit %}<input type="hidden" name="action" value="update"><input type="hidden" name="id" value="{{ edit.id }}">{% endif %}
+ <label>Class {{ select('class_id', classes, 'classId', 'class_name', edit.classId if edit else None, id='cls', required=True) }}</label>
+ <label>Section <select name="section_id" id="sec" required><option value="">Select</option>{% for s in sections %}<option value="{{ s.sectionId }}" {{ 'selected' if edit and edit.sectionId == s.sectionId }}>{{ s.section_name }}</option>{% endfor %}</select></label>
+ <label>Teacher {{ select('teacher_id', teachers, 'user_id', 'full_name', edit.teacherId if edit else None, required=True) }}</label>
+ <div style="flex:0 0 auto;display:flex;gap:8px;padding-bottom:1px"><button class="btn primary">{{ 'Save changes' if edit else 'Assign' }}</button>{% if edit %}<a class="btn" href="{{ url_for('admin.class_teachers') }}" data-cancel>Cancel</a>{% endif %}</div>
+</form></div>{% endif %}
+{{ trash_tabs(trash, n_trash) }}
+<div class="table-wrap" data-live-html="list"><table class="t"><thead><tr><th>Class</th><th>Section</th><th>Class teacher</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr {% if edit and edit.id == r.id %}style="background:var(--orange-soft)"{% endif %}><td>{{ r.class_name }}</td><td>{{ r.section_name }}</td><td>{{ r.teacher }}</td>
+<td class="actions">{% if trash %}{{ trash_form(r.id, 'class teacher') }}{% else %}<a class="btn sm" href="{{ url_for('admin.class_teachers', edit=r.id) }}" data-modal>Edit</a> {{ del_form('admin.class_teachers', r.id, 'Remove class teacher?') }}{% endif %}</td></tr>
+{% else %}<tr><td colspan="4" class="empty">{{ 'The Trash is empty.' if trash else 'Nothing assigned.' }}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}
+{% block scripts %}<script>
+if(document.getElementById('cls'))document.getElementById('cls').addEventListener('change', e => getJSON('/admin/api/sections?class_id=' + e.target.value).then(r => fillSelect(document.getElementById('sec'), r, 'sectionId', 'section_name')));
+</script>{% endblock %}

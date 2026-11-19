@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}{% from '_pager.html' import pager %}
+{% block heading %}{{ m.title }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ m.title }}</h1></div></div>
+{% if not trash %}<div class="card w-mid">
+  <h3>{{ 'Edit ' + m.singular if edit else 'Add ' + m.singular }}</h3>
+  <form method="post" class="toolbar" style="margin:0" data-modal-form>
+    {% if edit %}<input type="hidden" name="id" value="{{ edit[m.pk] }}">{% endif %}
+    {% for f, label in m.fields %}<label>{{ label }}<input name="{{ f }}" value="{{ edit[f] if edit else '' }}" required></label>{% endfor %}
+    <button class="btn primary" type="submit">{{ 'Update' if edit else 'Create' }}</button>
+    {% if edit %}<a class="btn" href="{{ request.path }}" data-cancel>Cancel</a>{% endif %}
+  </form>
+</div>{% endif %}
+<div class="mp-seg trash-tabs w-mid" style="margin:0 0 12px"><a class="{{ '' if trash else 'on' }}" href="{{ request.path }}">Active</a><a class="{{ 'on' if trash }}" href="{{ request.path }}?trash=1">Trash <em>{{ n_trash }}</em></a></div>
+<form class="toolbar w-mid" method="get">{% if trash %}<input type="hidden" name="trash" value="1">{% endif %}<label>Search<input name="q" value="{{ q }}"></label><button class="btn">Search</button></form>
+<div class="table-wrap w-mid" data-live-html="list"><table class="t"><thead><tr><th>#</th>{% for f,label in m.fields %}<th>{{ label }}</th>{% endfor %}<th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r[m.pk] }}</td>{% for f,_ in m.fields %}<td>{{ r[f] }}</td>{% endfor %}
+{% if trash %}<td class="actions"><form method="post" style="display:inline" onsubmit="return confirm('Restore this {{ m.singular|lower }}?')"><input type="hidden" name="trash" value="1"><input type="hidden" name="action" value="restore"><input type="hidden" name="id" value="{{ r[m.pk] }}"><button class="btn sm">Restore</button></form>
+<form method="post" style="display:inline" onsubmit="return confirm('Delete this {{ m.singular|lower }} permanently? This cannot be undone.')"><input type="hidden" name="trash" value="1"><input type="hidden" name="action" value="purge"><input type="hidden" name="id" value="{{ r[m.pk] }}"><button class="btn sm danger">Delete permanently</button></form></td>
+{% else %}<td class="actions"><a class="btn sm" href="?edit={{ r[m.pk] }}" data-modal>Edit</a>
+<form method="post" style="display:inline" onsubmit="return confirm('Delete this {{ m.singular|lower }}?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ r[m.pk] }}"><button class="btn sm danger">Delete</button></form></td>{% endif %}</tr>
+{% else %}<tr><td colspan="9" class="empty">{{ 'The Trash is empty.' if trash else 'Nothing here yet.' }}</td></tr>{% endfor %}
+</tbody></table></div><div class="w-mid">{{ pager(p) }}</div>
+{% endblock %}

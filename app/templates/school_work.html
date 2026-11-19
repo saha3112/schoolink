@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}{% from '_files.html' import file_list, file_input %}{% from '_picker.html' import picker %}
+{% block heading %}Classwork & Homework{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Classwork &amp; homework</h1></div></div>
+{{ picker(classes, sections, [], cls, sec, None, need_exam=False) }}
+{% if cls and sec %}<div class="card"><h3>Post new</h3><form method="post" enctype="multipart/form-data"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}"><div class="form-grid">
+ <label>Type<select name="kind"><option value="classwork">Classwork</option><option value="homework">Homework</option></select></label>
+ <label>Subject<select name="subject_id" required><option value="">Select</option>{% for s in subjects %}<option value="{{ s.subjectId }}">{{ s.subject_name }}</option>{% endfor %}</select></label>
+ <label>Date<input type="date" name="work_date" value="{{ today.isoformat() }}"></label><label>Due date (homework)<input type="date" name="due_date"></label>
+ <label style="grid-column:1/-1">Title<input name="title" maxlength="200" required></label><label style="grid-column:1/-1">Description<textarea name="body" rows="3"></textarea></label>
+ <div style="grid-column:1/-1">{{ file_input() }}</div></div><p><button class="btn primary">Post</button></p></form></div>{% endif %}
+<div class="toolbar"><a class="btn sm {{ 'primary' if not kind }}" href="?class_id={{ cls or '' }}&section_id={{ sec or '' }}">All</a><a class="btn sm {{ 'primary' if kind=='classwork' }}" href="?class_id={{ cls or '' }}&section_id={{ sec or '' }}&kind=classwork">Classwork</a><a class="btn sm {{ 'primary' if kind=='homework' }}" href="?class_id={{ cls or '' }}&section_id={{ sec or '' }}&kind=homework">Homework</a></div>
+{% for r in rows %}<div class="post"><h4>{{ r.title }} <span class="chip {{ 'green' if r.kind == 'homework' else '' }}">{{ r.kind|capitalize }}</span></h4>
+ <div class="meta">{{ r.class_name }} {{ r.section_name }} · {{ r.subject_name }} · {{ r.work_date.strftime('%d %b %Y') }}{% if r.due_date %} · due {{ r.due_date.strftime('%d %b %Y') }}{% endif %} · {{ r.author }}</div>
+ {% if r.body %}<div class="body">{{ r.body }}</div>{% endif %}{{ file_list(r.files, furl, r.can_edit) }}
+ {% if r.can_edit %}<div class="row-actions"><form method="post" onsubmit="return confirm('Delete?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ r.id }}"><button class="btn sm danger">Delete</button></form></div>{% endif %}</div>
+{% else %}<div class="card empty">Nothing posted yet.</div>{% endfor %}
+{% endblock %}

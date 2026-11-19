@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}{% from '_files.html' import file_list, file_input %}{% from '_form.html' import select %}
+{% block heading %}Announcements{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Announcements</h1><p>Notices for the whole school, a class or a section.</p></div></div>
+<div class="card"><h3>New announcement</h3>
+<form method="post" enctype="multipart/form-data"><div class="form-grid">
+ <label>For <select name="audience" id="aud">{% if me.is_admin %}<option value="school">Whole school</option>{% endif %}<option value="section">A class / section</option></select></label>
+ <label id="clsBox">Class {{ select('class_id', classes, 'classId', 'class_name', id='cls') }}</label>
+ <label id="secBox">Section <select name="section_id" id="sec"><option value="">{{ 'All sections' if me.is_admin else 'Select' }}</option></select></label>
+ <label style="grid-column:1/-1">Title<input name="title" maxlength="200" required></label>
+ <label style="grid-column:1/-1">Message<textarea name="body" rows="4" required></textarea></label>
+ <div style="grid-column:1/-1">{{ file_input() }}</div></div>
+<p><button class="btn primary">Post</button></p></form></div>
+{% for r in rows %}<div class="post"><h4>{{ r.title }}</h4><div class="meta">{{ r.label }} · {{ r.author or 'Admin' }} · {{ r.created_at.strftime('%d %b %Y, %H:%M') }}</div>
+ <div class="body">{{ r.body }}</div>{{ file_list(r.files, furl, r.can_edit) }}
+ {% if r.can_edit %}<div class="row-actions"><form method="post" onsubmit="return confirm('Delete this announcement?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ r.id }}"><button class="btn sm danger">Delete</button></form></div>{% endif %}</div>
+{% else %}<div class="card empty">No announcements yet.</div>{% endfor %}
+{% endblock %}
+{% block scripts %}<script>
+const aud = document.getElementById('aud'), cls = document.getElementById('cls'), sec = document.getElementById('sec');
+const toggle = () => { const s = aud.value === 'school'; document.getElementById('clsBox').style.display = document.getElementById('secBox').style.display = s ? 'none' : ''; cls.required = !s; };
+aud.addEventListener('change', toggle); toggle();
+cls.addEventListener('change', () => getJSON('/school/api/sections?class_id=' + cls.value).then(r => fillSelect(sec, r, 'sectionId', 'section_name', {{ 'All sections' if me.is_admin else 'Select' }} && '{{ 'All sections' if me.is_admin else 'Select' }}')));
+</script>{% endblock %}

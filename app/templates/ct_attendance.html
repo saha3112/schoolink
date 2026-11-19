@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Attendance{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Attendance entry</h1></div></div>
+{{ picker(classes, sections, exams, cls, sec, exam) }}
+{% if ready %}<form method="post">
+ <div class="toolbar"><label>Total sessions (apply to all)<input type="number" min="0" id="allTotal" name="total_all" style="width:150px"></label><button type="button" class="btn" onclick="document.querySelectorAll('.tot').forEach(i=>i.value=document.getElementById('allTotal').value)">Fill all</button></div>
+ <div class="table-wrap"><table class="t marks-grid"><thead><tr><th class="num">Roll</th><th>Student</th><th>Total sessions</th><th>Attended</th></tr></thead><tbody>
+ {% for s in students %}{% set d = data.get(s.studentId) %}<tr><td class="num">{{ s.student_rollNumber }}</td><td>{{ s.student_name }}</td>
+ <td><input class="m tot" type="number" min="0" name="total_{{ s.studentId }}" value="{{ d.totalSession if d and d.totalSession is not none else '' }}"></td>
+ <td><input class="m" type="number" min="0" name="att_{{ s.studentId }}" value="{{ d.attendSession if d and d.attendSession is not none else '' }}"></td></tr>{% endfor %}</tbody></table></div>
+ <p style="margin-top:14px"><button class="btn primary">Save attendance</button></p></form>
+{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}
+{% endblock %}

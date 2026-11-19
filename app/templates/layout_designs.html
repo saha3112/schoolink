@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}{% from '_icons.html' import icon %}
+{% block heading %}Card designs{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow"><i></i> Report setup</div><h1>Report card designs</h1>
+<p>Create your own report card layout in HTML. Placeholders like <code>{{ '{{ student.student_name }}' }}</code> are filled with each student's real data. After saving, choose the design for a class in <a href="{{ url_for('layouts_admin.rules') }}">Report layouts</a>.</p></div>
+<a class="btn primary" href="?new=1">{{ icon('plus', 15) }} New design</a></div>
+<div class="grid" style="grid-template-columns:minmax(220px,280px) minmax(0,1fr);align-items:start">
+  <div class="card" style="margin:0"><h3>Your designs</h3>
+    {% for d in designs %}<a class="quick-action" style="margin-bottom:8px;{{ 'border-color:var(--brand);background:var(--brand-soft)' if cur and cur.id == d.id }}" href="?id={{ d.id }}"><span>{{ d.name }}<br><small class="muted">{{ d.updated_at.strftime('%d %b %Y') if d.updated_at }}</small></span></a>
+    {% else %}<div class="muted">No designs of your own yet. Add a ready-made template from the right, or click “New design”.</div>{% endfor %}</div>
+  <div>
+  {% if cur %}
+  <form method="post" class="card" style="margin:0">
+    <input type="hidden" name="id" value="{{ cur.id or '' }}">
+    <label>Design name<input name="name" value="{{ cur.name }}" required maxlength="120"></label>
+    <label style="margin-top:12px">Design (HTML + placeholders)<textarea name="html" rows="22" spellcheck="false" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:pre;overflow:auto">{{ cur.html }}</textarea></label>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <label>Preview class<select id="pvClass"><option value="">Select…</option>{% for c in classes %}<option value="{{ c.classId }}">{{ c.class_name }}</option>{% endfor %}</select></label>
+      <label>Section<select id="pvSec"><option value="">Select…</option>{% for s in sections %}<option value="{{ s.sectionId }}" data-class="{{ s.class_id }}" hidden>{{ s.section_name }}</option>{% endfor %}</select></label>
+      <label>Student<select id="pvStu" name="student"><option value="">Select…</option></select></label>
+      <button class="btn primary">Save &amp; preview</button>
+    </div>
+  </form>
+  {% if cur.id %}<form method="post" style="margin-top:10px" onsubmit="return confirm('Delete this design?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ cur.id }}"><button class="btn sm danger">Delete design</button></form>{% endif %}
+  {% if preview %}<div class="card" style="margin-top:14px;padding:0;overflow:hidden"><div style="padding:10px 14px;border-bottom:1px solid var(--line);font-weight:700">Preview</div>
+    <iframe src="{{ preview }}" style="width:100%;height:760px;border:0;background:#fff"></iframe></div>{% endif %}
+  <details class="card" style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">Available placeholders</summary>
+    <table class="t" style="margin-top:10px"><tbody>{% for v, t in D.VARIABLES %}<tr><td><code style="font-size:11.5px">{{ v }}</code></td><td>{{ t }}</td></tr>{% endfor %}</tbody></table>
+    <p class="muted" style="font-size:12px">Use <code>{{ '{{ value }}' }}</code> to print, <code>{{ '{% for x in list %}…{% endfor %}' }}</code> to repeat, <code>{{ '{% if x %}…{% endif %}' }}</code> for conditions.</p></details>
+  {% else %}
+  {% if builtins %}
+  <div class="card" style="margin:0 0 18px"><div class="card-head"><div><h3>Built-in report card designs</h3>
+   <p class="muted" style="margin:4px 0 0;font-size:12px">These ship with the application and are already used by your classes. Preview them with a real student; press “Use in a class” to choose where each one is used.</p></div></div>
+   <div class="preset-grid" data-live-html="builtins">{% for b in builtins %}<div class="preset">
+    <div class="preset-top"><b>{{ b.label }}</b><span class="chip gray">built-in</span></div>
+    <div class="preset-use">{% if b.used %}Used by {% for u in b.used[:4] %}<span class="chip">{{ u }}</span>{% endfor %}{% if b.used|length > 4 %}<span class="muted"> +{{ b.used|length - 4 }} more</span>{% endif %}{% else %}<span class="muted">Not used by any class yet</span>{% endif %}</div>
+    <div class="preset-act">{% if b.sample %}<a class="btn sm primary" href="{{ url_for('layouts_admin.builtin_preview', view=b.view, student=b.sample) }}" data-popup="{{ url_for('layouts_admin.builtin_preview', view=b.view, student=b.sample) }}" data-title="{{ b.label }}">Preview</a>{% endif %}
+     <button type="button" class="btn sm" data-use-view="{{ b.view }}" data-use-label="{{ b.label }}">Use in a class</button></div></div>{% endfor %}</div></div>
+  {% endif %}
+  {% if presets %}
+  <div class="card" style="margin:0"><div class="card-head"><div><h3>Ready-made templates you can edit</h3>
+   <p class="muted" style="margin:4px 0 0;font-size:12px">Add one to your designs, change the HTML, then assign it to a class. Your school details and the student's data fill in automatically.</p></div></div>
+   <div class="preset-grid">{% for p in presets %}<div class="preset"><div class="preset-top"><b>{{ p.name }}</b><span class="chip green">editable</span></div><p class="muted" style="margin:6px 0 12px;font-size:12px;line-height:1.5">{{ p.desc }}</p>
+    <form method="post"><input type="hidden" name="action" value="preset"><input type="hidden" name="preset" value="{{ p.key }}"><button class="btn sm primary">Add to my designs</button></form></div>{% endfor %}</div></div>
+  {% endif %}
+  {% if not builtins and not presets %}<div class="card empty">Select a design, or create a new one.</div>{% endif %}
+  {% endif %}
+  </div>
+</div>
+<script>
+(function(){var c=document.getElementById('pvClass'),s=document.getElementById('pvSec'),t=document.getElementById('pvStu'); if(!c) return;
+ c.addEventListener('change',function(){Array.prototype.forEach.call(s.options,function(o){if(!o.value)return;o.hidden=(o.dataset.class!==c.value)});s.value='';t.innerHTML='<option value="">Select…</option>'});
+ s.addEventListener('change',function(){if(!c.value||!s.value)return;fetch('{{ url_for("layouts_admin.students_json") }}?class_id='+c.value+'&section_id='+s.value).then(function(r){return r.json()}).then(function(a){t.innerHTML='<option value="">Select…</option>'+a.map(function(x){return '<option value="'+x.id+'">'+x.name.replace(/</g,'&lt;')+'</option>'}).join('')})});})();
+</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/designs.js') }}"></script>{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% set is_tab = kind == 'tabulation' %}
+{% block heading %}{{ 'Tabulation Sheet' if is_tab else 'Weighted Average Sheet' }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ 'Tabulation sheets' if is_tab else 'Weighted average sheets' }}</h1>
+<p>View or download one section, a whole class (all sections in one ZIP) or everything. PDF size: <b>23 × 35 inch</b>.</p></div></div>
+<form class="toolbar" method="get">
+  {% if exams|length == 1 %}<label>Exam<span class="fixed-val">{{ exams[0].exam_name }}</span><input type="hidden" name="exam_id" value="{{ exams[0].examId }}"></label>
+  {% else %}<label>Exam <select name="exam_id" onchange="this.form.submit()">{% for e in exams %}<option value="{{ e.examId }}" {{ 'selected' if exam == e.examId }}>{{ e.exam_name }}</option>{% endfor %}</select></label>{% endif %}
+  {% if classes|length == 1 %}<label>Class<span class="fixed-val">{{ classes[0].class_name }}</span><input type="hidden" name="class_id" value="{{ classes[0].classId }}"></label>
+  {% else %}<label>Class <select name="class_id" onchange="this.form.submit()"><option value="">All classes</option>{% for c in classes %}<option value="{{ c.classId }}" {{ 'selected' if cls == c.classId }}>{{ c.class_name }}</option>{% endfor %}</select></label>{% endif %}
+  {% if groups %}<button type="button" class="btn primary" data-bulk data-kind="{{ 'tab' if is_tab else 'wtd' }}" data-class="{{ cls or '' }}" data-exam="{{ exam }}">
+    Download {{ 'selected class' if cls else 'all classes' }} (ZIP)</button>{% endif %}
+</form>
+{% for (cid, cname), secs in groups.items() %}
+<div class="card" style="padding:0;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--line)">
+    <b>{{ cname }}</b>
+    {% if secs|length > 1 %}<button type="button" class="btn sm" data-bulk data-kind="{{ 'tab' if is_tab else 'wtd' }}" data-class="{{ cid }}" data-exam="{{ exam }}">All {{ secs|length }} sections (ZIP)</button>{% endif %}
+  </div>
+  <div class="table-wrap" style="border:0;border-radius:0"><table class="t"><tbody>
+  {% for s in secs %}
+    {% if is_tab %}{% set u = url_for('reports.tabulation', cid=cid, sid=s.sid, eid=exam) %}
+    {% elif s.junior %}{% set u = url_for('reports.weighted', cid=cid, sid=s.sid, eid=exam) %}
+    {% else %}{% set u = url_for('reports.weighted', cid=cid, sid=s.sid) %}{% endif %}
+    <tr><td>Section <b>{{ s.name }}</b></td><td class="muted">{{ s.students }} students</td>
+    <td class="actions"><a class="btn sm" href="{{ u }}" data-popup="{{ u }}" data-title="{{ cname }} {{ s.name }} — {{ 'Tabulation sheet' if is_tab else 'Weighted average' }}">View</a>
+    <a class="btn sm" data-download href="{{ u }}?pdf=1&dl=1">PDF</a></td></tr>
+  {% endfor %}
+  </tbody></table></div>
+</div>
+{% else %}<div class="card empty">No class sections have this sheet.</div>{% endfor %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Daily Attendance{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Daily attendance</h1><p>Mark Present / Absent / Leave for a day. Totals can be copied to the report card.</p></div></div>
+<form class="toolbar" method="get">
+ {% if classes|length == 1 %}<label>Class<span class="fixed-val">{{ classes[0].class_name }}</span><input type="hidden" name="class_id" value="{{ classes[0].classId }}"></label>
+ {% else %}<label>Class <select name="class_id" onchange="if(this.form.section_id)this.form.section_id.value='';this.form.submit()"><option value="">Select</option>{% for c in classes %}<option value="{{ c.classId }}" {{ 'selected' if cls == c.classId }}>{{ c.class_name }}</option>{% endfor %}</select></label>{% endif %}
+ {% if sections|length == 1 %}<label>Section<span class="fixed-val">{{ sections[0].section_name }}</span><input type="hidden" name="section_id" value="{{ sections[0].sectionId }}"></label>
+ {% elif cls %}<label>Section <select name="section_id" onchange="this.form.submit()"><option value="">Select</option>{% for s in sections %}<option value="{{ s.sectionId }}" {{ 'selected' if sec == s.sectionId }}>{{ s.section_name }}</option>{% endfor %}</select></label>{% endif %}
+ <label>Date <input type="date" name="date" value="{{ day.isoformat() }}" max="{{ today.isoformat() }}" onchange="this.form.submit()"></label></form>
+{% if students %}
+<form method="post"><input type="hidden" name="action" value="save"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}"><input type="hidden" name="date" value="{{ day.isoformat() }}">
+ <div class="toolbar"><button type="button" class="btn sm" onclick="document.querySelectorAll('input.p').forEach(i=>i.checked=true)">All present</button>
+  <span class="muted">{% if marks %}Saved for this day: {{ marks|length }} of {{ students|length }}{% else %}Not marked yet{% endif %}</span></div>
+ <div class="table-wrap"><table class="t"><thead><tr><th class="num">Roll</th><th>Student</th><th>Status</th><th class="num">This month</th></tr></thead><tbody>
+ {% for s in students %}{% set st = marks.get(s.studentId, 'P') %}{% set m = month.get(s.studentId) %}<tr><td class="num">{{ s.student_rollNumber }}</td><td>{{ s.student_name }}</td>
+ <td><div class="att-radio"><label><input type="radio" class="p" name="s_{{ s.studentId }}" value="P" {{ 'checked' if st=='P' }}><span>P</span></label><label><input type="radio" class="a" name="s_{{ s.studentId }}" value="A" {{ 'checked' if st=='A' }}><span>A</span></label><label><input type="radio" class="l" name="s_{{ s.studentId }}" value="L" {{ 'checked' if st=='L' }}><span>L</span></label></div></td>
+ <td class="num">{% if m %}{{ m[1] }}/{{ m[0] }} ({{ (m[1]*100/m[0])|round|int }}%){% else %}–{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+ <p style="margin-top:14px"><button class="btn primary">Save attendance</button></p></form>
+<div class="card" style="margin-top:18px"><h3>Copy to report card</h3><p class="muted">Counts the days marked between two dates (Present + Leave = attended) and fills <i>Total sessions / Attended</i> of the report card for the chosen exam.</p>
+<form method="post" class="toolbar" style="margin:0" onsubmit="return confirm('This replaces the report card attendance for the selected exam. Continue?')"><input type="hidden" name="action" value="apply"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}">
+ <label>Exam<select name="exam_id" required>{% for e in exams %}<option value="{{ e.examId }}">{{ e.exam_name }}</option>{% endfor %}</select></label><label>From<input type="date" name="from" required></label><label>To<input type="date" name="to" required></label><button class="btn">Copy</button></form></div>
+{% else %}<div class="card empty">Select class and section.</div>{% endif %}
+{% endblock %}

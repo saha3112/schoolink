@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Timetable{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Timetable</h1></div></div>
+{% if mine %}<div class="card"><h3>My periods</h3><div class="table-wrap"><table class="t"><thead><tr><th>Day</th><th>Period</th><th>Class</th><th>Subject</th><th>Time</th></tr></thead><tbody>
+{% for m in mine %}<tr><td>{{ days[m.weekday] }}</td><td>{{ m.period }}</td><td>{{ m.class_name }} {{ m.section_name }}</td><td>{{ m.subject_name }}</td><td>{{ m.start_time or '' }}{{ ' – ' + m.end_time if m.end_time }}</td></tr>{% endfor %}</tbody></table></div></div>{% endif %}
+{{ picker(classes, sections, [], cls, sec, None, need_exam=False) }}
+{% if cls and sec %}
+<form method="post"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}"><input type="hidden" name="periods" value="{{ periods }}">
+<div class="table-wrap"><table class="t tt"><thead><tr><th>Period</th>{% for d in days %}<th>{{ d }}</th>{% endfor %}</tr></thead><tbody>
+{% for p in range(1, periods + 1) %}<tr><th>{{ p }}{% if me.is_admin %}<br><input name="st_{{ p }}" value="{{ times.get(p, ('',''))[0] }}" placeholder="09:00" style="width:64px"><br><input name="et_{{ p }}" value="{{ times.get(p, ('',''))[1] }}" placeholder="09:45" style="width:64px">{% else %}<small>{{ times.get(p, ('',''))[0] }}{{ ' – ' + times.get(p)[1] if times.get(p) and times.get(p)[1] }}</small>{% endif %}</th>
+ {% for d in range(days|length) %}{% set c = cells.get((d, p)) %}<td>
+  {% if me.is_admin %}<select name="sub_{{ d }}_{{ p }}"><option value="">—</option>{% for s in subs %}<option value="{{ s.subjectId }}" {{ 'selected' if c and c.subjectId == s.subjectId }}>{{ s.subject_name }}</option>{% endfor %}</select>
+   <select name="tch_{{ d }}_{{ p }}" style="margin-top:4px"><option value="">teacher</option>{% for t in teachers %}<option value="{{ t.user_id }}" {{ 'selected' if c and c.teacherId == t.user_id }}>{{ t.name }}</option>{% endfor %}</select>
+  {% elif c %}<b>{{ c.subject_name }}</b><small>{{ c.teacher or '' }}</small>{% else %}–{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+{% if me.is_admin %}<p style="margin-top:14px"><button class="btn primary">Save timetable</button></p>{% endif %}</form>
+{% else %}<div class="card empty">Select class and section.</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · Schoolink</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('sl-theme')||'light'}catch(e){}</script></head>
+<body class="login-body">
+<div class="login-wrap">
+  <div class="login-side">
+    <div class="lg"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="" onerror="this.style.display='none'"></div>
+    <h2>{{ school_name }}</h2>
+    <p>Marks, report cards, attendance and school life — all in one place for teachers, administrators and parents.</p>
+  </div>
+  <div class="login-card">
+    <div class="login-brand"><div class="eyebrow"><i></i> Schoolink</div><h1>Welcome back 👋</h1><p class="muted">Sign in to continue to your portal.</p></div>
+    {% with msgs = get_flashed_messages(with_categories=true) %}{% for c,m in msgs %}<div class="alert alert-{{ c }}">{{ m }}</div>{% endfor %}{% endwith %}
+    <form method="post" autocomplete="on">
+      <label>Email / Mobile<input name="email" required autofocus autocomplete="username"></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn primary block" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/pw.js') }}"></script></body></html>

@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}{% from '_picker.html' import picker %}
+{% block heading %}Result Release{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Result release</h1><p>Parents can open their child's report card only after you release it. They get a notification when you do.</p></div></div>
+{{ picker(classes, sections, [], cls, sec, None, need_exam=False) }}
+{% if rows %}
+<div class="card"><form method="post" class="toolbar" style="margin:0"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}">
+ <span class="muted">{{ rows|selectattr('released')|list|length }} of {{ rows|length }} released</span>
+ <button class="btn primary" name="mode" value="release" onclick="return confirm('Release the report cards of the whole section to parents?')">Release all</button>
+ <button class="btn danger" name="mode" value="hide" onclick="return confirm('Hide all report cards of this section from parents?')">Hide all</button></form></div>
+<div class="table-wrap"><table class="t"><thead><tr><th class="num">Roll</th><th>Student</th><th>Status</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td class="num">{{ r.student_rollNumber }}</td><td>{{ r.student_name }}</td><td>{% if r.released %}<span class="chip green">Released{% if r.openAt %} · {{ r.openAt.strftime('%d %b') }}{% endif %}</span>{% else %}<span class="chip gray">Not released</span>{% endif %}</td>
+<td class="actions"><form method="post" style="display:inline"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}"><input type="hidden" name="student_id" value="{{ r.studentId }}">
+<button class="btn sm" name="mode" value="{{ 'hide_one' if r.released else 'release_one' }}">{{ 'Hide' if r.released else 'Release' }}</button></form></td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card empty">Select class and section.</div>{% endif %}
+{% endblock %}

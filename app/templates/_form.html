@@ -1,0 +1,19 @@
+{% macro select(name, items, val, txt, selected=None, placeholder='Select', cls='', required=False, id=None, auto=False) -%}
+<select name="{{ name }}" {% if id %}id="{{ id }}"{% endif %} class="{{ cls }}" {{ 'required' if required }} {% if auto %}onchange="this.form.submit()"{% endif %}>
+  {% if placeholder is not none %}<option value="">{{ placeholder }}</option>{% endif %}
+  {% for i in items %}<option value="{{ i[val] }}" {{ 'selected' if selected is not none and i[val]|string == selected|string }}>{{ i[txt] }}</option>{% endfor %}
+</select>
+{%- endmacro %}
+{% macro del_form(endpoint, id, msg='Delete this record?', extra={}) -%}
+<form method="post" action="{{ url_for(endpoint, **extra) }}" style="display:inline" onsubmit="return confirm('{{ msg }}')">
+  <input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ id }}">
+  <button class="btn sm danger" title="Delete">Delete</button></form>
+{%- endmacro %}
+
+{% macro trash_tabs(trash, n_trash) -%}
+<div class="trash-tabs" style="margin:0 0 12px"><a class="{{ '' if trash else 'on' }}" href="{{ request.path }}">Active</a><a class="{{ 'on' if trash }}" href="{{ request.path }}?trash=1">Trash <em>{{ n_trash }}</em></a></div>
+{%- endmacro %}
+{% macro trash_form(id, what='record') -%}
+<form method="post" style="display:inline" onsubmit="return confirm('Restore this {{ what }}?')"><input type="hidden" name="trash" value="1"><input type="hidden" name="action" value="restore"><input type="hidden" name="id" value="{{ id }}"><button class="btn sm">Restore</button></form>
+<form method="post" style="display:inline" onsubmit="return confirm('Delete this {{ what }} permanently? This cannot be undone.')"><input type="hidden" name="trash" value="1"><input type="hidden" name="action" value="purge"><input type="hidden" name="id" value="{{ id }}"><button class="btn sm danger">Delete permanently</button></form>
+{%- endmacro %}

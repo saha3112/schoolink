@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}{% from '_files.html' import file_input, media_picker %}{% from '_form.html' import select %}
+{% block heading %}Gallery{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Gallery</h1><p>Photo albums — view, download, add and remove photos.</p></div></div>
+<div class="card"><h3>New album</h3><form method="post" enctype="multipart/form-data"><div class="form-grid">
+ <label>Title<input name="title" maxlength="200" required></label><label>Date<input type="date" name="album_date" value="{{ '' }}"></label>
+ <label>Class {{ select('class_id', classes, 'classId', 'class_name', id='cls', placeholder='Whole school' if me.is_admin else 'Select') }}</label>
+ <label>Section <select name="section_id" id="sec"><option value="">All</option></select></label>
+ <div style="grid-column:1/-1">{{ file_input('Photos', 'image/*') }}</div></div><p><button class="btn primary">Create album</button></p></form></div>
+<div class="album-grid">{% for a in albums %}
+ <div class="album"><a href="#" onclick="document.getElementById('al{{ a.id }}').hidden=!document.getElementById('al{{ a.id }}').hidden;return false" style="color:inherit">
+  <div class="thumbs {{ '' if a.files else 'empty' }}">{% for f in a.files[:6] %}<img src="{{ furl(f.path) }}" alt="" loading="lazy">{% else %}No photos{% endfor %}</div></a>
+  <div class="info"><b>{{ a.title }}</b><span class="muted">{{ a.label }} · {{ a.files|length }} photo(s){% if a.album_date %} · {{ a.album_date.strftime('%d %b %Y') }}{% endif %}</span>
+   <div id="al{{ a.id }}" hidden><div class="photo-grid">{% for f in a.files %}<div class="ph"><a href="{{ furl(f.path) }}" data-popup="{{ furl(f.path) }}" data-title="{{ f.name }}"><img src="{{ furl(f.path) }}" alt="" loading="lazy"></a>
+     <div class="tools"><a href="{{ furl(f.path, True) }}" download title="Download">⬇</a>{% if a.can_edit %}<form method="post" action="{{ url_for('school.attachment_delete', fid=f.id) }}" onsubmit="return confirm('Remove photo?')" style="display:inline"><button title="Remove">×</button></form>{% endif %}</div></div>{% endfor %}</div>
+    {% if a.can_edit %}<form method="post" action="{{ url_for('school.gallery_add', aid=a.id) }}" style="margin-top:10px" class="sig-form">{{ media_picker('media_ids', '', 'image', True, 20, '', 'Choose photos') }}<button class="btn sm primary">Add photos</button></form>
+    <form method="post" onsubmit="return confirm('Delete the whole album?')" style="margin-top:8px"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ a.id }}"><button class="btn sm danger">Delete album</button></form>{% endif %}</div>
+  </div></div>{% else %}<div class="card empty" style="grid-column:1/-1">No albums yet.</div>{% endfor %}</div>
+{% endblock %}
+{% block scripts %}<script>
+const cls = document.getElementById('cls'), sec = document.getElementById('sec');
+cls.addEventListener('change', () => getJSON('/school/api/sections?class_id=' + cls.value).then(r => fillSelect(sec, r, 'sectionId', 'section_name', 'All')));
+</script>{% endblock %}

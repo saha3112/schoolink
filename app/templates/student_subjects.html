@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}{% from '_form.html' import select %}
+{% block heading %}Student Subjects{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student-subjects.css') }}">
+<div class="subject-page" id="subjectPage">
+ <div class="eyebrow">ACADEMIC MANAGEMENT</div>
+ <div class="heading"><div><h1>Student Subject Allocation</h1><p>Manage student-wise subjects with a clean, easy-to-use allocation matrix.</p></div>
+ {% if students %}<a class="primary" href="{{ url_for('students.subjects', class_id=cls, section_id=sec, detect=1) }}">✦ Detect from entered marks</a>{% endif %}</div>
+ <div class="stats">
+  <div class="stat"><div class="stat-icon">🎓</div><span>Total Students</span><strong>{{ students|length }}</strong><small>Enrolled in selected section</small></div>
+  <div class="stat"><div class="stat-icon">▦</div><span>Available Subjects</span><strong>{{ subjects|length }}</strong><small>Mapped to selected class</small></div>
+  <div class="stat"><div class="stat-icon">✓</div><span>Active Allocations</span><strong id="allocationCount">0</strong><small>Across student records</small></div>
+  <div class="stat"><div class="stat-icon">◉</div><span>Completion Rate</span><strong id="completionRate">0%</strong><small>Selected subject assignments</small></div>
+ </div>
+ <div id="subjectLoadStatus" role="status" aria-live="polite"></div>
+ <section class="panel">
+  <div class="panel-head"><div><h2>Subject Assignment Matrix</h2><p>Tick the subjects each student studies. Press Save to apply your changes.</p></div>
+   <form class="filters" method="get"><div class="field"><label for="subjectClass">CLASS</label>{{ select('class_id', classes, 'classId', 'class_name', cls, id='subjectClass') }}</div>
+    <div class="field"><label for="subjectSection">SECTION</label>{{ select('section_id', sections, 'sectionId', 'section_name', sec, id='subjectSection') }}</div>
+    <div class="field"><label for="studentSearch">SEARCH STUDENT</label><input type="search" id="studentSearch" placeholder="Name or roll number"></div>
+   </form>
+  </div>
+  {% if students %}
+  <form method="post" id="allocationForm">
+   <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="class_id" value="{{ cls }}"><input type="hidden" name="section_id" value="{{ sec }}">
+   <div class="toolbar"><div class="left"><span class="chip" id="selectedLabel">0 allocations selected</span><span class="hint">Tip: Use the header checkboxes to select a full subject column.</span></div><div class="right"><button type="button" class="secondary" data-action="select">✓ Select all</button><button type="button" class="secondary" data-action="clear">✕ Clear all</button><button type="button" class="secondary" data-action="export">↓ Export CSV</button></div></div>
+   <div class="table-wrap"><table class="subject-table" style="width:{{ 255 + subjects|length * 62 }}px;min-width:100%"><colgroup><col style="width:55px"><col style="width:200px">{% for sb in subjects %}<col style="width:62px">{% endfor %}</colgroup><thead><tr><th class="roll"><div class="identity-heading"><span>ROLL</span></div></th><th class="student"><div class="identity-heading"><span>STUDENT NAME</span></div></th>
+   {% for sb in subjects %}<th class="subject" title="{{ sb.subject_name }}"><div class="subject-heading"><span class="vertical">{{ sb.subject_name }}{% if sb.isSpecialSubject == '1' %} ★{% endif %}</span><input type="checkbox" class="col-all" data-col="{{ sb.subjectId }}" aria-label="Toggle all {{ sb.subject_name }}"></div></th>{% endfor %}</tr></thead>
+   <tbody>{% for st in students %}<tr data-student-row><td class="roll">{{ st.student_rollNumber }}</td><td class="student"><span class="student-name"><span>{{ st.student_name }}</span><input type="checkbox" class="row-all" data-row="{{ st.studentId }}" aria-label="Toggle all subjects for {{ st.student_name }}"></span></td>
+   {% for sb in subjects %}<td class="{{ 'suggested' if (st.studentId, sb.subjectId) in suggested }}"><input type="checkbox" class="cell" data-r="{{ st.studentId }}" data-c="{{ sb.subjectId }}" name="e_{{ st.studentId }}_{{ sb.subjectId }}" value="1" aria-label="{{ st.student_name }}: {{ sb.subject_name }}" {{ '' if (st.studentId, sb.subjectId) in excl else 'checked' }}></td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+   <div class="footer"><span id="footerInfo">Showing {{ students|length }} students · {{ subjects|length }} subjects</span><span>Scroll horizontally to view all subjects →</span></div>
+   <div class="footer"><span>★ Special subject · Yellow = suggested from marks</span><span id="saveStatus" role="status">Selections are ready to save</span></div>
+   <div class="save-row"><button type="submit" class="primary">Save allocations</button></div>
+  </form>
+  {% elif cls and sec %}<div class="empty">No students in this section.</div>{% else %}<div class="empty">Select class and section to manage subject allocations.</div>{% endif %}
+ </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/student-subjects.js') }}"></script>{% endblock %}

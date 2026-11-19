@@ -1,0 +1,7 @@
+{# child switcher: shown only when a parent has more than one child #}
+{% macro child_bar(kids, child, endpoint) %}
+{% if child %}<div class="child-bar">
+  <div class="child-now"><span class="avatar" style="width:34px;height:34px;font-size:13px;cursor:default">{{ child.student_name[:1] }}</span><div><b>{{ child.student_name }}</b><div class="muted" style="font-size:12.5px">{{ child.class_name }} · Section {{ child.section_name }} · Roll {{ child.student_rollNumber }}</div></div></div>
+  {% if kids|length > 1 %}<div class="child-pick">{% for k in kids %}<a class="btn sm {{ 'primary' if k.studentId == child.studentId }}" href="{{ url_for(endpoint, child=k.studentId) }}">{{ k.student_name.split()[0] }}</a>{% endfor %}</div>{% endif %}
+</div>{% else %}<div class="card empty">No child is linked to this account yet. Please contact the school.</div>{% endif %}
+{% endmacro %}
