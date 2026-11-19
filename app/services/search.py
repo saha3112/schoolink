@@ -177,6 +177,14 @@ def run(user, q):
         return res
     scope = _scope(user)
     p = parse(q)
+    from . import smart_answer as SA
+    smart = SA.answer(user, q, p)                          # "parents number of <student>", "email of <student>" ...
+    if smart and smart["status"] == "ok":
+        res["say"] = smart["say"]
+        if smart["group"]:
+            res["groups"].append(smart["group"])
+        res["understood"] += smart["chips"]
+        return res
     classes = _classes()
     cls_ids, sec_ids, sec_rows = [], [], []
     if p["cls"]:
@@ -309,4 +317,6 @@ def run(user, q):
         if prs:
             res["groups"].append({"title": "Parents", "items": [{"title": r["nm"], "icon": "users", "sub": "Parent" + (f" · {r['phone_1']}" if r["phone_1"] else ""),
                                   "url": url_for("parents.detail", pid=r["id"]), "actions": []} for r in prs]})
+    if smart and not any(g.get("items") for g in res["groups"]):
+        res["say"] = smart["say"]                           # asked for details but no student (or parent) matched
     return res

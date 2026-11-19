@@ -283,11 +283,13 @@ window.sectionSubjects = function (o) {
     return '<div class="ts-marks">' + m.rows.map(r => '<div class="ts-mrow"><span>' + esc(r.subject) + '</span><span>' + r.parts.map(p => '<i>' + esc(p.n) + ' ' + esc(p.m) + '/' + esc(p.f) + '</i>').join('') + '</span><b>' + (r.total != null ? esc(r.total) + '/' + esc(r.full) : '') + '</b></div>').join('') +
       '<div class="ts-mrow ts-mtot"><span>Total</span><span></span><b>' + esc(m.total) + '/' + esc(m.full) + (m.pct != null ? ' · ' + m.pct + '%' : '') + '</b></div></div>';
   };
+  const factsHtml = f => !f ? '' : '<div class="ts-facts">' + f.map(x => '<div class="ts-fact"><span>' + esc(x.k) + '</span>' + (x.v == null ? '<i>Not available</i>' : (x.tel ? '<a href="tel:' + esc(String(x.v).replace(/[^+\d]/g, '')) + '">' + esc(x.v) + '</a>' : '<b>' + esc(x.v) + '</b>')) + '</div>').join('') + '</div>';
   const itemHtml = it => '<div class="ts-item"><' + (it.url ? 'a class="ts-main" href="' + esc(it.url) + '"' : 'div class="ts-main"') + '><span class="ts-ico">' + (it.iconHtml || ICON[it.icon] || ICON.layers) + '</span><span class="ts-txt"><b>' + esc(it.title) + '</b><small>' + esc(it.sub || '') + '</small></span>' + (it.badge ? '<em>' + esc(it.badge) + '</em>' : '') + '</' + (it.url ? 'a' : 'div') + '>' +
-    ((it.actions && it.actions.length) ? '<div class="ts-acts">' + it.actions.map(a => link(a, 'ts-act')).join('') + '</div>' : '') + marksHtml(it.marks) + '</div>';
+    ((it.actions && it.actions.length) ? '<div class="ts-acts">' + it.actions.map(a => link(a, 'ts-act')).join('') + '</div>' : '') + factsHtml(it.facts) + marksHtml(it.marks) + '</div>';
   const group = (title, items, extra) => '<div class="ts-group"><div class="ts-gh">' + esc(title) + '</div>' + items.map(itemHtml).join('') + (extra || '') + '</div>';
   const render = (d, q) => {
     let html = '';
+    if (d && d.say) html += '<div class="ts-say">' + esc(d.say) + '</div>';
     if (d && d.understood && d.understood.length) html += '<div class="ts-chips">Showing: ' + d.understood.map(x => '<span>' + esc(x) + '</span>').join('') + '</div>';
     const pg = pageMatches(q).map(p => ({ title: p.title, sub: p.sub || 'Page', url: p.url, iconHtml: p.icon }));
     const groups = (d && d.groups) || [];

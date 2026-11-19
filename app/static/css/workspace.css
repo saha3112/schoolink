@@ -268,3 +268,19 @@ html[data-theme="dark"] .workspace .t th{border-bottom-color:#4a4870}
 .workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--brand) 38%,var(--line));border-radius:8px;border:3px solid transparent;background-clip:content-box}
 .workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar-thumb:hover{background:var(--brand);background-clip:content-box}
 .workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar-track{background:transparent}
+
+/* ---- search: direct answers (parent details etc.) ---- */
+.ts-say{margin:8px 10px 4px;padding:10px 12px;border-radius:12px;background:var(--brand-soft);color:var(--brand-ink);font-size:13px;font-weight:600;line-height:1.45}
+.ts-facts{margin:4px 10px 10px 44px;display:grid;gap:2px}
+.ts-fact{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.ts-fact:last-child{border-bottom:0}
+.ts-fact span{color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.ts-fact b{color:var(--text);font-weight:650;overflow-wrap:anywhere}
+.ts-fact a{color:var(--brand);font-weight:750;text-decoration:none;font-variant-numeric:tabular-nums}
+.ts-fact i{color:var(--muted);font-style:normal;font-size:12.5px}
+
+/* ---- One corner radius for every table box, on all four sides (scrollbars are clipped too) ---- */
+.workspace{--table-radius:16px}
+.workspace .table-wrap,.workspace .subject-page .table-wrap{border-radius:var(--table-radius)!important;clip-path:inset(0 round var(--table-radius))}
+.workspace .table-wrap::-webkit-scrollbar-corner{background:transparent}
+.workspace .table-wrap>table{border-radius:0}
