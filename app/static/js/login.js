@@ -20,11 +20,4 @@
       element.classList.add('reveal-pending'); observer.observe(element);
     });
   }
-  const forgot = document.querySelector('.forgot-password');
-  const guidance = document.querySelector('.reset-guidance');
-  forgot.addEventListener('click', () => {
-    const expanded = forgot.getAttribute('aria-expanded') !== 'true';
-    forgot.setAttribute('aria-expanded', String(expanded));
-    guidance.hidden = !expanded;
-  });
 })();
