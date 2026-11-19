@@ -293,7 +293,7 @@
     const render = () => {
       holder.innerHTML = items.map(it => '<span class="mp-chip" data-id="' + it.id + '">' + (it.thumb ? '<img src="' + esc(it.thumb) + '" alt="">' : '<i style="--c:' + extColor(it.ext) + '">' + esc((it.ext || 'file').toUpperCase()) + '</i>') +
         '<b title="' + esc(it.name) + '">' + esc(it.name) + '</b><button type="button" class="modal-x mini" aria-label="Remove ' + esc(it.name) + '" title="Remove"></button><input type="hidden" name="' + esc(name) + '" value="' + it.id + '"></span>').join('');
-      const b = box.querySelector('[data-mp-open]'); if (b) b.innerHTML = I.clip + ' ' + (items.length ? 'Change selection (' + items.length + ')' : (box.dataset.button || (multiple ? 'Choose from library or upload' : 'Choose or upload')));
+      const b = box.querySelector('[data-mp-open]'); if (b) b.innerHTML = I.clip + ' ' + (items.length ? 'Change selection (' + items.length + ')' : 'Choose from library or upload');
       box.dispatchEvent(new CustomEvent('mp:change', { bubbles: true, detail: { items } }));
     };
     box.addEventListener('click', e => {

@@ -1,0 +1,135 @@
+/* =====================================================================================================================
+   Schoolink UI system - the single source of truth for buttons, action colours, tables and card edges.
+   Loaded after every other stylesheet so the whole application looks and behaves the same.
+   ===================================================================================================================== */
+:root{
+ --row-hover:#f3f2ff;--row-bar:#6b5cf0;--th-bg:linear-gradient(180deg,#f9faff,#f0f3fd);--th-ink:#5a6694;--td-line:#edf0fb;
+ --a-edit:#2f4fd8;--a-edit-bg:#eef2ff;--a-edit-bd:#cbd6ff;--a-edit-hv:#dde6ff;
+ --a-del:#d3304b;--a-del-bg:#fff1f3;--a-del-bd:#ffcbd3;--a-del-hv:#ffe0e5;
+ --a-res:#0b9a67;--a-res-bg:#e7faf1;--a-res-bd:#b4ead4;--a-res-hv:#d3f5e7;
+ --a-view:#5744d1;--a-view-bg:#f4f1ff;--a-view-bd:#d9d2ff;--a-view-hv:#e8e3ff;
+ --a-purge-1:#ea4a62;--a-purge-2:#bf2440;
+}
+html[data-theme="dark"]{
+ --row-hover:#252d52;--row-bar:#9a8cff;--th-bg:linear-gradient(180deg,#222b4d,#1d2644);--th-ink:#aab6dc;--td-line:#2d3858;
+ --a-edit:#a9bcff;--a-edit-bg:#222d5c;--a-edit-bd:#34428a;--a-edit-hv:#2b3a78;
+ --a-del:#ff8da0;--a-del-bg:#42232f;--a-del-bd:#6d3040;--a-del-hv:#53293a;
+ --a-res:#5fe0ae;--a-res-bg:#17372f;--a-res-bd:#245c4b;--a-res-hv:#1d4639;
+ --a-view:#c5b8ff;--a-view-bg:#2a2757;--a-view-bd:#40397f;--a-view-hv:#342f69;
+}
+
+/* ---------------------------------------------------------------- buttons: one shape, one rhythm */
+.workspace .btn{min-height:36px;padding:8px 15px;border-radius:12px;font-size:12.5px;font-weight:650;letter-spacing:.01em;border:1px solid #dfe4f7;background:#fff;color:var(--text);
+ box-shadow:0 1px 2px #2b3b8a0d;transition:transform .15s,box-shadow .18s,background-color .15s,border-color .15s,color .15s}
+.workspace .btn:hover{transform:translateY(-1px);background:#f8f9ff;border-color:#b9c3f3;box-shadow:0 8px 18px #4a5fc61f}
+.workspace .btn:active{transform:none;box-shadow:0 2px 6px #4a5fc61a}
+.workspace .btn.sm{min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:10px}
+.workspace .btn[disabled],.workspace .btn:disabled{opacity:.5;transform:none;box-shadow:none;cursor:not-allowed}
+html[data-theme="dark"] .workspace .btn{background:#1f2848;border-color:#34406a;color:#e6ebff;box-shadow:none}
+html[data-theme="dark"] .workspace .btn:hover{background:#27315a;border-color:#4a5894}
+html[data-theme="dark"] .workspace .btn.primary{background:#7557e4;border-color:transparent;color:#fff}
+
+/* ---------------------------------------------------------------- action colours (set by ui.js from the label) */
+.workspace .btn.act-edit,.workspace .btn.act-delete,.workspace .btn.act-restore,.workspace .btn.act-view,.workspace .btn.danger:not(.act-purge){
+ --c:var(--a-edit);--bg:var(--a-edit-bg);--bd:var(--a-edit-bd);--hv:var(--a-edit-hv);background:var(--bg);color:var(--c);border-color:var(--bd)}
+.workspace .btn.act-delete,.workspace .btn.danger:not(.act-purge){--c:var(--a-del);--bg:var(--a-del-bg);--bd:var(--a-del-bd);--hv:var(--a-del-hv)}
+.workspace .btn.act-restore{--c:var(--a-res);--bg:var(--a-res-bg);--bd:var(--a-res-bd);--hv:var(--a-res-hv)}
+.workspace .btn.act-view{--c:var(--a-view);--bg:var(--a-view-bg);--bd:var(--a-view-bd);--hv:var(--a-view-hv)}
+.workspace .btn.act-edit:hover,.workspace .btn.act-delete:hover,.workspace .btn.act-restore:hover,.workspace .btn.act-view:hover,.workspace .btn.danger:not(.act-purge):hover{
+ background:var(--hv);color:var(--c);border-color:var(--c);box-shadow:0 8px 18px color-mix(in srgb,var(--c) 24%,transparent)}
+.workspace .btn.act-purge,.workspace .btn.danger-solid{background:linear-gradient(135deg,var(--a-purge-1),var(--a-purge-2));color:#fff;border-color:transparent;box-shadow:0 6px 14px #c1244033}
+.workspace .btn.act-purge:hover,.workspace .btn.danger-solid:hover{background:linear-gradient(135deg,#f25a71,#cc2a47);color:#fff;border-color:transparent;box-shadow:0 10px 22px #c124404d}
+.workspace td .btn+.btn,.workspace td .btn+form,.workspace td form+.btn,.workspace td form+form{margin-left:6px}
+.workspace td form{display:inline-block;margin:0}
+
+/* ---------------------------------------------------------------- the library / upload button: same label and look everywhere */
+.workspace .mp-box-row .btn[data-mp-open]{min-height:38px;padding:8px 16px;border-radius:12px;background:var(--a-view-bg);color:var(--a-view);border-color:var(--a-view-bd);font-weight:700}
+.workspace .mp-box-row .btn[data-mp-open]:hover{background:var(--a-view-hv);border-color:var(--a-view);box-shadow:0 8px 18px color-mix(in srgb,var(--a-view) 24%,transparent)}
+
+/* ---------------------------------------------------------------- tables: every head and cell centred, one hover, one rhythm */
+.workspace table.t,.workspace table.tt,.workspace table.sub-matrix,.workspace table.roll-table{border-collapse:separate;border-spacing:0}
+.workspace table.t thead th,.workspace table.tt thead th,.workspace table.sub-matrix thead th,.workspace table.roll-table thead th{background:var(--th-bg);color:var(--th-ink);
+ font-size:10.5px;font-weight:800;letter-spacing:.075em;text-transform:uppercase;text-align:center!important;vertical-align:middle;padding:14px 14px;border-bottom:1px solid #e0e5f9;white-space:nowrap}
+.workspace table.t td,.workspace table.tt td,.workspace table.roll-table td{text-align:center!important;vertical-align:middle!important;padding:12px 14px;font-size:13px;color:var(--sub);border-bottom:1px solid var(--td-line)}
+.workspace table.t tbody tr:last-child td{border-bottom:0}
+.workspace table.t td :is(b,strong){color:var(--text)}
+.workspace table.t td.actions,.workspace table.t td:last-child:has(.btn){white-space:nowrap}
+.workspace table.t td .na-cell{color:var(--muted)}
+.workspace table.t tbody tr{transition:background-color .14s}
+.workspace table.t tbody tr:hover td,.workspace table.tt tbody tr:hover td,.workspace table.roll-table tbody tr:hover td{background-color:var(--row-hover)!important}
+.workspace table.t tbody tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--row-bar)}
+.workspace table.t .col-name,.workspace table.t .col-email,.workspace table.t .col-login,.workspace table.t .col-description{text-align:center!important}
+.workspace .marks-grid thead .col-name{text-align:center!important}
+/* narrow columns: #, numbers, counts (marked by tables.js) take only the width they need */
+.workspace table.t .col-narrow{width:1%;white-space:nowrap}
+.workspace table.t th.col-narrow,.workspace table.t td.col-narrow{padding-left:12px;padding-right:12px}
+.workspace table.t th.col-index{min-width:52px}
+html[data-theme="dark"] .workspace table.t thead th{border-bottom-color:#2d3858}
+
+/* ---------------------------------------------------------------- cards: the gradient edge sits exactly on the rim (no white sliver) */
+.workspace .card:before{inset:-1.5px;left:-1.5px;right:-1.5px;top:-1.5px;bottom:-1.5px;border-radius:inherit;padding:3.5px;clip-path:inset(0 0 calc(100% - 26px) 0)}
+
+/* ---------------------------------------------------------------- scrollbars: slim, rounded, in the sign-in gradient (everywhere) */
+html{scrollbar-width:thin;scrollbar-color:#a9b8f4 transparent}
+html[data-theme="dark"]{scrollbar-color:#5b6bc2 transparent}
+*{scrollbar-width:thin;scrollbar-color:#a9b8f4 transparent}
+html[data-theme="dark"] *{scrollbar-color:#5b6bc2 transparent}
+::-webkit-scrollbar{width:10px!important;height:10px!important;background:transparent!important}
+::-webkit-scrollbar-track{background:transparent!important;border-radius:10px!important}
+::-webkit-scrollbar-corner{background:transparent!important}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#93b7ff,#ab8fff)!important;border:2.5px solid transparent!important;background-clip:content-box!important;border-radius:999px!important;
+ min-height:36px;min-width:36px;transition:background .15s}
+::-webkit-scrollbar-thumb:horizontal{background:linear-gradient(90deg,#93b7ff,#ab8fff)!important;background-clip:content-box!important}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#2d8cf5,#6a3df2)!important;background-clip:content-box!important}
+::-webkit-scrollbar-thumb:horizontal:hover{background:linear-gradient(90deg,#2d8cf5,#6a3df2)!important;background-clip:content-box!important}
+::-webkit-scrollbar-thumb:active{background:linear-gradient(180deg,#1d70dc,#5530d6)!important;background-clip:content-box!important}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#4f62c4,#7258cc)!important;background-clip:content-box!important}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:horizontal{background:linear-gradient(90deg,#4f62c4,#7258cc)!important;background-clip:content-box!important}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#6f84ee,#9275ee)!important;background-clip:content-box!important}
+.sb-nav::-webkit-scrollbar,.sidebar ::-webkit-scrollbar{width:8px!important}
+
+/* permanent delete: solid red gradient (older rules clear background-image with !important, so this must too) */
+.workspace .btn.act-purge,.workspace .btn.act-purge.danger,.workspace .btn.danger-solid{background-color:#d62f4b!important;background-image:linear-gradient(135deg,var(--a-purge-1),var(--a-purge-2))!important;color:#fff!important;border-color:transparent!important}
+.workspace .btn.act-purge:hover,.workspace .btn.danger-solid:hover{background-color:#e0364f!important;background-image:linear-gradient(135deg,#f25a71,#cc2a47)!important;color:#fff!important}
+
+/* row actions stay on one line, centred */
+.workspace table.t td .parent-row-actions,.workspace table.t td .row-actions{display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center;justify-content:center;gap:6px;margin:0 0 0 6px;vertical-align:middle}
+.workspace table.t td .parent-row-actions:first-child,.workspace table.t td .row-actions:first-child{margin-left:0}
+.workspace table.t td:has(.btn){white-space:nowrap}
+
+/* dark theme: the base dark button rule is more specific than the variants above, so repeat them here */
+html[data-theme="dark"] .workspace .btn.act-edit,html[data-theme="dark"] .workspace .btn.act-delete,html[data-theme="dark"] .workspace .btn.act-restore,html[data-theme="dark"] .workspace .btn.act-view,html[data-theme="dark"] .workspace .btn.danger:not(.act-purge){background:var(--bg);color:var(--c);border-color:var(--bd)}
+html[data-theme="dark"] .workspace .btn.act-edit:hover,html[data-theme="dark"] .workspace .btn.act-delete:hover,html[data-theme="dark"] .workspace .btn.act-restore:hover,html[data-theme="dark"] .workspace .btn.act-view:hover,html[data-theme="dark"] .workspace .btn.danger:not(.act-purge):hover{background:var(--hv);color:var(--c);border-color:var(--c);box-shadow:0 8px 18px color-mix(in srgb,var(--c) 26%,transparent)}
+html[data-theme="dark"] .workspace .mp-box-row .btn[data-mp-open]{background:var(--a-view-bg);color:var(--a-view);border-color:var(--a-view-bd)}
+
+/* =====================================================================================================================
+   Frosted glass cards (everywhere except the sign-in page): translucent, blurred, no coloured edge. Each card carries the
+   same soft ring + sheen the dashboard banner has, and a fine grain like frosted glass.
+   ===================================================================================================================== */
+:root{
+ --grain:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .3 0 0 0 0 .6 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+ --grain-dark:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* soft coloured light behind the page, so the glass has something to blur */
+body.workspace:before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(560px 440px at 82% 12%,#7b9bff47,transparent 70%),radial-gradient(520px 420px at 10% 70%,#b68cff3d,transparent 70%),radial-gradient(460px 380px at 62% 96%,#4fc8ff2e,transparent 70%)}
+html[data-theme="dark"] body.workspace:before{background:radial-gradient(560px 440px at 82% 12%,#5b6cff2e,transparent 70%),radial-gradient(520px 420px at 10% 70%,#8a5cff26,transparent 70%),radial-gradient(460px 380px at 62% 96%,#2fa8ff1c,transparent 70%)}
+
+.workspace .card{background:linear-gradient(135deg,#ffffffbd,#ffffff7a)!important;-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);
+ border:1px solid #ffffffc7!important;box-shadow:0 14px 40px #4854b824,0 2px 6px #4854b80f,inset 0 1px 0 #ffffffe6!important}
+.workspace .card:before{content:'';position:absolute;inset:0;left:0;right:0;top:0;bottom:0;width:auto;height:auto;border-radius:inherit;padding:0;z-index:-1;pointer-events:none;opacity:1;
+ -webkit-mask:none;mask:none;clip-path:none;
+ background:radial-gradient(circle 150px at 100% 0%,transparent 0 88px,#ffffff8c 89px,transparent 91.5px,transparent 146px,#ffffff61 147px,transparent 149.5px),
+  radial-gradient(circle 260px at 100% 0%,#ffffff9e,#ffffff00 72%),linear-gradient(115deg,#ffffff6b 0%,#ffffff00 34%),var(--grain)}
+.workspace .table-wrap{background:linear-gradient(135deg,#ffffffc2,#ffffff80)!important;-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+ border:1px solid #ffffffc7!important;box-shadow:0 14px 40px #4854b81f,0 2px 6px #4854b80d,inset 0 1px 0 #ffffffe6!important}
+.workspace .card .table-wrap{background:#ffffff4d!important;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid #ffffffa6!important;box-shadow:none!important}
+.workspace .stat,.workspace .stat.c2,.workspace .stat.c3,.workspace .stat.c4{border-top:1px solid #ffffffc7!important}
+
+html[data-theme="dark"] .workspace .card{background:linear-gradient(135deg,#2a3563a3,#1b2447a3)!important;border:1px solid #ffffff1a!important;box-shadow:0 14px 40px #02061a61,inset 0 1px 0 #ffffff14!important}
+html[data-theme="dark"] .workspace .card:before{background:radial-gradient(circle 150px at 100% 0%,transparent 0 88px,#ffffff29 89px,transparent 91.5px,transparent 146px,#ffffff1a 147px,transparent 149.5px),
+  radial-gradient(circle 260px at 100% 0%,#ffffff1f,#ffffff00 72%),linear-gradient(115deg,#ffffff14 0%,#ffffff00 34%),var(--grain-dark)}
+html[data-theme="dark"] .workspace .table-wrap{background:linear-gradient(135deg,#27325ea8,#1a2346a8)!important;border:1px solid #ffffff1a!important;box-shadow:0 14px 40px #02061a52,inset 0 1px 0 #ffffff12!important}
+html[data-theme="dark"] .workspace .card .table-wrap{background:#ffffff0a!important;border:1px solid #ffffff14!important}
+html[data-theme="dark"] .workspace .stat,html[data-theme="dark"] .workspace .stat.c2,html[data-theme="dark"] .workspace .stat.c3,html[data-theme="dark"] .workspace .stat.c4{border-top:1px solid #ffffff1a!important}
+@supports not (backdrop-filter:blur(2px)){.workspace .card,.workspace .table-wrap{background:linear-gradient(135deg,#fffffff2,#f6f8ffe0)!important}}

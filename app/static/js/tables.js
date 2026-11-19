@@ -12,7 +12,8 @@
     if(t==='status'||t==='role')return 'status';
     if(t.includes('code')||t.includes('adm.'))return 'code';
     if(['address','comment','reason','note','message'].includes(t))return 'description';
-    if(t==='actions')return 'actions';return '';
+    if(t==='actions')return 'actions';
+    if(t==='#'||t==='no'||t==='no.'||t==='sl'||t==='sl.'||t==='sl no'||t==='sr no'||t==='s.no')return 'index';return '';
   };
   function init(root=document){
     root.querySelectorAll('table.t').forEach(table=>{
@@ -26,6 +27,24 @@
       Array.from(table.tBodies).forEach(body=>Array.from(body.rows).forEach(row=>{
         let i=0;Array.from(row.cells).forEach(cell=>{const type=columns[i];if(type&&cell.colSpan===1)cell.classList.add('col-'+type);i+=cell.colSpan;});
       }));
+    });
+  }
+  /* Columns that only hold short numbers (#, counts, ids) shrink to fit instead of taking a full share of the width. */
+  const NUM_HEAD=/^(#|no\.?|sl\.?(\s*no\.?)?|sr\.?(\s*no\.?)?|s\.?\s*no\.?|id|order|sort|count|total|students?|sections?|classes|subjects?|teachers?|max|rank|age|year|%|days|sessions)$/i;
+  const NUM_CELL=/^[\d.,\-–\/%\s]{1,9}$/;
+  function narrow(root=document){
+    root.querySelectorAll('table.t').forEach(table=>{
+      if(table.classList.contains('marks-grid')||table.hasAttribute('data-no-narrow')||!table.tHead||table.tHead.rows.length!==1||!table.tBodies[0])return;
+      const heads=Array.from(table.tHead.rows[0].cells),rows=Array.from(table.tBodies[0].rows).slice(0,80).filter(r=>r.cells.length===heads.length);
+      if(!rows.length)return;
+      heads.forEach((th,i)=>{
+        if(th.colSpan>1||th.querySelector('input'))return;
+        const name=th.textContent.replace(/\s+/g,' ').trim(),texts=rows.map(r=>r.cells[i].textContent.replace(/\s+/g,' ').trim()).filter(Boolean);
+        const numeric=texts.length&&texts.every(x=>NUM_CELL.test(x)),yes=(name==='#'||NUM_HEAD.test(name))&&(numeric||name==='#');
+        const on=!!yes&&name.length<=14;
+        th.classList.toggle('col-narrow',on);th.classList.toggle('col-index',on&&name==='#');
+        rows.forEach(r=>r.cells[i].classList.toggle('col-narrow',on));
+      });
     });
   }
   /* Every data cell takes the text alignment of the header cell that sits above it (handles rowspan / colspan headers). */
@@ -127,5 +146,5 @@
     });
   }
   addEventListener('resize',()=>{stickHead();fit();});addEventListener('load',()=>{stickHead();fit();});
-  window.slTables={init:()=>{init();align();paginate();stickHead();fit();}};init();align();paginate();stickHead();fit();addEventListener('sl:live-updated',()=>{init();align();paginate();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{align();paginate();stickHead();fit();});
+  window.slTables={init:()=>{init();narrow();align();paginate();stickHead();fit();}};init();narrow();align();paginate();stickHead();fit();addEventListener('sl:live-updated',()=>{init();narrow();align();paginate();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{narrow();align();paginate();stickHead();fit();});
 })();
