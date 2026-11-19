@@ -133,13 +133,13 @@ cd schoolink
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
-mkdir -p ~/.config/schoolink && cp .env.example ~/.config/schoolink/.env   # fill in your values
+mkdir -p .secrets && cp .env.example .secrets/.env   # fill in your values
 .venv/bin/python run.py     # http://127.0.0.1:8120
 ```
 
 ### Configuration
 
-Settings come from environment variables or an `.env` file, read from `$SCHOOLINK_ENV`, then `~/.config/schoolink/.env`, then `./.env`.
+Settings come from environment variables or an `.env` file, read from `$SCHOOLINK_ENV`, then `.secrets/.env`, then `./.env`.
 
 | Variable | Description |
 |:--|:--|

@@ -18,9 +18,9 @@ def _load_env(path):
         pass
 
 
-# Secrets live outside the project folder: $SCHOOLINK_ENV, else ~/.config/schoolink/.env, else ./.env
+# Secrets live in the git-ignored .secrets/ folder: $SCHOOLINK_ENV, else ./.secrets/.env, else ./.env
 for _p in (os.environ.get("SCHOOLINK_ENV"),
-           os.path.join(os.path.expanduser("~"), ".config", "schoolink", ".env"),
+           os.path.join(BASE_DIR, ".secrets", ".env"),
            os.path.join(BASE_DIR, ".env")):
     if _p and os.path.isfile(_p):
         _load_env(_p)
