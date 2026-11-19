@@ -21,8 +21,13 @@ def student_details(student_id):
 
 
 def parent_details(student_id):
-    return db.query("SELECT CONCAT_WS(' ', parents.fname, parents.mname, parents.lname) AS parentName, parents.address, parents.phone_1 "
-                    "FROM parents, students WHERE parents.id = students.parent_id AND students.studentId = %s", (student_id,))
+    from . import parent_identity as PI
+    rows = db.query("SELECT p.*, u.fname AS account_name FROM parents p JOIN students st ON st.parent_id=p.id "
+                    "LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL "
+                    "WHERE st.studentId=%s AND p.deleted_at IS NULL", (student_id,))
+    for row in rows:
+        row['parentName'] = PI.name(row)
+    return rows
 
 
 def build(student_id, force_view=None):

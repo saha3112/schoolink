@@ -53,6 +53,7 @@
       scripts.forEach(s => { if (s.type && s.type !== 'text/javascript') return; const n = document.createElement('script'); n.textContent = s.textContent; document.body.appendChild(n); n.remove(); });
       if (window.slUpgradeConfirm) slUpgradeConfirm(body);
       if (window.slPretty) slPretty.init();
+      if (window.slTables) slTables.init(body);
       const first = body.querySelector('input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea'); if (first && !state.opts.noFocus) setTimeout(() => { try { first.focus({ preventScroll: true }); } catch (e) { } }, 60);
     }
     async function load(u) {

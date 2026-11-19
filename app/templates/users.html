@@ -1,13 +1,18 @@
-{% extends 'layout.html' %}{% from '_pager.html' import pager %}
-{% block heading %}Users & Passwords{% endblock %}
+{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_record_actions.html' import row_actions,bulk_controls with context %}
+{% block heading %}Users & passwords{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Users &amp; passwords</h1><p>Reset the password of any admin or teacher.</p></div></div>
-<form class="toolbar" method="get"><label>Search<input name="q" value="{{ q }}" placeholder="Name / mobile / email"></label><button class="btn">Search</button></form>
-<div class="table-wrap w-mid"><table class="t"><thead><tr><th>Name</th><th>Login</th><th>Role</th><th>New password</th></tr></thead><tbody>
-{% for r in rows %}<tr><td>{{ r.fname }}</td><td>{{ r.email }}</td>
- <td>{{ {'0':'Super Admin','9':'Super Admin','1':'Admin','2':'Teacher'}[r.user_type|string] }}</td>
- <td><form method="post" action="{{ url_for('account.reset_password', uid=r.id) }}" style="display:flex;gap:6px">
-   <input type="password" name="new_password" placeholder="min 6 chars" minlength="6" required style="width:170px"><button class="btn sm">Set</button></form></td></tr>
-{% else %}<tr><td colspan="4" class="empty">No users.</td></tr>{% endfor %}
-</tbody></table></div>{{ pager(p) }}
+<div class="page-head"><h1>{{ 'User Trash' if trash else 'Users & passwords' }}</h1><p>Manage accounts and reset passwords within your permission level. Your own account and super-admin accounts are protected.</p></div>
+<div class="toolbar">{% if me.is_admin and can_access('security.admin_accounts') %}<a class="btn primary" href="{{ url_for('security.admin_accounts') }}">Create admin</a>{% endif %}{% if me.is_admin and can_access('security.permissions') %}<a class="btn" href="{{ url_for('security.permissions') }}">Manage permissions</a>{% endif %}</div>
+{% if manage_accounts %}<div class="trash-tabs" style="margin-bottom:18px"><a class="{{ '' if trash else 'on' }}" href="{{ url_for('account.users',q=q) }}">Active</a><a class="{{ 'on' if trash }}" href="{{ url_for('account.users',q=q,trash=1) }}">Trash <em>{{ n_trash }}</em></a></div>{% endif %}
+<form class="toolbar" method="get">{% if trash %}<input type="hidden" name="trash" value="1">{% endif %}<label>Find a user<input name="q" value="{{ q }}" placeholder="Name / mobile / email"></label><button class="btn">Search</button></form>
+{% if manage_accounts %}{{ bulk_controls('user',trash) }}{% endif %}
+{% if trash %}<p class="muted">Linked parent accounts must be restored or removed through All Parents. Teacher profiles and assignments are protected from permanent deletion here.</p>{% endif %}
+<div class="table-wrap"><table class="t"><thead><tr>{% if manage_accounts %}<th class="parent-checkbox-cell"><input type="checkbox" data-record-all aria-label="Select eligible users on this page"></th>{% endif %}<th>Name</th><th>Login</th><th>Role</th><th>Status</th><th>Password reset access</th><th>Reset password</th>{% if manage_accounts %}<th>Actions</th>{% endif %}</tr></thead><tbody>
+{% for r in rows %}<tr>{% if manage_accounts %}<td class="parent-checkbox-cell"><input type="checkbox" name="ids" value="{{ r.id }}" form="recordBulk" data-record-id data-record-label="{{ r.fname }} · {{ r.email }}" aria-label="Select {{ r.fname }}" {{ 'disabled' if not r.can_lifecycle }}></td>{% endif %}
+<td><strong>{{ r.fname }}</strong></td><td>{{ r.email }}</td><td>{{ {'0':'Super Admin','9':'Super Admin','1':'Admin','2':'Teacher','3':'Parent'}.get(r.user_type|string,'User') }}</td><td><span class="chip {{ 'gray' if trash or r.active|string != '1' else 'green' }}">{{ 'Trashed' if trash else 'Active' if r.active|string == '1' else 'Inactive' }}</span></td>
+<td><span class="chip {{ 'green' if r.reset_enabled else 'gray' }}">{{ 'Enabled' if r.reset_enabled else 'Off' }}</span>{% if r.can_manage and not trash %}<a class="btn sm" href="{{ url_for('security.permissions',user=r.id) }}">Manage</a>{% endif %}</td>
+<td>{% if r.can_reset %}<form method="post" action="{{ url_for('account.reset_password',uid=r.id) }}" class="password-reset-form"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="password" name="new_password" placeholder="At least 8 characters" minlength="8" maxlength="72" required autocomplete="new-password"><button class="btn sm">Reset</button></form>{% else %}<span class="muted">{{ 'Use Change Password for your account' if r.id == me.id else 'Not available in Trash' if trash else 'Protected / not permitted' }}</span>{% endif %}</td>
+{% if manage_accounts %}<td>{% if r.can_lifecycle %}{{ row_actions(r.id,r.fname ~ ' · ' ~ r.email,trash,'user') }}{% else %}<span class="muted">Protected</span>{% endif %}</td>{% endif %}</tr>
+{% else %}<tr><td colspan="{{ 8 if manage_accounts else 6 }}" class="empty">No matching users.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
 {% endblock %}
+{% block scripts %}<script src="{{ url_for('static',filename='js/record-bulk.js',v='1') }}"></script>{% endblock %}

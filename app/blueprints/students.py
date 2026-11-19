@@ -16,11 +16,20 @@ def _sections(cid):
     return db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0' ORDER BY section_name", (cid,)) if cid else []
 
 
-@bp.route("/")
+@bp.route("/", methods=["GET","POST"])
 @admin_required
 def student_list():
+    from ..services import student_lifecycle as lifecycle
+    if request.method=='POST':
+        try:
+            action=request.form.get('action','')
+            count=lifecycle.apply(current_user(),action,request.form.getlist('ids'))
+            flash(str(count)+' student(s) '+{'trash':'moved to Trash. Marks and history were kept.','restore':'restored. Section roll numbers were updated.','purge':'deleted permanently.'}[action],'success')
+        except lifecycle.StudentActionError as error:flash(str(error),'error')
+        return redirect(url_for('students.student_list',**{k:request.args[k] for k in ('trash','class_id','section_id','q') if k in request.args}))
+    trash=request.args.get('trash')=='1'
     cls, sec, q = to_int(request.args.get("class_id")), to_int(request.args.get("section_id")), request.args.get("q", "").strip()
-    where, args = "WHERE st.isDelete='0'", []
+    where, args = "WHERE st.isDelete=%s", ['1' if trash else '0']
     if cls: where += " AND st.class_id=%s"; args.append(cls)
     if sec: where += " AND st.section_id=%s"; args.append(sec)
     if q:
@@ -29,13 +38,13 @@ def student_list():
     total = db.scalar(f"SELECT COUNT(*) {base}", args)
     p = paginate(total, 25, page_arg())
     rows = db.query(f"SELECT st.*, c.class_name, s.section_name {base} ORDER BY st.class_id, st.section_id, st.student_rollNumber LIMIT %s OFFSET %s", args + [25, p["offset"]])
-    return render_template("student_list.html", rows=rows, p=p, cls=cls, sec=sec, q=q, classes=_classes(), sections=_sections(cls))
+    return render_template("student_list.html", rows=rows, p=p, cls=cls, sec=sec, q=q, classes=_classes(), sections=_sections(cls), trash=trash, n_trash=db.scalar("SELECT COUNT(*) FROM students WHERE isDelete='1'"))
 
 
 @bp.route("/<int:sid>/edit", methods=["GET", "POST"])
 @admin_required
 def edit(sid):
-    st = db.one("SELECT st.*, c.class_name, s.section_name FROM students st LEFT JOIN classes c ON c.classId=st.class_id LEFT JOIN sections s ON s.sectionId=st.section_id WHERE st.studentId=%s", (sid,))
+    st = db.one("SELECT st.*, c.class_name, s.section_name FROM students st LEFT JOIN classes c ON c.classId=st.class_id LEFT JOIN sections s ON s.sectionId=st.section_id WHERE st.studentId=%s AND st.isDelete='0'", (sid,))
     if not st:
         flash("Student not found.", "error"); return redirect(url_for("students.student_list"))
     if request.method == "POST":

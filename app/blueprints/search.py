@@ -12,4 +12,7 @@ def api():
     u = current_user()
     if not (u["is_admin"] or u["is_teacher"]):
         abort(403)
+    from ..services import user_access as UA
+    if UA.restricted(u):
+        return jsonify(groups=[], understood=['Use quick navigation for your permitted pages.'])
     return jsonify(S.run(u, request.args.get("q", "")))

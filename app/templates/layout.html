@@ -7,17 +7,19 @@
 <meta name="csrf" content="{{ csrf_token }}">{% if csv_kind %}
 <meta name="csv-kind" content="{{ csv_kind }}">{% endif %}
 <title>{% block title %}{{ school_name }}{% endblock %} · Schoolink</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v='2') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/workspace.css', v='8') }}">
+<meta name="theme-color" content="#4930dc">
 <script>
  // restore sidebar state before paint (no flash)
  try { document.documentElement.dataset.theme = localStorage.getItem('sl-theme') || 'light'; } catch(e){}
  try { if (localStorage.getItem('sb-collapsed') === '1' && innerWidth > 992) document.documentElement.classList.add('sb-collapsed'); } catch(e){}
 </script>
 </head>
-<body>
+<body class="workspace">
 <header class="topbar">
   <button class="icon-btn" id="sbToggle" aria-label="Toggle sidebar" title="Toggle sidebar">{{ icon('menu', 23) }}</button>
-  <div class="page-path"><span class="path-sub">Workspace / {{ 'Administration' if me.is_admin else me.role_label }}</span><strong class="path-current">{% block heading %}{% endblock %}</strong></div>
+  <div class="page-path"><span class="path-sub">Workspace / {{ me.role_label }}</span><strong class="path-current">{% block heading %}{% endblock %}</strong></div>
   <div class="header-spacer"></div>
   {% if me.is_admin or me.is_teacher %}
   <div class="top-search" id="ts" role="search">
@@ -40,7 +42,7 @@
   <div class="header-divider"></div>
   <div class="header-pop profile" id="profile">
     <button class="account-button" id="profileBtn" aria-haspopup="true" aria-expanded="false" aria-label="Open account menu">
-      <span class="avatar">{{ me.initials }}</span>
+      <span class="avatar">{% if me.profile_version %}<img src="{{ url_for('account.profile_image', uid=me.id, v=me.profile_version) }}" alt="" class="user-avatar-image">{% else %}{{ me.initials }}{% endif %}</span>
       <span class="account-copy"><strong class="account-name">{{ me.fname }}</strong><span class="account-role">{{ me.role_label }}</span></span>
       {{ icon('chevron', 13) }}
     </button>
@@ -56,8 +58,8 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="sb-brand">
-    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" onerror="this.style.display='none'">
-    <div class="sb-title"><b>{{ school_name }}</b><small>{{ school_tagline }}</small></div>
+    <img src="{{ url_for('static', filename='img/sts-logo.png') }}" alt="" onerror="this.style.display='none'">
+    <div class="sb-title"><b>{{ school_name }}</b><small>{{ me.sidebar_label }}</small></div>
   </div>
   <nav class="sb-nav" data-live-html="nav">
   {% for m in menu %}
@@ -102,12 +104,13 @@
   </div>
   <div class="vm-body"><div class="vm-loading" id="vmLoading">Loading…</div><iframe id="vmFrame" title="Document"></iframe></div>
 </div>
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js', v='4') }}"></script>
 <script src="{{ url_for('static', filename='js/pw.js') }}"></script>
 <script src="{{ url_for('static', filename='js/live.js') }}"></script>
 <script src="{{ url_for('static', filename='js/media.js') }}"></script>
 <script src="{{ url_for('static', filename='js/csv.js') }}"></script>
-<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tables.js', v='1') }}"></script>
+<script src="{{ url_for('static', filename='js/modal.js', v='2') }}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

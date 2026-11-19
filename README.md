@@ -160,7 +160,7 @@ Settings come from environment variables or an `.env` file, read from `$SCHOOLIN
 | **Parent** | Parent portal for linked children |
 | **Others** | Change Password only |
 
-Every signed-in user can change their own password from the profile menu. Admins can reset any user's password.
+Every signed-in user can manage their profile photo and change their own password from the account menu. Admin password resets, page permissions, delegated reset access and outgoing SMTP setup are described in [Account administration](docs/account-administration.md).
 
 ## 🔄 What changed from the old app
 

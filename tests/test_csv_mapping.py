@@ -115,22 +115,22 @@ class CsvMappingTests(unittest.TestCase):
         self.assertEqual(_name(parent), 'Rina Das')
         self.assertEqual(_fill_parent_name(parent)['fname'], 'Rina Das')
         self.assertEqual(_name(dict(self.parent(), fname='', account_name='Parent')), '')
-        self.assertEqual(_name(dict(self.parent(), account_name='Other Name')), 'Parent')
+        self.assertEqual(_name(dict(self.parent(), account_name='Other Name')), 'Other Name')
 
     def test_parent_sample_contains_all_contact_fields(self):
         headers, rows = C.sample(dict(kind='parents'))
         self.assertTrue({'first_name','middle_name','last_name','mobile','alternate_phone','secondary_name','email','occupation','address','student_codes','admission_numbers','initial_password'}.issubset(headers))
         self.assertTrue(all(len(row) == len(headers) for row in rows))
 
-    def test_parent_list_missing_name_uses_code_without_dash(self):
+    def test_parent_list_missing_name_is_explicit_and_keeps_code(self):
         from jinja2 import Environment, ChoiceLoader, DictLoader, FileSystemLoader
         env = Environment(loader=ChoiceLoader([DictLoader({'layout.html':'{% block content %}{% endblock %}', '_pager.html':'{% macro pager(p) %}{% endmacro %}'}), FileSystemLoader('app/templates')]))
         env.globals['url_for'] = lambda *args, **kw: '/parents/'
         row = dict(self.parent(), name='', code='PAR01181843', children=[], email='', occupation='')
         html = env.get_template('parents_list.html').render(rows=[row], p={'total':1}, me={'is_admin':True}, classes=[], sections=[], q='', cls=None, sec=None)
-        self.assertIn('<b>PAR01181843</b>', html)
+        self.assertIn('<b>Name not recorded</b>', html)
         self.assertNotIn('<b>—</b>', html)
-        self.assertEqual(html.count('PAR01181843'), 1)
+        self.assertEqual(html.count('>PAR01181843</div>'), 1)
 
     def test_invalid_mapping_writes_nothing(self):
         with patch.object(C.db, 'query', side_effect=[[self.parent()], []]), patch.object(C.db, 'execute') as write, patch.object(C.db, 'commit') as commit:

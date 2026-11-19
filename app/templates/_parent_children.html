@@ -1,7 +1,9 @@
-<p class="muted">Choose up to three children below. All child selections are optional. Each option shows the student code and admission number. You can link more children later; existing links are kept.</p>
-{% for number in range(1, 4) %}
+<p class="muted">Linked children are preselected. Use an empty field to add another child. All selections are optional; existing links are kept.</p>
+{% set child_slots = [3, selected_children|length]|max %}
+{% for number in range(1, child_slots + 1) %}
+{% set selected_child = selected_children[number - 1] if number <= selected_children|length else '' %}
 <label style="margin-top:10px">Child {{ number }} (optional)
 <select name="child_ids"><option value="">Select a child</option>
-{% for child in student_options %}<option value="{{ child.studentId }}">{{ child.student_name }} · Code: {{ child.student_code or '—' }} · Adm. no: {{ child.ADMNO or '—' }} · {{ child.class_name or '' }} {{ child.section_name or '' }}</option>{% endfor %}
+{% for child in student_options %}<option value="{{ child.studentId }}" {{ 'selected' if child.studentId|string == selected_child|string }}>{{ child.student_name }} · Code: {{ child.student_code or '—' }} · Adm. no: {{ child.ADMNO or '—' }} · {{ child.class_name or '' }} {{ child.section_name or '' }}</option>{% endfor %}
 </select></label>
 {% endfor %}

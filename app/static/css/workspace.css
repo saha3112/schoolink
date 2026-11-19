@@ -1,0 +1,242 @@
+/* Schoolink workspace: the same blue / violet identity as the sign-in page.
+   Shared by every authenticated page, including parent and teacher portals. */
+:root{
+ --brand:#4930dc;--brand2:#9845ed;--brand-ink:#3824b5;--brand-soft:#efedff;
+ --bg:#f0f4ff;--surface:#fff;--surface2:#f7f8ff;--surface3:#edf0fc;
+ --text:#14204b;--sub:#56628b;--muted:#7380a2;--line:#e0e5f5;
+ --shadow:0 6px 24px #294e9b07,0 1px 3px #353f7d04;
+ --shadow-lg:0 22px 65px #283f8524;
+ --side-bg:linear-gradient(165deg,#f9fbff 0%,#f0edff 64%,#eaf3ff 100%);
+ --side-text:#526086;--side-icon:#7a83b5;--side-line:#dfe4f5;
+ --side-hover:#e9e7fc;--side-active:linear-gradient(110deg,#157ef2,#4936e6 64%,#9043ec);
+ --side-active-text:#fff;--sub-active:linear-gradient(100deg,#e7ebff,#efe5ff);
+ --workspace-gradient:linear-gradient(110deg,#059cf1,#304ce5 46%,#7035eb 80%,#a645e7);
+ --workspace-border:linear-gradient(90deg,#67beff,#8a73f7,#d0a4f5,#589fff);
+ --workspace-glass:#ffffffed;--chart-line:#e7eaf8;
+}
+html[data-theme="dark"]{
+ --brand:#ac9bff;--brand2:#cd9cf8;--brand-ink:#c1b5ff;--brand-soft:#2c2a52;
+ --bg:#10172e;--surface:#1a2340;--surface2:#1e2947;--surface3:#26314e;
+ --text:#eef1ff;--sub:#b8c3e0;--muted:#98a6cc;--line:#34405f;
+ --shadow:0 6px 28px #040a191f;--shadow-lg:0 24px 65px #03061670;
+ --side-bg:linear-gradient(165deg,#15233d,#201e43 64%,#172b42);
+ --side-text:#bbc5e2;--side-icon:#a3afd7;--side-line:#34405f;
+ --side-hover:#303254;--sub-active:linear-gradient(100deg,#293659,#362b58);
+ --workspace-glass:#1a2340ed;--chart-line:#34405f;
+}
+body.workspace{
+ background:radial-gradient(ellipse at 95% 0,#d9c5fa38,transparent 42%),
+ radial-gradient(ellipse at 10% 75%,#c6ddff35,transparent 50%),var(--bg);
+ background-attachment:fixed;
+}
+html[data-theme="dark"] body.workspace{background:radial-gradient(ellipse at 95% 0,#6843a517,transparent 45%),var(--bg)}
+/* Persistent navigation and header. */
+.workspace .topbar{background:var(--workspace-glass);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 3px 20px #314b8b04}
+.workspace .topbar:after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--workspace-border);opacity:.45;pointer-events:none}
+.workspace .path-sub{color:var(--muted);letter-spacing:.3px}
+.workspace .path-current{color:var(--text);font-weight:750}
+.workspace .sidebar{border-right:1px solid var(--side-line);box-shadow:3px 0 24px #354f8c06}
+.workspace .sb-brand{height:var(--top-h);padding:0 16px;gap:11px}
+.workspace .sb-brand img{width:46px;height:54px;flex:none;object-fit:contain;border-radius:11px;padding:5px;background:#fff;box-shadow:0 4px 14px #3c46a516}
+.workspace .sb-title{min-width:0}.workspace .sb-title b{font-size:12px;max-width:172px;white-space:normal;line-height:1.3;letter-spacing:-.15px}
+.workspace .sb-title small{display:block;margin-top:5px;font-size:8px;letter-spacing:.8px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.workspace .sb-section{font-size:9px;letter-spacing:1.6px;color:var(--muted);margin-top:22px}
+.workspace .sb-link{margin-bottom:3px;border-radius:11px;font-size:12px;padding:11px 13px}
+.workspace .sb-link.active{border:1px solid transparent;padding:10px 12px;box-shadow:0 5px 15px #6542df24;color:#fff}
+.workspace .sb-link.active .ic{color:#fff}
+.workspace .sb-link.active:hover{background:var(--side-active);color:#fff}
+.workspace .sb-sub{border-color:var(--line);margin-top:5px;margin-bottom:8px}
+.workspace .sb-sub a{font-size:11.5px;border-radius:8px;padding:8px 11px}
+.workspace .sb-sub a.active:before{background:linear-gradient(#349bff,#9c44ec)}
+.workspace .avatar{background:var(--workspace-gradient);color:#fff;border:1px solid #ffffff55;box-shadow:0 4px 12px #7348d920}
+.workspace .top-search{background:var(--surface2);border-radius:12px;border-color:var(--line)}
+.workspace .top-search:focus-within{border-color:#9686e7;box-shadow:0 0 0 3px var(--brand-soft)}
+.workspace .theme-switch{border-radius:11px}
+.workspace .theme-switch .ti.sun,.workspace .theme-switch .ti.moon{box-shadow:none}
+html:not([data-theme="dark"]) .workspace .theme-switch .ti.sun,html[data-theme="dark"] .workspace .theme-switch .ti.moon{background:var(--workspace-gradient);color:white}
+/* Page hierarchy, surfaces and shared form controls. */
+.workspace .content{padding:calc(var(--top-h) + 27px) 30px 42px;min-width:0}
+.workspace .page-head{margin-bottom:23px}
+.workspace .page-head h1{font-size:26px;line-height:1.3;font-weight:750;letter-spacing:-.8px;color:var(--text)}
+.workspace .page-head p{color:var(--sub);font-size:12px;line-height:1.7}
+.workspace .eyebrow{font-size:10px;letter-spacing:1.5px;color:var(--brand-ink)}
+.workspace :is(.card,.kid-card,.post,.album,.sig-card,.step){border-color:var(--line);border-radius:19px;box-shadow:var(--shadow)}
+.workspace .card{padding:22px;background:var(--surface)}
+.workspace .card h3{font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--text)}
+.workspace .card-head{padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.workspace .btn{border-radius:10px;font-weight:650;box-shadow:none}
+.workspace .btn:hover{border-color:#b8b0e7;box-shadow:0 4px 12px #554c9b0b}
+.workspace .btn.primary{background:var(--workspace-gradient);background-size:125% 100%;color:white;border-color:transparent;box-shadow:0 4px 13px #6346d621}
+.workspace .btn.primary:hover{background:var(--workspace-gradient);background-size:125% 100%;background-position:100% 50%;color:white}
+.workspace .btn.danger:hover{color:var(--rose);border-color:var(--rose);background:var(--rose-soft)}
+.workspace .btn:focus-visible,.workspace .icon-btn:focus-visible,.workspace .sb-link:focus-visible{outline:3px solid #9b8de5;outline-offset:3px}
+.workspace label{font-weight:650;color:var(--sub)}
+.workspace :is(input,select,textarea){border-radius:10px;border-color:var(--line);background:var(--surface2);color:var(--text)}
+.workspace :is(input,select,textarea):focus{background:var(--surface);border-color:#9b8be1;box-shadow:0 0 0 3px var(--brand-soft)}
+.workspace .top-search input,.workspace .pal-top input{background:transparent}
+.workspace :is(input[type=checkbox],input[type=radio]){accent-color:#6941df}
+.workspace .toolbar{gap:12px;align-items:flex-end}
+.workspace :is(.chip,.trash-tabs,.file-chip){border-radius:9px}
+.workspace .trash-tabs a.on{color:var(--brand-ink);box-shadow:0 2px 8px #4f49a310}
+.workspace .pager .cur{background:var(--workspace-gradient);border-color:transparent;color:#fff}
+/* Tables keep their existing sticky columns, data colors and horizontal scrolling. */
+.workspace .table-wrap{border-color:var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.workspace .t th{background:var(--surface2);color:var(--sub);font-size:10px;font-weight:700;letter-spacing:.65px;padding:13px 15px}
+.workspace .t td{border-color:var(--line);padding:12px 15px;color:var(--sub)}
+.workspace .t tbody tr:hover{background:var(--surface2)}
+.workspace .t td :is(b,strong){color:var(--text)}
+.workspace .empty{font-size:12px;line-height:1.8;color:var(--sub)}
+/* Dashboard identity and compact, readable analytics. */
+.workspace .hero{background:linear-gradient(112deg,#176de2,#4733cd 56%,#8741d7);border:1px solid #ffffff50;border-radius:23px;box-shadow:0 12px 28px #613fd41c;padding:30px 32px}
+.workspace .hero:before{width:340px;height:340px;border-color:#ffffff30;top:-220px;right:60px;box-shadow:0 0 0 32px #ffffff08,0 0 0 65px #ffffff06}
+.workspace .hero:after{width:180px;height:1px;right:30px;bottom:25px;background:linear-gradient(90deg,transparent,#ffffffa0,transparent);background-size:200% 100%;animation:workspace-line 9s ease-in-out infinite}
+.workspace .hero h1{font-size:28px;font-weight:750;letter-spacing:-.9px}
+.workspace .hero h1 span{color:#e1d4ff}.workspace .hero p.sub{color:#e9eaff}
+.workspace .hero .btn{background:#fff;color:#4932ba;box-shadow:0 5px 15px #16357c12}
+.workspace .hero .btn:hover{background:#f2edff;border-color:transparent}
+.workspace .hero-art .circ{background:#ffffff14;border:1px solid #ffffff45;box-shadow:inset 0 0 25px #ffffff09}
+.workspace .stat{padding:21px;border-top:2px solid #c7bdf5}
+.workspace .stat.c2{border-top-color:#a6d9e8}.workspace .stat.c3{border-top-color:#f1d1b0}.workspace .stat.c4{border-top-color:#e3b8e8}
+.workspace .stat b{font-size:30px;font-weight:750;letter-spacing:-1px}
+.workspace .stat .si{background:linear-gradient(140deg,#e8eaff,#eadcfc);color:#6940d7;border:1px solid #ffffff80}
+.workspace .stat.c2 .si{background:var(--mint-soft);color:var(--mint)}
+.workspace .stat.c3 .si{background:var(--orange-soft);color:var(--orange)}
+.workspace .stat.c4 .si{background:var(--rose-soft);color:var(--rose)}
+.workspace .quick-action{border-radius:12px;padding:13px;background:var(--surface2);font-weight:600}
+.workspace .quick-action:hover{border-color:#c1b1ec;background:var(--brand-soft);color:var(--brand-ink)}
+.workspace .chart-bar{background:linear-gradient(0deg,#5941da,#9681f0)}
+.workspace .chart-bar.secondary{background:linear-gradient(0deg,#248eaf,#75cfdf)}
+.workspace .progress-track{background:var(--surface3)}
+.workspace .timeline-marker{background:var(--brand-soft);color:var(--brand-ink)}
+/* Parent portals, school feeds, media and shared dialogs. */
+.workspace .kid-card{background:var(--surface);border:1px solid var(--line);border-top:3px solid #aaa0ea;padding:22px}
+.workspace .kid-card h3{font-weight:700;color:var(--text)}
+.workspace .child-bar{background:var(--surface);border-color:var(--line);border-radius:14px}
+.workspace .post,.workspace .album{border:1px solid var(--line);background:var(--surface)}
+.workspace .ev .date{border-radius:12px;background:var(--brand-soft);color:var(--brand-ink)}
+.workspace :is(.profile-menu,.bell-menu,.ts-panel,.pal-box,.sl-box,.pg-box,.mp-box,.pv-box){border:1px solid var(--line);box-shadow:var(--shadow-lg);background:var(--surface);border-radius:18px}
+.workspace :is(.mp-head,.pv-head,.sl-foot,.pg-head){border-color:var(--line)}
+.workspace .sl-items{background:var(--surface2)}
+.workspace .popup-item:hover{background:var(--brand-soft);color:var(--brand-ink)}
+.workspace .popup-item.danger:hover{background:var(--rose-soft);color:var(--rose)}
+.workspace .step-n{background:var(--workspace-gradient);color:#fff}
+.workspace .ss-head{background:var(--brand-soft)}
+@keyframes workspace-line{0%,100%{background-position:0% 50%;opacity:.35}50%{background-position:100% 50%;opacity:.9}}
+@media(max-width:1100px){.workspace .content{padding-left:22px;padding-right:22px}.workspace .hero{padding:25px}.workspace .hero h1{font-size:25px}}
+@media(max-width:992px){.workspace .content{padding:calc(var(--top-h) + 19px) 16px 32px}.workspace .sidebar{box-shadow:10px 0 40px #17275024}.workspace .sb-title b{font-size:12px}}
+@media(max-width:640px){.workspace .content{padding-left:12px;padding-right:12px}.workspace .page-head h1{font-size:23px}.workspace .card{padding:17px;border-radius:16px}.workspace .hero{padding:22px;border-radius:18px;min-height:170px}.workspace .hero h1{font-size:23px}.workspace .hero-art{display:none}.workspace .table-wrap{border-radius:13px}.workspace .t th,.workspace .t td{padding:11px 12px}.workspace .stat{padding:17px}.workspace .stat b{font-size:27px}}
+@media(prefers-reduced-motion:reduce){.workspace *,.workspace *:before,.workspace *:after{animation:none!important;transition:none!important}}
+@media print{body.workspace{background:#fff}.workspace .content{animation:none}.workspace .hero:after,.workspace .topbar:after{display:none}}
+html[data-theme="dark"]{--side-active:linear-gradient(110deg,#246edf,#5740d8 64%,#8745d8);--side-active-text:#fff}
+html[data-theme="dark"] .workspace .stat .si{background:linear-gradient(140deg,#2e355f,#3d2d5b);color:#c3adff;border-color:#ffffff0d}
+html[data-theme="dark"] .workspace .stat.c2 .si{background:var(--mint-soft);color:var(--mint)}
+html[data-theme="dark"] .workspace .stat.c3 .si{background:var(--orange-soft);color:var(--orange)}
+html[data-theme="dark"] .workspace .stat.c4 .si{background:var(--rose-soft);color:var(--rose)}
+
+/* Solid action colors in every state; gradients remain decorative only. */
+.workspace :is(button,.btn,[role=button],.sb-link,.sb-sub a,.pager a,.pager .cur){background-image:none!important}
+.workspace .btn{background-color:var(--surface)}
+.workspace .btn:hover{background-color:var(--surface3)}
+.workspace .btn.primary{background:#5940d9;color:#fff;border-color:transparent}
+.workspace .btn.primary:hover{background:#452cb9;color:#fff}
+.workspace .btn.primary:active{background:#39229d}
+.workspace .btn.danger{background:var(--surface);color:var(--rose)}
+.workspace .btn.danger:hover{background:var(--rose-soft);color:var(--rose)}
+.workspace .btn.danger-solid{background:#c83757;color:white;border-color:transparent}
+.workspace .btn.danger-solid:hover{background:#a82a46;color:white}
+.workspace .hero .btn{background:#fff;color:#4932ba}
+.workspace .hero .btn:hover{background:#ede8ff}
+.workspace .sb-link.active,.workspace .pager .cur{background:#5940d9;color:white}
+.workspace .sb-link.active:hover,.workspace .pager .cur:hover{background:#452cb9;color:white}
+.workspace .sb-sub a.active{background:var(--brand-soft)}
+.workspace .sb-sub a.active:hover{background:var(--surface3)}
+.workspace .avatar{background:#5940d9;color:#fff}
+.workspace .account-button:hover .avatar{background:#452cb9}
+html:not([data-theme="dark"]) .workspace .theme-switch .ti.sun,html[data-theme="dark"] .workspace .theme-switch .ti.moon{background:#5940d9;color:#fff}
+html[data-theme="dark"] .workspace .btn.primary,html[data-theme="dark"] .workspace .sb-link.active,html[data-theme="dark"] .workspace .pager .cur{background:#7557e4;color:#fff}
+html[data-theme="dark"] .workspace .btn.primary:hover,html[data-theme="dark"] .workspace .sb-link.active:hover,html[data-theme="dark"] .workspace .pager .cur:hover{background:#6345cc}
+
+/* Shared dropdown menus: selected, hover and keyboard focus use solid tones. */
+.workspace .ps-standard{height:40px;padding:0 12px;min-width:0;background:var(--surface2);border-color:var(--line);font-weight:600}
+.workspace .ps-btn:hover{background:var(--brand-soft);border-color:#a597df}
+.workspace .ps-btn[aria-expanded=true],.workspace .ps-btn:focus-visible{background:var(--surface);border-color:#927be0;box-shadow:0 0 0 3px var(--brand-soft)}
+.workspace .ps-btn[aria-invalid=true]{border-color:var(--rose)}
+.workspace .ps-btn .ps-t{font-size:12px;letter-spacing:0}.workspace .ps-empty{font-size:12px;color:var(--sub)}
+.workspace .ps-standard .ps-face{flex:1}.workspace .ps-standard .ps-chev{color:var(--brand-ink)}
+.workspace .ps-pop{padding:6px;border:1px solid #c8bde9;border-radius:13px;background:var(--surface);box-shadow:0 12px 32px #3b267b26;scrollbar-width:thin;scrollbar-color:#b5a7df var(--surface2)}
+.workspace .ps-opt{background:var(--surface);color:var(--text);border-radius:8px;padding:10px 11px;font-weight:550;min-height:38px}
+.workspace .ps-opt:hover,.workspace .ps-opt:focus-visible{background:var(--brand-soft);color:var(--brand-ink);outline:none}
+.workspace .ps-opt.on{background:#5940d9;color:#fff}
+.workspace .ps-opt.on:hover,.workspace .ps-opt.on:focus-visible{background:#452cb9;color:#fff}
+.workspace .ps-opt.on :is(.ps-ok,.ps-empty,.ps-t,small){color:#fff}
+.workspace .ps-opt:disabled{opacity:.45;cursor:not-allowed}
+.workspace .ps-opt:disabled:hover{background:var(--surface);color:var(--sub)}
+.workspace :is(.profile-menu,.bell-menu,.ts-panel,.pal-box){border-color:var(--line);background:var(--surface)}
+.workspace :is(.popup-heading,.bm-head){background:var(--surface2);border-radius:12px 12px 0 0;border-color:var(--line)}
+.workspace :is(.popup-item,.pal-list a,.ts-item):hover{background:var(--brand-soft);color:var(--brand-ink)}
+html[data-theme="dark"] .workspace .ps-pop{border-color:#65578f;box-shadow:0 12px 35px #05081870}
+html[data-theme="dark"] .workspace .ps-opt.on{background:#7557e4;color:#fff}
+html[data-theme="dark"] .workspace .ps-opt.on:hover,html[data-theme="dark"] .workspace .ps-opt.on:focus-visible{background:#6345cc;color:#fff}
+
+/* Role-aware identity and clearer navigation hierarchy. */
+.workspace .sb-nav{padding:15px 12px 24px}.workspace .sb-section{font-size:9px;letter-spacing:1.4px;font-weight:700;margin:20px 11px 9px}
+.workspace .sb-link{font-size:12.5px;font-weight:600;letter-spacing:.05px;gap:11px;min-height:41px;padding:10px 11px;margin-bottom:3px}
+.workspace .sb-link>.ic{width:19px;height:19px;stroke-width:1.7;color:#7a79af}.workspace .sb-link:hover>.ic,.workspace .sb-group.open>.sb-link>.ic{color:#6743ce}
+.workspace .sb-sub a{font-size:11.5px;font-weight:500;line-height:1.5;padding:8px 11px}.workspace .sb-sub a.active{font-weight:700;background:var(--brand-soft);color:var(--brand-ink)}
+.workspace .sb-link.active>.ic{color:white}.workspace .sb-group.open>.sb-parent{font-weight:650}.workspace .sb-title small{font-size:8px;font-weight:650;letter-spacing:1px;color:var(--brand-ink);text-transform:uppercase}
+html[data-theme="dark"] .workspace .sb-link>.ic{color:#aba4d4}html[data-theme="dark"] .workspace .sb-link:hover>.ic{color:#d1c1ff}html[data-theme="dark"] .workspace .sb-link.active>.ic{color:white}
+.user-avatar-image{width:100%;height:100%;object-fit:cover;border-radius:inherit}.workspace .avatar{overflow:hidden}
+.settings-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:start}
+.settings-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.settings-section-heading{margin:25px 0 16px;padding-top:22px;border-top:1px solid var(--line)}
+.permission-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.permission-group{min-width:0;margin:0;padding:12px 14px 14px;border:1px solid var(--line);border-radius:13px;background:var(--surface2)}
+.permission-group legend{font-size:12px;font-weight:700;color:var(--brand-ink);padding:0 6px}
+.workspace label.permission-choice{display:flex;flex-direction:row;align-items:flex-start;gap:9px;padding:7px 0;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;line-height:1.5}
+.permission-choice input{flex:none;margin:2px 0 0}.permission-choice small{display:block;font-size:11px;color:var(--sub);line-height:1.6;margin-top:5px}
+.permission-reset-box,.settings-note{background:var(--brand-soft);padding:15px 18px;border-radius:12px;margin-top:18px}.settings-note p{font-size:12px;color:var(--sub);margin:6px 0}
+.profile-settings{max-width:650px}.profile-summary{display:flex;align-items:center;gap:22px;margin-bottom:27px}.profile-summary p{margin:5px 0 10px}.profile-photo{width:112px;height:112px;flex:none;border-radius:25px;overflow:hidden;background:var(--brand-soft);color:var(--brand-ink);display:grid;place-items:center;font-size:32px;font-weight:700;border:1px solid var(--line)}.profile-photo img{width:100%;height:100%;object-fit:cover}
+.password-reset-form{display:flex;align-items:center;gap:8px;min-width:230px}.password-reset-form .pw-wrap{width:180px;min-width:0}.password-reset-form input{width:100%;font-size:11px}.password-reset-form .btn{flex:none}
+@media(max-width:1050px){.permission-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.settings-layout{grid-template-columns:1fr}}
+@media(max-width:640px){.permission-grid{grid-template-columns:1fr}.profile-summary{gap:15px}.profile-photo{width:85px;height:85px;border-radius:20px}.workspace .sb-title small{font-size:8px}.permission-group{padding:10px 13px}}
+/* Keep account-password fields full width, including their visibility control. */
+.workspace .pw-wrap>input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){width:100%;max-width:100%;padding-right:44px;display:block}
+.workspace .pw-eye{right:5px;color:var(--sub)}.workspace .pw-eye:hover{background:var(--brand-soft);color:var(--brand-ink)}
+.parent-bulk-bar{display:flex;align-items:center;flex-wrap:wrap;gap:13px;padding:13px 16px;border:1px solid var(--line);background:var(--surface);border-radius:13px;margin-bottom:14px}.parent-bulk-bar label{display:flex;flex-direction:row;align-items:center;gap:9px}.parent-bulk-bar .ps-standard{min-width:165px}.parent-selection-count{font-size:12px;font-weight:700;color:var(--brand-ink)}.parent-bulk-bar>.muted{font-size:10px;margin-left:auto}.parent-checkbox-cell{width:42px;text-align:center}.parent-checkbox-cell input{cursor:pointer}.parent-row-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.parent-row-actions form{margin:0}.parent-row-actions .btn{white-space:nowrap}.workspace .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}@media(max-width:640px){.parent-bulk-bar{padding:12px;gap:10px}.parent-bulk-bar>.muted{width:100%;margin:0}.parent-bulk-bar label{flex:1}.parent-bulk-bar .ps-standard{min-width:0;width:100%}}
+
+/* Consistent column dividers, including Roll / Student and sticky entry grids. */
+.workspace .t th+th,.workspace .t td+td{border-left:1px solid var(--line)}
+.workspace .t th{border-bottom:1px solid #cfc9ed}
+.workspace .marks-grid th:first-child,.workspace .marks-grid td:first-child{border-right:1px solid var(--line)}
+html[data-theme="dark"] .workspace .t th{border-bottom-color:#4a4870}
+
+/* Full-width settings, with clear groups and responsive form columns. */
+.school-settings-grid{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+.workspace .school-settings-grid .settings-card{margin:0;min-width:0;max-width:none}
+.settings-report-profile{grid-column:1 / -1}.settings-profile-form{grid-template-columns:repeat(2,minmax(0,1fr))}.settings-profile-form>div:last-child{grid-column:1 / -1}
+/* Fixed identity columns; remaining space belongs to the actual data. */
+.workspace .t th,.workspace .t td{vertical-align:middle}
+.workspace .t .col-roll{width:52px!important;min-width:52px!important;max-width:52px!important;padding-left:8px;padding-right:8px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.workspace .t .col-check{width:42px;min-width:42px;max-width:42px;text-align:center;padding-left:10px;padding-right:10px}
+.workspace .t .col-name{width:220px;min-width:180px;text-align:left;white-space:normal!important;overflow-wrap:break-word}
+.workspace .t .col-phone{width:125px;min-width:120px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.workspace .t .col-email,.workspace .t .col-login{min-width:170px;overflow-wrap:anywhere;text-align:left}
+.workspace .t .col-class{width:100px;min-width:85px;white-space:nowrap}.workspace .t .col-section{width:75px;min-width:70px;white-space:nowrap}
+.workspace .t .col-status{width:110px;min-width:95px;white-space:nowrap}.workspace .t .col-code{min-width:120px;white-space:nowrap}
+.workspace .t .col-description{min-width:220px;max-width:420px;white-space:normal;overflow-wrap:anywhere;line-height:1.7}
+.workspace .t .col-actions{width:1%;min-width:140px}.workspace .t td.num{font-variant-numeric:tabular-nums}
+.workspace .marks-grid .col-name{min-width:220px;width:220px}
+.workspace .marks-grid input.m:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){width:94px;max-width:100%;min-height:38px;text-align:center;font-size:13px;font-weight:650;font-variant-numeric:tabular-nums}
+.workspace .marks-grid thead th{text-align:center}.workspace .marks-grid thead .col-name{text-align:left}
+.workspace .marks-grid .marks-subtype{display:block;font-size:11px;font-weight:650;text-transform:none;letter-spacing:.15px;margin-bottom:6px}
+.workspace .marks-grid .max-marks{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:20px;color:var(--brand-ink);background:var(--brand-soft);font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;white-space:nowrap}
+@media(max-width:850px){.school-settings-grid{grid-template-columns:1fr}.settings-report-profile{grid-column:auto}}
+@media(max-width:640px){.settings-profile-form{grid-template-columns:1fr}.workspace .t .col-name{min-width:170px}.workspace .marks-grid .col-name{min-width:190px;width:190px}}
+.school-settings-grid>.settings-card:last-child{grid-column:1 / -1}
+.workspace .t .col-children{min-width:280px;width:340px;line-height:1.7}
+/* Separate borders keep row-spanning sticky identity cells continuous while scrolling. */
+.workspace table.marks-grid{border-collapse:separate;border-spacing:0}
+.workspace .marks-grid th,.workspace .marks-grid td{border-left:0;border-right:1px solid var(--line)}
+.workspace .marks-grid th+th,.workspace .marks-grid td+td{border-left:0}
+.workspace .marks-grid thead tr:not(:first-child) th:first-child{position:static;left:auto;z-index:auto}
+.workspace .marks-grid thead tr:first-child th:nth-child(2),
+.workspace .marks-grid tbody td:nth-child(2){box-shadow:inset -1px 0 0 var(--line)}

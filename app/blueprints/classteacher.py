@@ -1,5 +1,5 @@
 """Class teacher panel: attendance, comments, development skills, rank, house points, average/award."""
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from .. import db
 from ..auth import roles_required, current_user
 from ..services import access, features, ranking
@@ -18,10 +18,14 @@ def _ctx(need_exam=True):
     user = current_user()
     pairs = features.pairs(FEATURE_OF.get(request.endpoint.split(".")[-1], "card"), user)
     cls, sec, exam = (to_int(request.values.get(k)) for k in ("class_id", "section_id", "exam_id"))
+    if not user['is_admin']:
+        if not pairs or not features.nav_allowed(user,request.endpoint):abort(403)
+        if cls and cls not in {p['classId'] for p in pairs}:abort(403)
+        if request.method=='POST' and (cls,sec) not in {(p['classId'],p['sectionId']) for p in pairs}:abort(403)
     classes = access.classes_for(pairs)
-    cls, sec, exam, sections = access.autopick(pairs, classes, cls, sec, exam, access.exams() if need_exam else None)
+    cls, sec, exam, sections = access.autopick(pairs, classes, cls, sec, exam, None if need_exam else [])
     ready = bool(cls and sec and (exam or not need_exam))
-    return user, dict(cls=cls, sec=sec, exam=exam, classes=classes, sections=sections, exams=access.exams(),
+    return user, dict(cls=cls, sec=sec, exam=exam, classes=classes, sections=sections, exams=access.exams_for(cls,sec) if need_exam else [],
                       students=access.students(cls, sec) if ready else []), ready
 
 

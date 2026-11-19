@@ -1,6 +1,6 @@
 """Subject teacher panel: marks entry, special subjects, marks list."""
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from .. import db
 from ..auth import roles_required, current_user
 from ..services import access, enrollment, features
@@ -54,18 +54,28 @@ def graded_ids(cls, sec, subjects):
 
 
 def _ctx(user, feature="entry"):
-    pairs = features.pairs(feature, user)
-    cls, sec, exam = (to_int(request.values.get(k)) for k in ("class_id", "section_id", "exam_id"))
-    classes = access.classes_for(pairs)
-    cls, sec, exam, sections = access.autopick(pairs, classes, cls, sec, exam)
-    return pairs, cls, sec, exam, classes, sections
+    pairs=features.pairs(feature,user)
+    cls,sec,exam=(to_int(request.values.get(k)) for k in ('class_id','section_id','exam_id'))
+    classes=access.classes_for(pairs)
+    if not user['is_admin']:
+        if not pairs or not features.nav_allowed(user,request.endpoint):abort(403)
+        if cls and cls not in {row['classId'] for row in pairs}:abort(403)
+        if request.method=='POST' and (cls,sec) not in {(row['classId'],row['sectionId']) for row in pairs}:abort(403)
+    # Class/section defaults must be resolved before choosing an eligible exam.
+    cls,sec,_unused,sections=access.autopick(pairs,classes,cls,sec,None,[])
+    exams=features.mark_exams(user,feature,cls,sec)
+    if exam and exam not in {row['examId'] for row in exams}:
+        if request.method=='POST':abort(403)
+        exam=None
+    if not exam and len(exams)==1:exam=exams[0]['examId']
+    return pairs,cls,sec,exam,classes,sections,exams
 
 
 @bp.route("/entry", methods=["GET", "POST"])
 @cap
 def entry():
     user = current_user()
-    pairs, cls, sec, exam, classes, sections = _ctx(user)
+    pairs, cls, sec, exam, classes, sections, exams = _ctx(user)
     subjects, students, existing, excl = [], [], {}, set()
     if cls and sec and exam:
         students = access.students(cls, sec)
@@ -100,7 +110,7 @@ def entry():
                 existing = {(stu["studentId"], s["subjectId"], st["subtype_id"]): request.form.get(f"m_{s['subjectId']}_{st['subtype_id']}_{stu['studentId']}", "")
                             for s in subjects for st in s["subtypes"] for stu in students}
                 return render_template("marks_entry.html", pairs=pairs, cls=cls, sec=sec, exam=exam, classes=classes, sections=sections,
-                                       exams=access.exams_for(cls, sec), subjects=subjects, students=students, existing=existing, excl=excl, graded=graded_ids(cls, sec, subjects))
+                                       exams=exams, subjects=subjects, students=students, existing=existing, excl=excl, graded=graded_ids(cls, sec, subjects))
             for r in rows:
                 upsert_mark(cls, sec, r[0], r[1], exam, r[2], r[3], r[4], user["id"])
             db.commit()
@@ -109,7 +119,7 @@ def entry():
         for r in db.query("SELECT studentId, subjectId, exam_subtype_id, marks FROM exam_marks WHERE classId=%s AND sectionId=%s AND examId=%s AND isDelete='0'", (cls, sec, exam)):
             existing[(r["studentId"], r["subjectId"], r["exam_subtype_id"])] = r["marks"]
     return render_template("marks_entry.html", pairs=pairs, cls=cls, sec=sec, exam=exam, classes=classes, sections=sections,
-                           exams=access.exams_for(cls, sec), subjects=subjects, students=students, existing=existing, excl=excl, graded=graded_ids(cls, sec, subjects))
+                           exams=exams, subjects=subjects, students=students, existing=existing, excl=excl, graded=graded_ids(cls, sec, subjects))
 
 
 @bp.route("/special", methods=["GET", "POST"])
@@ -117,11 +127,12 @@ def entry():
 def special():
     """Special subjects have a single (WRITTEN, id 2) mark column, usually a grade."""
     user = current_user()
-    pairs, cls, sec, exam, classes, sections = _ctx(user, "special")
+    pairs, cls, sec, exam, classes, sections, exams = _ctx(user, "special")
     subjects, students, existing, excl = [], [], {}, set()
     if cls and sec and exam:
         students = access.students(cls, sec)
-        subjects = access.allowed_subjects(user, cls, sec, special=True)
+        allowed={row['subjectId'] for row in features.mark_contexts(user,'special') if (row['classId'],row['sectionId'],row['examId'])==(cls,sec,exam)}
+        subjects = [subject for subject in access.allowed_subjects(user, cls, sec, special=True) if subject['subjectId'] in allowed]
         excl = enrollment.excluded(cls, sec)
         subjects = [s for s in subjects if any((stu["studentId"], s["subjectId"]) not in excl for stu in students)]
         if request.method == "POST":
@@ -144,14 +155,14 @@ def special():
         for r in db.query("SELECT studentId, subjectId, marks FROM exam_marks WHERE classId=%s AND sectionId=%s AND examId=%s AND exam_subtype_id=2 AND isDelete='0'", (cls, sec, exam)):
             existing[(r["studentId"], r["subjectId"])] = r["marks"]
     return render_template("marks_special.html", cls=cls, sec=sec, exam=exam, classes=classes, sections=sections,
-                           exams=access.exams_for(cls, sec), subjects=subjects, students=students, existing=existing, excl=excl)
+                           exams=exams, subjects=subjects, students=students, existing=existing, excl=excl)
 
 
 @bp.route("/list")
 @cap
 def marks_list():
     user = current_user()
-    pairs, cls, sec, exam, classes, sections = _ctx(user)
+    pairs, cls, sec, exam, classes, sections, exams = _ctx(user)
     subjects, students, grid, excl = [], [], {}, set()
     if cls and sec and exam:
         students = access.students(cls, sec)
@@ -163,5 +174,15 @@ def marks_list():
         subjects = [s for s in subjects if any((stu["studentId"], s["subjectId"]) not in excl for stu in students)]
         for r in db.query("SELECT studentId, subjectId, exam_subtype_id, marks FROM exam_marks WHERE classId=%s AND sectionId=%s AND examId=%s AND isDelete='0'", (cls, sec, exam)):
             grid[(r["studentId"], r["subjectId"], r["exam_subtype_id"])] = r["marks"]
+    fmt = request.args.get('download')
+    if fmt:
+        if fmt not in ('pdf', 'xlsx', 'csv') or not (cls and sec and exam and subjects):
+            abort(400, 'Choose an available class, section and exam before downloading.')
+        from ..services.marks_export import download
+        cname = next((r['class_name'] for r in classes if r['classId'] == cls), '')
+        sname = next((r['section_name'] for r in sections if r['sectionId'] == sec), '')
+        ename = next((r['exam_name'] for r in exams if r['examId'] == exam), '')
+        title = f"{cname} · Section {sname} · {ename}"
+        return download(fmt, title, f'marks-class-{cls}-section-{sec}-exam-{exam}', subjects, students, grid, excl)
     return render_template("marks_list.html", cls=cls, sec=sec, exam=exam, classes=classes, sections=sections,
-                           exams=access.exams_for(cls, sec), subjects=subjects, students=students, grid=grid, excl=excl)
+                           exams=exams, subjects=subjects, students=students, grid=grid, excl=excl, can_edit=features.nav_allowed(user, "marks.entry"))

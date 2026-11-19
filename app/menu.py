@@ -68,6 +68,7 @@ MENU = [
 ]
 
 PROFILE_MENU = [
+    ("My profile", "account.profile", "users", None),
     ("Change Password", "account.change_password", "key", None),
     ("Users & Passwords", "account.users", "shield", "admin"),
     ("Settings", "admin.settings", "settings", "admin"),

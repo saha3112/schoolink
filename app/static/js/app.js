@@ -375,7 +375,7 @@ window.sectionSubjects = function (o) {
       wrap.querySelector('[data-x]').onclick = () => done(false);
       const no = wrap.querySelector('[data-no]'); if (no) no.onclick = () => done(false);
       wrap.querySelector('[data-ok]').onclick = () => done(true);
-      wrap.querySelector('[data-ok]').focus();
+      (o.danger && no ? no : wrap.querySelector('[data-ok]')).focus();
     });
   }
   window.slConfirm = (message, o) => {
@@ -398,7 +398,9 @@ window.sectionSubjects = function (o) {
   document.addEventListener('submit', e => {
     const f = e.target; if (!f.dataset || !f.dataset.confirm || bypass === f) return;
     e.preventDefault(); const sub = e.submitter;
-    slConfirm(f.dataset.confirm).then(ok => { if (ok) { bypass = f; f.requestSubmit ? f.requestSubmit(sub || undefined) : f.submit(); bypass = null; } });
+    const options={tone:f.dataset.confirmTone,title:f.dataset.confirmTitle,ok:f.dataset.confirmOk};
+    try { options.items=JSON.parse(f.dataset.confirmItems || '[]'); } catch (_) { options.items=[]; }
+    slConfirm(f.dataset.confirm,options).then(ok => { if (ok) { bypass = f; f.requestSubmit ? f.requestSubmit(sub || undefined) : f.submit(); bypass = null; } });
   }, true);
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-confirm]'); if (!b || b.tagName === 'FORM' || bypass === b) return;
@@ -458,22 +460,31 @@ window.sectionSubjects = function (o) {
 (function () {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let pop = null, openFor = null, openedAt = 0;
+  const enhanced = new WeakSet();
+  const selector = 'select:not([multiple]):not([size]),select[size="1"]:not([multiple])';
   const face = (o, forPop) => {
     if (!o) return '<span class="ps-empty">—</span>';
     const icon = o.dataset.icon ? '<img class="ps-ic" src="' + esc(o.dataset.icon) + '" alt="">' : '';
     const tone = o.dataset.tone ? ' tone-' + o.dataset.tone : '';
-    if (!o.value) return '<span class="ps-empty">' + (forPop ? 'Not set' : '—') + '</span>';
+    if (!o.value) return '<span class="ps-empty">' + esc(o.textContent.trim() || (forPop ? 'Not set' : '—')) + '</span>';
     if (o.parentNode.dataset.pretty === 'grade') return '<span class="gb' + tone + '">' + esc(o.textContent.trim()) + '</span>' + (forPop && o.dataset.note ? '<small>' + esc(o.dataset.note) + '</small>' : '');
     return icon + '<span class="ps-t">' + esc(o.textContent.trim()) + '</span>' + (forPop && o.dataset.note ? '<small>' + esc(o.dataset.note) + '</small>' : '');
   };
   function refresh(sel) { const b = sel.nextElementSibling; if (b && b.classList.contains('ps-btn')) { b.querySelector('.ps-face').innerHTML = face(sel.options[sel.selectedIndex], false); b.disabled = sel.disabled; } }
   function enhance(sel) {
-    if (sel.dataset.psReady) return; sel.dataset.psReady = '1';
+    if (enhanced.has(sel)) return; enhanced.add(sel); sel.dataset.psReady = '1';
+    if (sel.nextElementSibling && sel.nextElementSibling.classList.contains('ps-btn')) sel.nextElementSibling.remove();
     sel.classList.add('ps-native'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true');
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'ps-btn' + (sel.dataset.pretty === 'grade' ? ' ps-grade' : ' ps-dev');
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'ps-btn' + (sel.dataset.pretty === 'grade' ? ' ps-grade' : sel.dataset.pretty ? ' ps-dev' : ' ps-standard');
     b.setAttribute('aria-haspopup', 'listbox'); b.setAttribute('aria-expanded', 'false');
     b.innerHTML = '<span class="ps-face"></span><svg class="ps-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    const label = sel.labels && sel.labels[0];
+    const labelText = sel.getAttribute('aria-label') || (label && Array.from(label.childNodes).filter(n => n.nodeType === 3).map(n => n.textContent).join(' ').trim()) || sel.name || 'Choose an option';
+    b.setAttribute('aria-label', labelText);
     sel.insertAdjacentElement('afterend', b); refresh(sel);
+    sel.addEventListener('invalid', e => { e.preventDefault(); b.focus(); b.setAttribute('aria-invalid', 'true'); });
+    sel.addEventListener('change', () => b.removeAttribute('aria-invalid'));
+    if (sel.form) sel.form.addEventListener('reset', () => setTimeout(() => refresh(sel), 0));
     sel.addEventListener('change', () => refresh(sel));
     b.addEventListener('click', () => (openFor === sel ? closePop() : openPop(sel, b)));
     b.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); openPop(sel, b); } });
@@ -481,30 +492,52 @@ window.sectionSubjects = function (o) {
   function closePop(focusBack) { if (!pop) return; const b = openFor && openFor.nextElementSibling; pop.remove(); pop = null; if (b) { b.setAttribute('aria-expanded', 'false'); if (focusBack) b.focus(); } openFor = null; }
   function openPop(sel, btn) {
     closePop(); openFor = sel; openedAt = Date.now(); btn.setAttribute('aria-expanded', 'true');
-    pop = document.createElement('div'); pop.className = 'ps-pop'; pop.setAttribute('role', 'listbox');
-    pop.innerHTML = Array.from(sel.options).map((o, i) => '<button type="button" class="ps-opt' + (o.selected ? ' on' : '') + '" role="option" aria-selected="' + o.selected + '" data-i="' + i + '"><span class="ps-of">' + face(o, true) + '</span>' +
+    pop = document.createElement('div'); pop.className = 'ps-pop'; pop.setAttribute('role', 'listbox'); pop.setAttribute('aria-label', btn.getAttribute('aria-label') || 'Options');
+    pop.innerHTML = Array.from(sel.options).map((o, i) => '<button type="button" class="ps-opt' + (o.selected ? ' on' : '') + '" role="option" aria-selected="' + o.selected + '" data-i="' + i + '"' + (o.disabled || (o.parentElement.tagName === 'OPTGROUP' && o.parentElement.disabled) ? ' disabled' : '') + '><span class="ps-of">' + face(o, true) + '</span>' +
       (o.selected ? '<svg class="ps-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>' : '') + '</button>').join('');
     document.body.appendChild(pop);
-    const r = btn.getBoundingClientRect(), pw = Math.max(r.width, 200), ph = Math.min(pop.scrollHeight, 320);
-    pop.style.minWidth = pw + 'px';
+    const r = btn.getBoundingClientRect(), pw = Math.min(Math.max(r.width, 180), innerWidth - 16), ph = Math.min(pop.scrollHeight, 320);
+    pop.style.width = pw + 'px'; pop.style.minWidth = pw + 'px';
     let top = r.bottom + 6; if (top + ph > innerHeight - 8 && r.top - ph - 6 > 8) top = r.top - ph - 6;
+    top = Math.max(8, Math.min(top, innerHeight - Math.min(ph, innerHeight - 16) - 8));
+    pop.style.maxHeight = Math.min(320, innerHeight - top - 8) + 'px';
     pop.style.top = top + 'px'; pop.style.left = Math.min(Math.max(8, r.left), innerWidth - pw - 8) + 'px';
-    const cur = pop.querySelector('.on') || pop.querySelector('.ps-opt'); cur && cur.focus({ preventScroll: true });
-    pop.addEventListener('click', e => { const o = e.target.closest('.ps-opt'); if (!o) return; sel.selectedIndex = parseInt(o.dataset.i, 10); sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); refresh(sel); closePop(true); });
+    const cur = pop.querySelector('.on:not(:disabled)') || pop.querySelector('.ps-opt:not(:disabled)'); cur && cur.focus({ preventScroll: true });
+    pop.addEventListener('click', e => { const o = e.target.closest('.ps-opt'); if (!o || o.disabled) return; sel.selectedIndex = parseInt(o.dataset.i, 10); sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); refresh(sel); closePop(true); });
     pop.addEventListener('keydown', e => {
-      const items = Array.from(pop.querySelectorAll('.ps-opt')), i = items.indexOf(document.activeElement);
-      if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(i + 1, items.length - 1)].focus(); }
+      const items = Array.from(pop.querySelectorAll('.ps-opt:not(:disabled)')), i = items.indexOf(document.activeElement);
+      if (!items.length) return;
+      if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(i + 1, items.length - 1)].focus(); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(i - 1, 0)].focus(); }
       else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePop(true); }
       else if (e.key === 'Tab') closePop();
       else if (e.key.length === 1) { const k = e.key.toLowerCase(); const n = items.find((x, j) => j > i && x.textContent.trim().toLowerCase().startsWith(k)) || items.find(x => x.textContent.trim().toLowerCase().startsWith(k)); n && n.focus(); }
     });
   }
+  // Runs before modal Escape handlers: dismiss the menu, keep its form open.
+  document.addEventListener('keydown', e => {
+    if (pop && e.key === 'Escape') {
+      e.preventDefault(); e.stopImmediatePropagation(); closePop(true);
+    }
+  }, true);
   document.addEventListener('mousedown', e => { if (pop && !pop.contains(e.target) && !(openFor && openFor.nextElementSibling.contains(e.target))) closePop(); });
   window.addEventListener('resize', () => closePop()); document.addEventListener('scroll', e => { if (pop && Date.now() - openedAt > 300 && !pop.contains(e.target)) closePop(); }, true);
-  const init = () => document.querySelectorAll('select[data-pretty]').forEach(enhance);
-  const all = () => document.querySelectorAll('select[data-pretty]').forEach(refresh);
+  const init = () => document.querySelectorAll(selector).forEach(enhance);
+  const all = () => document.querySelectorAll(selector).forEach(refresh);
   document.addEventListener('DOMContentLoaded', init); if (document.readyState !== 'loading') init();
   window.addEventListener('sl:live-updated', () => { init(); all(); });
+  new MutationObserver(records => {
+    if (openFor && !openFor.isConnected) closePop();
+    let added = false;
+    records.forEach(record => {
+      const target = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+      const select = target && target.closest('select');
+      if (select && enhanced.has(select)) { refresh(select); if (openFor === select) closePop(); }
+      if (Array.from(record.addedNodes).some(node => node.nodeType === 1 && (node.matches(selector) || node.querySelector(selector)))) added = true;
+    });
+    if (added) init();
+  }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['disabled', 'selected', 'label'] });
   window.slPretty = { init, refresh: all };
 })();

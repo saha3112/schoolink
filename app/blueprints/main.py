@@ -18,8 +18,11 @@ def login():
                    "WHERE email=%s AND deleted_at IS NULL", (email,))
         if u and str(u["active"]) == "1" and verify_password(pw, u["password"]):
             session.clear()
-            session.permanent = True
+            session.permanent = request.form.get("remember") == "1"
             session["uid"] = u["id"]
+            from ..services import user_access as UA
+            access = UA.record(u['id'])
+            session['auth_version'] = access['session_version'] if access else 0
             nxt = request.args.get("next", "")
             return redirect(nxt if nxt.startswith("/") and not nxt.startswith("//") else url_for("main.dashboard"))
         flash("Invalid email/mobile or password.", "error")
@@ -43,8 +46,10 @@ def dashboard():
     u = current_user()
     if u.get("is_parent"):
         return redirect(url_for("parentpanel.dashboard"))
+    from ..services import user_access as UA
+    full_overview = u["is_admin"] and not UA.restricted(u)
     stats = {}
-    if u["is_admin"]:
+    if full_overview:
         stats = {
             "Classes": db.scalar("SELECT COUNT(*) FROM classes WHERE isDelete='0'"),
             "Sections": db.scalar("SELECT COUNT(*) FROM sections WHERE isDelete='0'"),
@@ -53,7 +58,7 @@ def dashboard():
             "Teachers": db.scalar("SELECT COUNT(*) FROM teachers"),
         }
     dash = None
-    if u["is_admin"]:
+    if full_overview:
         from ..services import dashstats as D
         exs = D.exams()
         sel = request.args.get("exam", type=int)

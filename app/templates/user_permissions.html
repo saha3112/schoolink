@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}{% from '_permissions.html' import permission_fields %}
+{% block heading %}User permissions{% endblock %}
+{% block content %}
+<div class="page-head"><h1>User permissions</h1><p>Choose admin page access and control who can reset other users’ passwords.</p></div>
+<div class="card"><form method="get" class="toolbar"><label>Find a user<input name="q" value="{{ q }}" placeholder="Name or login"></label><button class="btn">Search</button></form>
+<form method="get" class="toolbar"><label>User<select name="user" onchange="this.form.submit()"><option value="">Choose a user</option>{% for r in rows %}<option value="{{ r.id }}" {{ 'selected' if target and target.id == r.id }}>{{ r.fname }} · {{ r.email }} · {{ {'0':'Super Admin','9':'Super Admin','1':'Admin','2':'Teacher','3':'Parent'}.get(r.user_type|string,'User') }}</option>{% endfor %}</select></label><button class="btn">Open permissions</button></form>
+<p class="muted">Your own access and protected accounts cannot be changed here. You can grant only permissions you already hold.</p></div>
+{% if target %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="user" value="{{ target.id }}">
+<div class="card"><h3>{{ target.fname }}</h3><p class="muted">{{ target.email }}</p>
+{% if target.user_type|string == '1' %}{{ permission_fields(permission_groups, selected) }}{% else %}<p class="muted">This user keeps their role’s existing class, subject and child access. The switch below controls delegated password resets.</p>{% endif %}
+{% if can_delegate_reset %}<div class="permission-reset-box"><label class="permission-choice"><input type="checkbox" name="reset_passwords" {{ 'checked' if reset_enabled }}><span><strong>Allow password resets</strong><small>{{ 'Can reset accounts within their administrative authority.' if target.user_type|string == '1' else 'Can reset teacher and parent accounts. Admin and super-admin accounts are blocked.' }}</small></span></label></div>{% endif %}
+<div class="settings-actions"><button class="btn primary">Save permissions</button></div></div></form>
+{% if recent %}<div class="card"><h3>Recent account changes</h3><div class="table-wrap"><table class="t"><thead><tr><th>Action</th><th>When</th></tr></thead><tbody>{% for event in recent %}<tr><td>{{ event.action|replace('_',' ')|capitalize }}</td><td>{{ event.created_at.strftime('%d %b %Y, %H:%M') }}</td></tr>{% endfor %}</tbody></table></div></div>{% endif %}
+{% endif %}
+{% endblock %}

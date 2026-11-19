@@ -2,11 +2,12 @@
 {% block heading %}Marks List{% endblock %}
 {% block content %}
 <div class="page-head"><div><h1>Marks list</h1><p>Entered marks of your subjects.</p></div>
-{% if students %}<a class="btn" href="{{ url_for('marks.entry', class_id=cls, section_id=sec, exam_id=exam) }}">Edit marks</a>{% endif %}</div>
+<div class="toolbar">{% if subjects %}{% for fmt, label in [("pdf", "PDF"), ("xlsx", "Excel"), ("csv", "CSV")] %}<a class="btn" data-download href="{{ url_for('marks.marks_list', class_id=cls, section_id=sec, exam_id=exam, download=fmt, dl=1) }}">Download {{ label }}</a>{% endfor %}{% endif %}
+{% if students and can_edit and can_access("marks.entry") %}<a class="btn" href="{{ url_for('marks.entry', class_id=cls, section_id=sec, exam_id=exam) }}">Edit marks</a>{% endif %}</div></div>
 {{ picker(classes, sections, exams, cls, sec, exam) }}
-{% if subjects %}<div class="table-wrap" data-live-html="list"><table class="t">
+{% if subjects %}<div class="table-wrap" data-live-html="list"><table class="t marks-grid">
 <thead><tr><th rowspan="2" class="num">Roll</th><th rowspan="2">Student</th>{% for s in subjects %}<th colspan="{{ s.subtypes|length }}" style="text-align:center">{{ s.subject_name }}</th>{% endfor %}</tr>
-<tr>{% for s in subjects %}{% for st in s.subtypes %}<th class="num">{{ st.name }} /{{ st.fullmarks }}</th>{% endfor %}{% endfor %}</tr></thead>
+<tr>{% for s in subjects %}{% for st in s.subtypes %}<th class="num"><span class="marks-subtype">{{ st.name }}</span><span class="max-marks">Max {{ st.fullmarks }}</span></th>{% endfor %}{% endfor %}</tr></thead>
 <tbody>{% for stu in students %}<tr><td class="num">{{ stu.student_rollNumber }}</td><td>{{ stu.student_name }}</td>
 {% for s in subjects %}{% for st in s.subtypes %}{% if (stu.studentId, s.subjectId) in excl %}<td class="na-cell">—</td>{% else %}<td class="num">{{ grid.get((stu.studentId, s.subjectId, st.subtype_id), '–') }}</td>{% endif %}{% endfor %}{% endfor %}</tr>{% endfor %}</tbody></table></div>
 {% elif cls and sec and exam %}<div class="card empty">Nothing to show.</div>{% else %}<div class="card empty">Select class, section and exam.</div>{% endif %}

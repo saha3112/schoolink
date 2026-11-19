@@ -1,23 +1,26 @@
 {% extends 'layout.html' %}
 {% block heading %}Settings{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Settings</h1></div></div>
-<div class="card" style="max-width:520px"><h3>School details</h3><form method="post" class="form-grid" style="grid-template-columns:1fr">
+<div class="page-head"><div><h1>Settings</h1><p>School details, learning tools and administration.</p></div></div>
+<div class="toolbar">{% if can_access('security.smtp') %}<a class="btn" href="{{ url_for('security.smtp') }}">Mail / SMTP settings</a>{% endif %}{% if can_access('security.permissions') %}<a class="btn" href="{{ url_for('security.permissions') }}">User permissions</a>{% endif %}{% if can_access('security.admin_accounts') %}<a class="btn" href="{{ url_for('security.admin_accounts') }}">Create admin</a>{% endif %}</div>
+<div class="school-settings-grid">
+<section class="card settings-card"><h3>School details</h3><form method="post" class="form-grid" style="grid-template-columns:1fr">
  <input type="hidden" name="form" value="brand">
  <label>School name<input name="school_name" value="{{ brand.name }}" maxlength="120" required></label>
- <label>Tagline (shown under the name)<input name="school_tagline" value="{{ brand.tagline }}" maxlength="80"></label>
- <div><button class="btn primary">Save details</button></div></form></div>
-<div class="card" style="max-width:520px"><h3>Files &amp; gallery</h3>
+ <label>School tagline<input name="school_tagline" value="{{ brand.tagline }}" maxlength="80"></label>
+ <div><button class="btn primary">Save details</button></div></form></section>
+<section class="card settings-card"><h3>Files &amp; gallery</h3>
  <p class="muted" style="font-size:12px">Everyone can upload to the media library and move their own files to Trash (they can restore them). Administrators and super administrators can also delete permanently. Switch this on to let teachers do the same for the files they uploaded.</p>
  <form method="post"><input type="hidden" name="form" value="media">
  <label style="flex-direction:row;align-items:center;gap:10px"><input type="checkbox" name="staff_purge" {{ 'checked' if staff_purge }}> Allow teachers to delete their own files permanently</label>
- <p style="margin-top:12px"><button class="btn primary">Save</button></p></form></div>
-<div class="card" style="max-width:520px"><h3>Printed on report cards &amp; sheets</h3>
+ <p style="margin-top:12px"><button class="btn primary">Save</button></p></form></section>
+<section class="card settings-card settings-report-profile"><h3>Printed on report cards &amp; sheets</h3>
  <p class="muted" style="font-size:12px">These replace the school text in the report designs (name comes from "School details" above).</p>
- <form method="post" class="form-grid" style="grid-template-columns:1fr"><input type="hidden" name="form" value="profile">
+ <form method="post" class="form-grid settings-profile-form"><input type="hidden" name="form" value="profile">
  {% for k, f in pfields.items() %}<label>{{ f[0] }}<input name="{{ k }}" value="{{ profile[k] }}" maxlength="200"></label>{% endfor %}
- <div><button class="btn primary">Save report profile</button></div></form></div>
-<div class="card" style="max-width:520px"><form method="post">
+ <div><button class="btn primary">Save report profile</button></div></form></section>
+<section class="card settings-card"><h3>Marks entry access</h3><form method="post">
  <label style="flex-direction:row;align-items:center;gap:10px"><input type="checkbox" name="enabled" {{ 'checked' if enabled }}> Allow teachers to enter / edit marks</label>
- <p class="muted">Switch off while results are being finalised.</p><button class="btn primary">Save</button></form></div>
+ <p class="muted">Switch off while results are being finalised.</p><button class="btn primary">Save</button></form></section>
+</div>
 {% endblock %}

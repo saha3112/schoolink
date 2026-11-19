@@ -79,6 +79,12 @@ def context(user, kind, args):
             raise CsvError("Choose an exam first.")
         if not db.one("SELECT 1 FROM exams WHERE examId=%s AND isDelete='0'", (exam,)):
             raise CsvError("That exam does not exist.")
+    if kind in ('marks','special'):
+        feature='entry' if kind=='marks' else 'special'
+        if not any((row['classId'],row['sectionId'],row['examId'])==(cls,sec,exam) for row in features.mark_contexts(user,feature)):
+            raise PermissionError('This marks type or exam is not assigned to you for this section.')
+    elif spec['need_exam'] and exam not in {row['examId'] for row in access.exams_for(cls,sec)}:
+        raise PermissionError('This exam is not configured for this section.')
     return dict(kind=kind, spec=spec, user=user, cls=cls, sec=sec, exam=exam if spec["need_exam"] else None,
                 students=access.students(cls, sec),
                 class_name=db.scalar("SELECT class_name FROM classes WHERE classId=%s", (cls,)) or str(cls),
@@ -146,7 +152,9 @@ def _mark_columns(ctx):
 
 def _special_columns(ctx):
     out = []
+    allowed={row['subjectId'] for row in features.mark_contexts(ctx['user'],'special') if (row['classId'],row['sectionId'],row['examId'])==(ctx['cls'],ctx['sec'],ctx['exam'])}
     for sb in access.allowed_subjects(ctx["user"], ctx["cls"], ctx["sec"], special=True):
+        if sb['subjectId'] not in allowed:continue
         full = db.scalar("SELECT fullmarsks FROM assign_exam_subtype WHERE classId=%s AND sectionId=%s AND subjectId=%s AND examId=%s AND exam_subtype_id=2 AND isDelete='0' LIMIT 1",
                          (ctx["cls"], ctx["sec"], sb["subjectId"], ctx["exam"]), 0) or 0
         out.append((sb["subject_name"], sb["subjectId"], sb["subject_name"], 2, full))

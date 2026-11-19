@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}{% from '_permissions.html' import permission_fields %}
+{% block heading %}Admin accounts{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Admin accounts</h1><p>Create an administrator and choose exactly which parts of the school workspace they can access.</p></div>
+<div class="card"><h3>Create an admin</h3><p class="muted">New accounts use the Admin role. Super-admin accounts stay protected.</p>
+<form method="post" autocomplete="off"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="form-grid"><label>Full name<input name="name" maxlength="150" required></label><label>Email or mobile login<input name="email" maxlength="150" required autocomplete="off"></label>
+<label>Initial password<input type="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password"></label><label>Confirm password<input type="password" name="confirm_password" minlength="8" maxlength="72" required autocomplete="new-password"></label></div>
+<div class="settings-section-heading"><h3>Page access</h3><p class="muted">Dashboard, their own profile and password are always available. Unchecked pages are blocked on the server.</p></div>
+{{ permission_fields(permission_groups) }}
+{% if can_access('account.reset_password') %}<label class="permission-choice"><input type="checkbox" name="permissions" value="reset_passwords"><span>Allow password resets for permitted accounts</span></label>{% endif %}
+<div class="settings-actions"><button class="btn primary">Create admin account</button></div></form></div>
+<div class="table-wrap"><table class="t"><thead><tr><th>Name</th><th>Login</th><th>Role</th><th>Status</th></tr></thead><tbody>{% for r in rows %}<tr><td><strong>{{ r.fname }}</strong></td><td>{{ r.email }}</td><td>{{ 'Super Admin' if r.user_type|string in ['0','9'] else 'Admin' }}</td><td><span class="chip {{ 'green' if r.active|string == '1' else 'gray' }}">{{ 'Active' if r.active|string == '1' else 'Inactive' }}</span></td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

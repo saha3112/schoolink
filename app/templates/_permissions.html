@@ -1,0 +1,7 @@
+{% macro permission_fields(groups, selected=[]) %}
+<div class="permission-grid">
+{% for group,items in groups.items() %}<fieldset class="permission-group"><legend>{{ group }}</legend>
+{% for item in items %}{% if item.key != 'reset_passwords' %}<label class="permission-choice"><input type="checkbox" name="permissions" value="{{ item.key }}" {{ 'checked' if item.key in selected }}><span>{{ item.label }}</span></label>{% endif %}{% endfor %}
+</fieldset>{% endfor %}
+</div>
+{% endmacro %}

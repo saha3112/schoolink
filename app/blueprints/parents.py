@@ -7,6 +7,7 @@ from flask import Blueprint, Response, abort, flash, redirect, render_template, 
 from .. import db
 from ..auth import current_user, hash_password, roles_required, admin_required
 from ..services import access, features, notifications as N
+from ..services import parent_identity as PI
 from ..utils import page_arg, paginate, to_int
 
 bp = Blueprint("parents", __name__, url_prefix="/parents")
@@ -21,11 +22,14 @@ def _scope():
 
 def _where(scope):
     cls, sec, q = to_int(request.args.get("class_id")), to_int(request.args.get("section_id")), request.args.get("q", "").strip()
+    trash=request.args.get('trash')=='1'
+    if trash and scope is not None:abort(403)
+    state='p.deleted_at IS NOT NULL' if trash else 'p.deleted_at IS NULL'
     where, args = ["EXISTS (SELECT 1 FROM students st WHERE st.parent_id=p.id AND st.isDelete='0'" + (" AND st.class_id=%s" if cls else "") + (" AND st.section_id=%s" if sec else "") + ")"], []
     if scope is None and not cls and not sec:
-        where = ["p.deleted_at IS NULL"]
+        where = [state]
     else:
-        where.append("p.deleted_at IS NULL")
+        where.append(state)
     if cls: args.append(cls)
     if sec: args.append(sec)
     if scope is not None:
@@ -35,9 +39,11 @@ def _where(scope):
             conds = " OR ".join(["(st2.class_id=%s AND st2.section_id=%s)"] * len(scope))
             where.append(f"EXISTS (SELECT 1 FROM students st2 WHERE st2.parent_id=p.id AND st2.isDelete='0' AND ({conds}))")
             for c, s in scope: args += [c, s]
+    if request.args.get('missing') == '1':
+        where.append(PI.sql_name() + "='' ")
     if q:
         like = f"%{q}%"
-        where.append("(CONCAT_WS(' ', p.fname, p.mname, p.lname) LIKE %s OR p.phone_1 LIKE %s OR p.phone_2 LIKE %s OR p.email LIKE %s OR p.code LIKE %s OR p.address LIKE %s "
+        where.append("(" + PI.sql_name() + " LIKE %s OR p.phone_1 LIKE %s OR p.phone_2 LIKE %s OR p.email LIKE %s OR p.code LIKE %s OR p.address LIKE %s "
                      "OR EXISTS (SELECT 1 FROM students st3 WHERE st3.parent_id=p.id AND st3.isDelete='0' AND st3.student_name LIKE %s))")
         args += [like] * 7
     return " AND ".join(where), args, cls, sec, q
@@ -55,29 +61,32 @@ def _children(ids):
 
 
 def _name(p):
-    n = " ".join(x for x in (p.get("fname"), p.get("mname"), p.get("lname")) if x and x.strip()).strip()
-    if n:
-        return n
-    fallback = (p.get("account_name") or "").strip()
-    if fallback.lower() in ("parent", "user", "n/a", "none", "null", "-") or fallback == str(p.get("phone_1") or "").strip():
-        return ""
-    return fallback
+    return PI.name(p)
 
 
 def _fill_parent_name(parent):
-    if not any((parent.get(key) or "").strip() for key in ("fname", "mname", "lname")):
-        parent["fname"] = _name(parent)
-    return parent
+    return PI.fill(parent)
 
 
-@bp.route("/")
+@bp.route("/", methods=["GET","POST"])
 @cap
 def all_parents():
+    if request.method=='POST':
+        if not current_user()['is_admin']:abort(403)
+        from ..services import parent_lifecycle as lifecycle
+        try:
+            action=request.form.get('action','')
+            count=lifecycle.apply(current_user(),action,request.form.getlist('ids'))
+            message={'trash':'moved to Trash','restore':'restored','purge':'deleted permanently'}[action]
+            flash(f'{count} parent(s) {message}. Student records were kept.','success')
+        except lifecycle.ParentActionError as error:
+            flash(str(error),'error')
+        return redirect(url_for('parents.all_parents',**{key:request.args[key] for key in ('trash','class_id','section_id','missing','q') if key in request.args}))
     scope = _scope()
     where, args, cls, sec, q = _where(scope)
-    total = db.scalar(f"SELECT COUNT(*) FROM parents p WHERE {where}", args)
+    total = db.scalar(f"SELECT COUNT(*) FROM parents p LEFT JOIN new_users u ON u.id=p.user_id WHERE {where}", args)
     pg = paginate(total, 25, page_arg())
-    rows = db.query(f"SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL WHERE {where} ORDER BY p.id LIMIT %s OFFSET %s", args + [25, pg["offset"]])
+    rows = db.query(f"SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id WHERE {where} ORDER BY p.id LIMIT %s OFFSET %s", args + [25, pg["offset"]])
     kids = _children([r["id"] for r in rows])
     for r in rows:
         _fill_parent_name(r)
@@ -85,7 +94,8 @@ def all_parents():
     pairs = features.pairs("card", current_user()) if scope is not None else None
     classes = access.classes_for(pairs) if pairs is not None else db.query("SELECT classId, class_name FROM classes WHERE isDelete='0' ORDER BY classId")
     sections = (access.sections_for(pairs, cls) if pairs is not None else db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0' ORDER BY section_name", (cls,))) if cls else []
-    return render_template("parents_list.html", rows=rows, p=pg, q=q, cls=cls, sec=sec, classes=classes, sections=sections)
+    return render_template("parents_list.html", rows=rows, p=pg, q=q, cls=cls, sec=sec, classes=classes, sections=sections, missing=request.args.get('missing') == '1', trash=request.args.get('trash')=='1',
+                           n_trash=db.scalar('SELECT COUNT(*) FROM parents WHERE deleted_at IS NOT NULL') if current_user()['is_admin'] else 0)
 
 
 @bp.route("/export.csv")
@@ -93,7 +103,7 @@ def all_parents():
 def export():
     scope = _scope()
     where, args, *_ = _where(scope)
-    rows = db.query(f"SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL WHERE {where} ORDER BY p.id", args)
+    rows = db.query(f"SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id WHERE {where} ORDER BY p.id", args)
     kids = _children([r["id"] for r in rows])
     buf = io.StringIO(); w = csv.writer(buf)
     w.writerow(["mobile", "first_name", "middle_name", "last_name", "alternate_phone", "secondary_name", "address", "student_codes", "admission_numbers", "student_names", "class_names", "section_names", "roll_numbers", "parent_code", "email", "occupation"])
@@ -152,13 +162,13 @@ def create():
         except Exception:
             db.rollback()
             raise
-    return render_template("parent_create.html", student_options=students, selected_children=[])
+    return render_template("parent_create.html", student_options=students, selected_children=request.form.getlist("child_ids") if request.method == "POST" else [])
 
 
 @bp.route("/<int:pid>", methods=["GET", "POST"])
 @cap
 def detail(pid):
-    p = db.one("SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL WHERE p.id=%s", (pid,))
+    p = db.one("SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL WHERE p.id=%s AND p.deleted_at IS NULL", (pid,))
     if not p:
         abort(404)
     _fill_parent_name(p)
@@ -173,14 +183,9 @@ def detail(pid):
     u = current_user()
     if request.method == "POST":
         act = request.form.get("action")
-        if act == "reset" and u["is_admin"]:
-            pw = request.form.get("new_password", "")
-            if len(pw) < 6:
-                flash("Password must be at least 6 characters.", "error")
-            else:
-                db.execute("UPDATE new_users SET password=%s WHERE id=%s", (hash_password(pw), int(p["user_id"])))
-                N.notify([int(p["user_id"])], "Your password was changed by the school", "Use the new password the next time you sign in.", url_for("account.change_password"))
-                flash("Password updated.", "success")
+        if act == "reset":
+            from .account import reset_password
+            return reset_password(int(p['user_id']))
         elif act == "link" and u["is_admin"]:
             try:
                 selected = _chosen_children(request.form, _student_options())
@@ -226,4 +231,4 @@ def detail(pid):
             flash("Parent details saved.", "success")
         return redirect(url_for("parents.detail", pid=pid))
     p["name"] = _name(p)
-    return render_template("parent_detail.html", p=p, kids=kids, student_options=_student_options() if u["is_admin"] else [], selected_children=[])
+    return render_template("parent_detail.html", p=p, kids=kids, student_options=_student_options() if u["is_admin"] else [], selected_children=[k["studentId"] for k in kids])

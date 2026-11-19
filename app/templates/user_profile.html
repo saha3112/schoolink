@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block heading %}My profile{% endblock %}
+{% block content %}
+<div class="page-head"><h1>My profile</h1><p>Your photo appears in the account menu throughout Schoolink.</p></div>
+<div class="card profile-settings"><div class="profile-summary"><div class="profile-photo">{% if me.profile_version %}<img src="{{ url_for('account.profile_image', uid=me.id, v=me.profile_version) }}" alt="Your profile photo">{% else %}<span>{{ me.initials }}</span>{% endif %}</div><div><h3>{{ me.fname }}</h3><p class="muted">{{ me.email }}</p><span class="chip">{{ me.role_label }}</span></div></div>
+<form method="post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label>Profile photo<input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required></label><p class="muted">JPG, PNG or WebP. Up to 3 MB. Photos are cropped to a square.</p><div class="settings-actions"><button class="btn primary">Upload photo</button></div></form>
+{% if me.profile_version %}<form method="post" class="settings-actions"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="action" value="remove"><button class="btn danger">Remove photo</button></form>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% macro row_actions(id,label,trash,kind) %}
+{% set noun = 'student' if kind == 'student' else 'user account' %}
+{% set note = 'Academic records are kept and section roll numbers are updated.' if kind == 'student' else 'The login is suspended and existing sessions are signed out.' %}
+<div class="parent-row-actions">
+{% if trash %}
+<form method="post" data-confirm="Restore this {{ noun }}? {{ 'Section roll numbers will be updated.' if kind == 'student' else 'The previous account status will be restored.' }}" data-confirm-tone="restore" data-confirm-title="Restore {{ noun }}?" data-confirm-ok="Restore" data-confirm-items='{{ [label]|tojson }}'>
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="ids" value="{{ id }}"><input type="hidden" name="action" value="restore"><button class="btn sm">Restore</button></form>
+<form method="post" data-confirm="Delete this {{ noun }} permanently? {{ 'Students with academic history cannot be permanently deleted.' if kind == 'student' else 'Accounts with linked parent/teacher profiles cannot be permanently deleted here.' }} This cannot be undone." data-confirm-tone="danger" data-confirm-title="Delete {{ noun }} permanently?" data-confirm-ok="Delete permanently" data-confirm-items='{{ [label]|tojson }}'>
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="ids" value="{{ id }}"><input type="hidden" name="action" value="purge"><button class="btn sm danger">Delete permanently</button></form>
+{% else %}
+<form method="post" data-confirm="Move this {{ noun }} to Trash? {{ note }}" data-confirm-tone="warn" data-confirm-title="Move {{ noun }} to Trash?" data-confirm-ok="Move to Trash" data-confirm-items='{{ [label]|tojson }}'>
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="ids" value="{{ id }}"><input type="hidden" name="action" value="trash"><button class="btn sm danger">Trash</button></form>
+{% endif %}</div>
+{% endmacro %}
+{% macro bulk_controls(kind,trash) %}
+<form method="post" id="recordBulk" class="parent-bulk-bar" data-record-bulk data-record-kind="{{ kind }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<span class="parent-selection-count" data-record-count aria-live="polite">0 selected</span>
+<label>Action<select name="action" data-record-action>{% if trash %}<option value="restore">Restore selected</option><option value="purge">Delete permanently</option>{% else %}<option value="trash">Move to Trash</option>{% endif %}</select></label>
+<button type="submit" class="btn {{ 'primary' if trash else 'danger' }}" data-record-apply disabled>Apply to selected</button><span class="muted">Select all applies to eligible records on this page.</span></form>
+{% endmacro %}

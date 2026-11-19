@@ -11,7 +11,7 @@ import re
 from flask import url_for
 
 from .. import db
-from . import access, features
+from . import access, features, parent_identity as PI
 
 STOP = {"please", "plz", "find", "show", "me", "search", "get", "of", "in", "for", "the", "a", "an", "and", "to", "his", "her", "my",
         "student", "students", "marks", "mark", "result", "results", "score", "scores", "class", "section", "sec", "std", "standard",
@@ -301,9 +301,11 @@ def run(user, q):
                                   "url": url_for("admin.teacher_mapping_edit", teacher_id=t["user_id"]), "actions": []} for t in trs]})
         w, a = [], []
         for t in name_tokens:
-            w.append("(p.fname LIKE %s OR p.mname LIKE %s OR p.lname LIKE %s OR p.phone_1 LIKE %s OR p.email LIKE %s)"); a += [f"%{t}%"] * 5
-        prs = db.query("SELECT p.id, TRIM(CONCAT_WS(' ', p.fname, NULLIF(p.mname,''), p.lname)) nm, p.phone_1 FROM parents p WHERE p.deleted_at IS NULL AND "
+            w.append("(" + PI.sql_name() + " LIKE %s OR p.mname LIKE %s OR p.lname LIKE %s OR p.phone_1 LIKE %s OR p.email LIKE %s)"); a += [f"%{t}%"] * 5
+        prs = db.query("SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL WHERE p.deleted_at IS NULL AND "
                        + " AND ".join(w) + " ORDER BY p.fname LIMIT 5", a)
+        for parent in prs:
+            parent['nm'] = PI.name(parent) or 'Name not recorded'
         if prs:
             res["groups"].append({"title": "Parents", "items": [{"title": r["nm"], "icon": "users", "sub": "Parent" + (f" · {r['phone_1']}" if r["phone_1"] else ""),
                                   "url": url_for("parents.detail", pid=r["id"]), "actions": []} for r in prs]})

@@ -38,14 +38,28 @@ def current_user():
         u = db.one("SELECT id, fname, email, user_type, active FROM new_users "
                    "WHERE id=%s AND deleted_at IS NULL", (uid,))
         if u and str(u["active"]) in ("1", "true"):
+            from .services import user_access as UA
+            u['_access'] = UA.record(u['id'])
+            version = u['_access']['session_version'] if u['_access'] else 0
+            if session.get('auth_version', 0) != version:
+                session.clear()
+                return None
             u["user_type"] = str(u["user_type"])
+            u["is_super_admin"] = UA.is_super(u)
             u["is_admin"] = u["user_type"] in ADMIN_TYPES
             u["is_teacher"] = u["user_type"] in TEACHER_TYPES
             u["is_parent"] = u["user_type"] == "3"
+            if u['is_parent']:
+                from .services import parent_identity as PI
+                u['fname'] = PI.for_users([u['id']]).get(u['id']) or 'Parent'
             u["initials"] = "".join(w[0] for w in (u["fname"] or "U").split()[:2]).upper()
             u["role_label"] = ("Super Admin" if u["user_type"] in ("0", "9")
                                else "Admin" if u["user_type"] == "1"
                                else "Teacher" if u["user_type"] == "2" else "Parent" if u["user_type"] == "3" else "User")
+            from .services import filestore
+            u['profile_version'] = filestore.version(f"profile/{u['id']}.png")
+            u['can_reset_passwords'] = UA.has(u, 'reset_passwords')
+            u['sidebar_label'] = ('Super Admin Workspace' if u['is_super_admin'] else 'Administration Workspace' if u['is_admin'] else 'Teacher Workspace' if u['is_teacher'] else 'Parent & Family Portal' if u['is_parent'] else 'My Workspace')
             g.user = u
     return g.user
 

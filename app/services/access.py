@@ -55,7 +55,7 @@ def allowed_subjects(user, cid, sid, special=False):
            "JOIN assign_subject a ON a.subject_id=t.subjectId AND a.class_id=t.classId AND a.section_id=t.sectionId "
            "AND a.isDelete='0' AND a.isSpecialSubject=%s "
            "LEFT JOIN classSubject_slNo sl ON sl.classId=t.classId AND sl.sectionId=t.sectionId AND sl.subjectId=sb.subjectId "
-           "WHERE t.classId=%s AND t.sectionId=%s AND t.t_id=%s AND t.isDelete='0' "
+           "WHERE t.classId=%s AND t.sectionId=%s AND t.t_id=%s AND t.isDelete='0' AND sb.isDelete='0' "
            "ORDER BY sl IS NULL, sl, sb.subject_name")
     return db.query(sql, (flag, cid, sid, user["id"]))
 
@@ -63,7 +63,7 @@ def allowed_subjects(user, cid, sid, special=False):
 def subtypes(cid, sid, exam_id, subject_id):
     return db.query("SELECT x.id AS subtype_id, x.exam_type AS name, a.fullmarsks AS fullmarks FROM assign_exam_subtype a "
                     "JOIN exam_subtype x ON x.id=a.exam_subtype_id "
-                    "WHERE a.classId=%s AND a.sectionId=%s AND a.examId=%s AND a.subjectId=%s AND a.isDelete='0' "
+                    "WHERE a.classId=%s AND a.sectionId=%s AND a.examId=%s AND a.subjectId=%s AND a.isDelete='0' AND x.isDelete='0' "
                     "ORDER BY CAST(a.fullmarsks AS UNSIGNED), x.id", (cid, sid, exam_id, subject_id))
 
 
@@ -82,15 +82,24 @@ def exams_for(cid, sid):
 def autopick(pairs, classes, cls, sec, exam, exams_list=None):
     """Default the selection when there is only one choice (a teacher with a single class / section / exam).
     Returns (cls, sec, exam, sections)."""
+    from flask import has_request_context,request,abort
+    posting=has_request_context() and request.method=='POST'
+    if cls and cls not in [row['classId'] for row in classes]:
+        if posting:abort(403)
+        cls=None
     if not cls and len(classes) == 1:
         cls = classes[0]["classId"]
     sections = sections_for(pairs, cls) if cls else []
     if sec and sec not in [x["sectionId"] for x in sections]:
+        if posting:abort(403)
         sec = None
     if not sec and len(sections) == 1:
         sec = sections[0]["sectionId"]
     if exams_list is None and cls and sec:
         exams_list = exams_for(cls, sec)
+    if exam and exams_list is not None and exam not in [row['examId'] for row in exams_list]:
+        if posting:abort(403)
+        exam=None
     if not exam and exams_list is not None and len(exams_list) == 1:
         exam = exams_list[0]["examId"]
     return cls, sec, exam, sections
