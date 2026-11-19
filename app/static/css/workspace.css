@@ -315,3 +315,89 @@ main.content.soft-loading{opacity:.55;transition:opacity .15s ease;pointer-event
 .sl-pager .sl-pg-size{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:8px;margin:0;width:auto}
 .sl-pager .sl-pg-size>span{display:inline!important;margin:0;font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;white-space:nowrap}
 .sl-pager .sl-pg-size .ps-btn{width:auto;min-width:82px;height:32px;margin:0}
+
+/* =====================================================================================================================
+   Sign-in look for the workspace: pastel lavender / blue canvas, glass-white cards with a soft blue shadow, and the same
+   blue -> violet gradient the "Sign in" button uses. Colours and shapes only - sizes, layout and behaviour are unchanged.
+   ===================================================================================================================== */
+:root{--login-grad:linear-gradient(110deg,#04a5f7,#2542e7 46%,#6730f4 77%,#b241ed);--glass:linear-gradient(125deg,#fffffff7,#f8faffe8);
+ --glass-ring:0 0 0 1px #e1e7fa;--glass-shadow:0 14px 40px #2b66d324,0 2px 6px #8a9ee322;--table-radius:22px}
+body.workspace{background:radial-gradient(ellipse at 100% 0,#d2b4ff66,transparent 46%),radial-gradient(ellipse at 6% 66%,#cfddff77,transparent 44%),
+ linear-gradient(125deg,#fafcff,#edf1ff 55%,#e2edff) fixed}
+
+/* ---- sidebar ---- */
+.workspace .sidebar{background:radial-gradient(130% 52% at 100% 0%,#d2b4ff70,transparent 62%),radial-gradient(120% 46% at 0% 100%,#bcd3ff99,transparent 64%),
+ linear-gradient(165deg,#fcfdff 0%,#f2efff 58%,#e9f2ff 100%);border-right:1px solid #dde3f7;box-shadow:8px 0 36px #3c52b312}
+.workspace .sidebar:before{content:'';position:absolute;left:-110px;bottom:-130px;width:330px;height:330px;border-radius:50%;pointer-events:none;z-index:0;
+ background:radial-gradient(circle at 62% 38%,#5f8bff3d,#8a6bff24 52%,transparent 70%)}
+.workspace .sidebar>*{position:relative;z-index:1}
+.workspace .sb-brand{position:relative;border-bottom:0}
+.workspace .sb-brand:after{content:'';position:absolute;left:16px;right:16px;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#b8c4f2,transparent)}
+.workspace .sb-brand img{box-shadow:0 8px 20px #3c46a52a,0 0 0 1px #e6eafb;border-radius:14px}
+.workspace .sb-title b{color:#0b1749}
+.workspace .sb-title small{background:var(--login-grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:750}
+
+.workspace .sb-section{display:flex;align-items:center;gap:9px;color:#6f7cab}
+.workspace .sb-section:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#c6d0f3,transparent)}
+.workspace .sidebar .sb-link{border:1px solid transparent;border-radius:14px;color:#4b5a85;
+ transition:background-color .16s,box-shadow .16s,transform .16s,border-color .16s,color .16s}
+.workspace .sidebar .sb-link>.ic{box-sizing:content-box;width:18px;height:18px;padding:5px;border-radius:10px;background:#ffffffa6;box-shadow:inset 0 0 0 1px #e2e7fa;
+ color:#6872b9;transition:background-color .16s,color .16s,box-shadow .16s}
+.workspace .sidebar .sb-link:hover{background:#ffffffd9;border-color:#e3e8fb;box-shadow:0 8px 18px #4a5fc61c;transform:translateX(2px);color:#2a2d8f}
+.workspace .sidebar .sb-link:hover>.ic{background:#eef0ff;color:#4a35d6}
+.workspace .sidebar .sb-group.open>.sb-parent{background:#ffffffb8;border-color:#e3e8fb;color:#2a2d8f}
+.workspace .sidebar .sb-group.open>.sb-parent>.ic{background:#eef0ff;color:#4a35d6}
+.workspace .sidebar .sb-link.active,.workspace .sidebar .sb-link.active:hover{background-color:#2542e7;background-image:var(--login-grad)!important;background-size:150% 100%;
+ border-color:#ffffff73;color:#fff;box-shadow:0 12px 24px #5946e840;transform:none}
+.workspace .sidebar .sb-link.active>.ic,.workspace .sidebar .sb-link.active:hover>.ic{background:#ffffff2e;box-shadow:inset 0 0 0 1px #ffffff40;color:#fff}
+.workspace .sidebar .sb-sub{border-left:2px solid #d9def6;margin-left:25px;padding-left:6px}
+.workspace .sidebar .sb-sub a{color:#56638f;border-radius:10px;transition:background-color .15s,color .15s}
+.workspace .sidebar .sb-sub a:hover{background:#ffffffcc;color:#2a2d8f}
+.workspace .sidebar .sb-sub a.active{background:linear-gradient(100deg,#e6eeff,#f1e7ff);color:#3320b3;box-shadow:inset 0 0 0 1px #dfe3fb}
+
+.workspace .sb-foot{margin:6px 12px 14px;padding:11px 12px;border-radius:18px;display:flex;align-items:center;gap:10px;background:var(--glass);
+ border:1.5px solid #fff;box-shadow:var(--glass-shadow),var(--glass-ring)}
+.workspace .sb-foot-mark{flex:none;display:grid;place-items:center;width:34px;height:36px;filter:drop-shadow(0 4px 8px #3846d24d)}
+.workspace .sb-foot b{display:block;font-size:14px;font-weight:800;letter-spacing:-.3px;color:#0b1749;line-height:1.15}
+.workspace .sb-foot small{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:10px;font-weight:600;color:#5d6b94;white-space:nowrap}
+.workspace .sb-dot{width:7px;height:7px;border-radius:50%;background:#28c76f;box-shadow:0 0 0 3px #28c76f26}
+.sb-collapsed .workspace .sb-foot>div,.sb-collapsed.workspace .sb-foot>div{display:none}
+.sb-collapsed .workspace .sb-foot,.sb-collapsed.workspace .sb-foot{margin:6px 8px 12px;padding:8px 0;justify-content:center}
+
+/* ---- cards and table boxes ---- */
+.workspace .card{background:var(--glass);border:1.5px solid #fff;border-radius:22px;box-shadow:var(--glass-shadow),var(--glass-ring);position:relative}
+.workspace .card:before{content:'';position:absolute;left:24px;right:24px;top:0;height:3px;border-radius:0 0 8px 8px;pointer-events:none;
+ background:linear-gradient(90deg,#b0cfff,#c99dff,#5867ff,#42c2ff);opacity:.5}
+.workspace .table-wrap{background:var(--glass);border:1.5px solid #fff;border-radius:var(--table-radius)!important;box-shadow:var(--glass-shadow),var(--glass-ring)}
+.workspace .card-head{border-bottom-color:#e3e8fa}
+.workspace .card .table-wrap{box-shadow:none;border-color:#e6eafa}
+
+/* ---- dark theme ---- */
+html[data-theme="dark"] body.workspace{background:radial-gradient(ellipse at 100% 0,#6a45ad26,transparent 46%),radial-gradient(ellipse at 6% 66%,#2c5cae20,transparent 44%),linear-gradient(125deg,#0f162c,#121a33 55%,#101a34) fixed}
+html[data-theme="dark"] .workspace .sidebar{background:radial-gradient(130% 52% at 100% 0%,#6a45ad33,transparent 62%),radial-gradient(120% 46% at 0% 100%,#2f61b533,transparent 64%),linear-gradient(165deg,#141c36,#1a1b3d 58%,#14243e);
+ border-right-color:#2d3857;box-shadow:8px 0 36px #02061a55}
+html[data-theme="dark"] .workspace .sidebar:before{background:radial-gradient(circle at 62% 38%,#5f8bff30,#8a6bff1c 52%,transparent 70%)}
+html[data-theme="dark"] .workspace .sb-brand:after{background:linear-gradient(90deg,transparent,#3b4670,transparent)}
+html[data-theme="dark"] .workspace .sb-title b,html[data-theme="dark"] .workspace .sb-foot b{color:#eef1ff}
+html[data-theme="dark"] .workspace .sb-section{color:#8f9cc7}html[data-theme="dark"] .workspace .sb-section:after{background:linear-gradient(90deg,#34405f,transparent)}
+html[data-theme="dark"] .workspace .sidebar .sb-link{color:#bbc5e2}
+html[data-theme="dark"] .workspace .sidebar .sb-link>.ic{background:#ffffff0d;box-shadow:inset 0 0 0 1px #ffffff14;color:#aeb8e0}
+html[data-theme="dark"] .workspace .sidebar .sb-link:hover,html[data-theme="dark"] .workspace .sidebar .sb-group.open>.sb-parent{background:#ffffff10;border-color:#ffffff14;color:#fff;box-shadow:0 8px 18px #02061a40}
+html[data-theme="dark"] .workspace .sidebar .sb-link:hover>.ic,html[data-theme="dark"] .workspace .sidebar .sb-group.open>.sb-parent>.ic{background:#ffffff16;color:#d8ccff}
+html[data-theme="dark"] .workspace .sidebar .sb-sub{border-left-color:#34405f}
+html[data-theme="dark"] .workspace .sidebar .sb-sub a{color:#b3bedc}html[data-theme="dark"] .workspace .sidebar .sb-sub a:hover{background:#ffffff10;color:#fff}
+html[data-theme="dark"] .workspace .sidebar .sb-sub a.active{background:linear-gradient(100deg,#2a3760,#392d62);color:#e4dcff;box-shadow:inset 0 0 0 1px #ffffff14}
+html[data-theme="dark"] .workspace .sb-foot,html[data-theme="dark"] .workspace .card,html[data-theme="dark"] .workspace .table-wrap{background:linear-gradient(125deg,#1c2645f5,#18213ef2);
+ border:1px solid #2f3b5e;box-shadow:0 14px 40px #02061a66,0 1px 3px #02061a55}
+html[data-theme="dark"] .workspace .sb-foot small{color:#9eacd2}
+html[data-theme="dark"] .workspace .card:before{opacity:.35}
+html[data-theme="dark"] .workspace .card .table-wrap{box-shadow:none;border-color:#2f3b5e}
+
+/* keep the original row height (the icon chip must not make the menu longer) */
+.workspace .sidebar .sb-link{padding:5px 10px;min-height:41px;margin-bottom:3px}
+.workspace .sidebar .sb-link>.ic{width:17px;height:17px;padding:5.5px}
+.workspace .sb-foot>div{text-align:left;min-width:0}
+.workspace .sidebar:before{opacity:.75}
+html[data-theme="dark"] .workspace .card-head{border-bottom-color:var(--line)}
+
+.workspace .sb-nav{overflow-x:hidden}
