@@ -5,7 +5,7 @@
 <div class="card"><h3>New album</h3><form method="post" enctype="multipart/form-data"><div class="form-grid">
  <label>Title<input name="title" maxlength="200" required></label><label>Date<input type="date" name="album_date" value="{{ '' }}"></label>
  <label>Class {{ select('class_id', classes, 'classId', 'class_name', id='cls', placeholder='Whole school' if me.is_admin else 'Select') }}</label>
- <label>Section <select name="section_id" id="sec"><option value="">All</option></select></label>
+ <label>Section <select name="section_id" id="sec"><option value="">{{ 'All sections' if me.is_admin else 'Select section' }}</option></select></label>
  <div style="grid-column:1/-1">{{ file_input('Photos', 'image/*') }}</div></div><p><button class="btn primary">Create album</button></p></form></div>
 <div class="album-grid">{% for a in albums %}
  <div class="album"><a href="#" onclick="document.getElementById('al{{ a.id }}').hidden=!document.getElementById('al{{ a.id }}').hidden;return false" style="color:inherit">
@@ -18,6 +18,5 @@
   </div></div>{% else %}<div class="card empty" style="grid-column:1/-1">No albums yet.</div>{% endfor %}</div>
 {% endblock %}
 {% block scripts %}<script>
-const cls = document.getElementById('cls'), sec = document.getElementById('sec');
-cls.addEventListener('change', () => getJSON('/school/api/sections?class_id=' + cls.value).then(r => fillSelect(sec, r, 'sectionId', 'section_name', 'All')));
+audiencePicker({ cls: document.getElementById('cls'), sec: document.getElementById('sec'), admin: {{ 'true' if me.is_admin else 'false' }}, allLabel: 'All sections' });
 </script>{% endblock %}

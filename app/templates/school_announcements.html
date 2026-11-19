@@ -17,8 +17,5 @@
 {% else %}<div class="card empty">No announcements yet.</div>{% endfor %}
 {% endblock %}
 {% block scripts %}<script>
-const aud = document.getElementById('aud'), cls = document.getElementById('cls'), sec = document.getElementById('sec');
-const toggle = () => { const s = aud.value === 'school'; document.getElementById('clsBox').style.display = document.getElementById('secBox').style.display = s ? 'none' : ''; cls.required = !s; };
-aud.addEventListener('change', toggle); toggle();
-cls.addEventListener('change', () => getJSON('/school/api/sections?class_id=' + cls.value).then(r => fillSelect(sec, r, 'sectionId', 'section_name', {{ ('All sections' if me.is_admin else 'Select')|tojson }})));
+audiencePicker({ aud: document.getElementById('aud'), cls: document.getElementById('cls'), sec: document.getElementById('sec'), admin: {{ 'true' if me.is_admin else 'false' }}, allLabel: 'All sections' });
 </script>{% endblock %}

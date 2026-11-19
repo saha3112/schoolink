@@ -48,6 +48,8 @@ ATTR_WORDS = {
     "report_card": {"reportcard", "marksheet", "marksheets"},
     "comment": {"remark", "remarks", "comment", "comments", "feedback"},
     "teaches": {"teach", "teaches", "teaching", "taught", "subject", "subjects"},
+    "fees": {"fee", "fees", "payment", "payments", "dues", "tuition", "fine", "fines"},
+    "special": {"special"},
     "profile": {"details", "detail", "info", "information", "profile", "everything", "all"},
     "section": {"section", "class", "std", "standard", "studying", "study", "studies", "reads", "grade"},
 }
@@ -117,20 +119,23 @@ def _score(qtoks, name_toks):
 
 
 def _load():
-    if time.time() - _cache["t"] > 90:
-        _cache["stu"] = db.query(
+    """(students, teachers) with pre-computed name keys. Cached; refreshed at once when anything is written."""
+    from .. import cache
+
+    def load():
+        stu = db.query(
             "SELECT st.studentId, st.student_name, st.student_rollNumber, st.ADMNO, st.student_code, st.studentUID, st.DOB, st.parent_id, st.class_id, st.section_id, "
             "c.class_name, s.section_name FROM students st JOIN classes c ON c.classId=st.class_id JOIN sections s ON s.sectionId=st.section_id WHERE st.isDelete='0'")
-        for r in _cache["stu"]:
+        for r in stu:
             r["_toks"] = [norm(t) for t in re.findall(r"[a-z]+", (r["student_name"] or "").lower())]
-        _cache["tea"] = db.query(
+        tea = db.query(
             "SELECT t.user_id, t.fname, t.mname, t.lname, t.phone_1, t.phone_2, t.address, t.coordinator_type, u.email AS login FROM teachers t "
             "LEFT JOIN new_users u ON u.id=t.user_id WHERE t.deleted_at IS NULL")
-        for r in _cache["tea"]:
+        for r in tea:
             r["nm"] = " ".join(x.strip() for x in (r["fname"], r["mname"], r["lname"]) if x and x.strip())
             r["_toks"] = [norm(t) for t in re.findall(r"[a-z]+", r["nm"].lower())]
-        _cache["t"] = time.time()
-    return _cache["stu"], _cache["tea"]
+        return stu, tea
+    return cache.get(("smart.people",), load, 300, copy_result=False)
 
 
 def _rank(rows, qtoks, floor=0.78):
@@ -272,13 +277,35 @@ def _class_teacher(cid, sid):
                     "WHERE k.classId=%s AND k.sectionId=%s AND k.isDelete='0'", (cid, sid))
 
 
-def _subject_teachers(cid, sid, subject_like=None):
-    sql = ("SELECT sb.subject_name, TRIM(CONCAT_WS(' ', t.fname, NULLIF(t.mname,''), t.lname)) nm, t.user_id FROM assign_teacher a JOIN subjects sb ON sb.subjectId=a.subjectId "
+def _house(student_id):
+    r = db.one("SELECT houseName, housePoints FROM student_house WHERE studentId=%s AND isDelete='0' ORDER BY examId DESC LIMIT 1", (student_id,))
+    return (_clean(r["houseName"]), r["housePoints"]) if r else (None, None)
+
+
+def _special_subjects(cid, sid, student_id=None):
+    rows = db.query("SELECT sb.subjectId, sb.subject_name FROM assign_subject a JOIN subjects sb ON sb.subjectId=a.subject_id "
+                    "WHERE a.class_id=%s AND a.section_id=%s AND a.isSpecialSubject='1' AND a.isDelete='0' AND sb.isDelete='0' ORDER BY sb.subject_name", (cid, sid))
+    skip = _excluded(student_id)
+    return [r for r in rows if r["subjectId"] not in skip]
+
+
+def _excluded(student_id):
+    """Subjects this student does not take."""
+    if not student_id:
+        return set()
+    return {r["subjectId"] for r in db.query("SELECT subjectId FROM student_subject_exclusion WHERE studentId=%s", (student_id,))}
+
+
+def _subject_teachers(cid, sid, subject_like=None, student_id=None):
+    sql = ("SELECT sb.subjectId, sb.subject_name, TRIM(CONCAT_WS(' ', t.fname, NULLIF(t.mname,''), t.lname)) nm, t.user_id FROM assign_teacher a JOIN subjects sb ON sb.subjectId=a.subjectId "
            "JOIN teachers t ON t.user_id=a.t_id WHERE a.classId=%s AND a.sectionId=%s AND a.isDelete='0' AND t.deleted_at IS NULL")
     args = [cid, sid]
     rows = db.query(sql + " ORDER BY sb.subject_name", args)
     if subject_like:
         rows = [r for r in rows if all(re.search(re.escape(w), r["subject_name"].lower()) for w in subject_like)]
+    if student_id:
+        skip = _excluded(student_id)
+        rows = [r for r in rows if r["subjectId"] not in skip]
     return rows
 
 
@@ -316,6 +343,22 @@ def _dob_text(dob):
     today = dt.date.today()
     age = today.year - d.year - ((today.month, today.day) < (d.month, d.day))
     return d.strftime("%d %b %Y"), age
+
+
+_PAGE = {"w": None}
+
+
+def _page_words():
+    """Words that appear in menu / page names, so "special subjects" is treated as navigation, not as a person."""
+    if _PAGE["w"] is None:
+        from ..menu import MENU
+        ws = set()
+        for label, _ep, _icon, _cap, children in MENU:
+            ws |= set(re.findall(r"[a-z]+", label.lower()))
+            for ch in children or []:
+                ws |= set(re.findall(r"[a-z]+", ch[0].lower()))
+        _PAGE["w"] = ws
+    return _PAGE["w"]
 
 
 # ------------------------------------------------------------------ the engine
@@ -363,11 +406,21 @@ def answer(user, q, p):
     subj_tokens = []
 
     student_list_q = p_cls and bool(re.search(r"\b(student|students|pupil|pupils|boys|girls|list|names?|roster|everyone|all)\b", ql))
+    mine_q = bool(re.search(r"\b(my|mine|me|myself)\b|\bdo i\b|\bam i\b|\bi teach\b|\bi take\b", ql))
+    if (A.teacher or A.admin) and not A.parent and not adm_tokens and (not qtoks or all(w in _page_words() for w in qtoks)) and not p_cls and (
+            mine_q or (A.teacher and re.search(r"\bspecial\b", ql))) and re.search(r"\b(subjects?|special|classes|class|sections?|students?|profile|details|phone|timetable|teach|teaching|schedule|load)\b", ql):
+        return _my_answer(A, ql)
+    if qtoks and all(w in _page_words() for w in qtoks) and not (p_cls or adm_tokens) and not A.parent:
+        return None                                           # the words only name a page ("special subjects", "subject groups")
     question = bool(student_list_q or has_parent_word or fields or (attrs - {"section", "profile"}) or class_teacher_q or who_teaches or count_q or roll_attr or is_me
                     or re.search(r"\b(which|who|whose|when|how|where|what)\b", ql))
+    if A.parent:                                              # a parent can type just a child's name, "marks", "fees" ... anything about their child
+        question = True
     if not question:
         return None
 
+    if re.search(r"\bsubjects?\b", ql) and not qtoks and not adm_tokens and not p_cls and not A.parent and not who_teaches:
+        return _ok("Subjects can be viewed by student or by class. Try “subjects of aahil shaikh” or “subjects of class 6 c”, or open the page below.", [], [])
     if (attrs & {"events", "announcements"}) and not qtoks and not A.parent:
         return _school_info(A, attrs, p)
 
@@ -382,7 +435,7 @@ def answer(user, q, p):
 
     students, teachers = _load()
 
-    if sections and not qtoks and not adm_tokens and not (class_teacher_q or who_teaches) and (
+    if sections and not qtoks and not adm_tokens and not (class_teacher_q or who_teaches) and not re.search(r"\bsubjects?\b", ql) and (
             has_parent_word or fields or student_list_q or (attrs & {"admission", "dob", "code", "house"})):
         return _roster(A, sections, p, has_parent_word, fields, attrs)
 
@@ -466,15 +519,17 @@ def _student_answer(A, picks, attrs, fields, has_parent_word, class_teacher_q, w
             if age is not None:
                 facts.append(fact("Age", f"{age} years"))
         if "house" in attrs or full:
-            house = db.scalar("SELECT house FROM student_house WHERE studentId=%s ORDER BY 1 LIMIT 1", (st["studentId"],)) if _has_col("student_house", "house") else None
-            if house or "house" in attrs:
-                facts.append(fact("House", house))
+            hn, hp = _house(st["studentId"])
+            if hn or "house" in attrs:
+                facts.append(fact("House", hn))
+                if hn and "house" in attrs:
+                    facts.append(fact("House points", hp))
         if class_teacher_q or full:
             ct = _class_teacher(st["class_id"], st["section_id"])
             if ct or class_teacher_q:
                 facts.append(fact("Class teacher", ", ".join(r["nm"] for r in ct)))
         if who_teaches or "teaches" in attrs:
-            for r in _subject_teachers(st["class_id"], st["section_id"]):
+            for r in _subject_teachers(st["class_id"], st["section_id"], None, st["studentId"]):
                 facts.append(fact(r["subject_name"], r["nm"]))
         if "attendance" in attrs:
             tot, mon = _attendance(st["studentId"])
@@ -674,6 +729,65 @@ def _section_answer(A, sections, p, ql, words, class_teacher_q, who_teaches):
     return _ok(say, [{"title": "Class & section", "items": groups}], ["Class & section"])
 
 
+# ------------------------------------------------------------------ "my subjects", "my special subjects", "my classes"
+def _my_answer(A, ql):
+    """A teacher asking about their own teaching: subjects, special subjects, classes, students."""
+    if not A.teacher:
+        return _ok("You are signed in as an administrator, so no subjects or classes are assigned to you. "
+                   "Try “teachers”, “subjects of class 6 c” or “who teaches maths in class 6 a”.", [], [])
+    uid = A.user["id"]
+    rows = db.query("SELECT a.classId, a.sectionId, c.class_name, s.section_name, sb.subjectId, sb.subject_name, "
+                    "COALESCE(MAX(ass.isSpecialSubject), '0') special FROM assign_teacher a JOIN subjects sb ON sb.subjectId=a.subjectId "
+                    "JOIN classes c ON c.classId=a.classId JOIN sections s ON s.sectionId=a.sectionId "
+                    "LEFT JOIN assign_subject ass ON ass.class_id=a.classId AND ass.section_id=a.sectionId AND ass.subject_id=a.subjectId AND ass.isDelete='0' "
+                    "WHERE a.t_id=%s AND a.isDelete='0' AND sb.isDelete='0' GROUP BY a.classId, a.sectionId, c.class_name, s.section_name, sb.subjectId, sb.subject_name "
+                    "ORDER BY a.classId, s.section_name, sb.subject_name", (uid,))
+    cts = sorted(A.class_teacher_pairs())
+    ct_names = []
+    if cts:
+        ct_names = [f"{r['class_name']} {r['section_name']}" for r in db.query(
+            "SELECT c.class_name, s.section_name FROM classTeacher k JOIN classes c ON c.classId=k.classId JOIN sections s ON s.sectionId=k.sectionId "
+            "WHERE k.teacherId=%s AND k.isDelete='0' ORDER BY k.classId, s.section_name", (uid,))]
+    special_only = bool(re.search(r"\bspecial\b", ql))
+    wants_students = bool(re.search(r"\bstudents?\b", ql)) and not re.search(r"\bsubjects?\b", ql)
+    wants_classes = bool(re.search(r"\b(classes|class|sections?)\b", ql)) and not re.search(r"\bsubjects?\b|\bspecial\b", ql)
+    if not rows and not ct_names:
+        return _ok("No subjects or classes are assigned to you yet. Please ask the administrator to map you in Teacher Mapping.", [], [])
+
+    def grouped(sel):
+        by = {}
+        for r in sel:
+            by.setdefault(f"{r['class_name']} · {r['section_name']}", []).append(r["subject_name"])
+        return [fact(k, ", ".join(v)) for k, v in by.items()]
+    if special_only:
+        sp = [r for r in rows if str(r["special"]) == "1"]
+        if not sp:
+            return _ok("You have no special subjects assigned. Special subjects appear here only when the administrator maps one to you.", [], [])
+        n = len({r["subjectId"] for r in sp})
+        return _ok(f"You teach {n} special subject{'s' if n != 1 else ''}.", [{"title": "My special subjects", "items": [_item("Special subjects", "", grouped(sp))]}], ["My teaching"])
+    if wants_students:
+        facts = []
+        for (cid, sid) in sorted({(r["classId"], r["sectionId"]) for r in rows} | set(cts)):
+            n = db.scalar("SELECT COUNT(*) FROM students WHERE class_id=%s AND section_id=%s AND isDelete='0'", (cid, sid)) or 0
+            nm = db.one("SELECT c.class_name, s.section_name FROM classes c JOIN sections s ON s.sectionId=%s WHERE c.classId=%s", (sid, cid))
+            facts.append(fact(f"{nm['class_name']} · {nm['section_name']}" if nm else f"{cid}-{sid}", f"{n} students"))
+        return _ok("These are the students in the sections you work with.", [{"title": "My students", "items": [_item("Students by section", "", facts)]}], ["My teaching"])
+    facts = []
+    if ct_names:
+        facts.append(fact("Class teacher of", ", ".join(ct_names)))
+    if wants_classes:
+        sec = sorted({f"{r['class_name']} {r['section_name']}" for r in rows})
+        facts.append(fact("Teaching in", ", ".join(sec)))
+    else:
+        facts += grouped(rows)
+        sp = [r for r in rows if str(r["special"]) == "1"]
+        if sp:
+            facts.append(fact("Special subjects", ", ".join(sorted({r["subject_name"] for r in sp}))))
+    n_sub = len({r["subjectId"] for r in rows})
+    say = f"You teach {n_sub} subject{'s' if n_sub != 1 else ''} in {len({(r['classId'], r['sectionId']) for r in rows})} section(s)." if rows else "You are a class teacher but no subjects are assigned to you."
+    return _ok(say, [{"title": "My teaching", "items": [_item("My subjects and classes", "", facts)]}], ["My teaching"])
+
+
 # ------------------------------------------------------------------ teachers
 def _teacher_answer(A, cands, qtoks, attrs, fields, words):
     top = cands[0][0]
@@ -824,6 +938,8 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
             students, teachers = _load()
             if _rank(students, qtoks) or _rank(teachers, qtoks):      # names someone else's child or a teacher
                 return _none("I can only share information about your own children.")
+            if not (is_me or (attrs - {"section", "profile"}) or fields or marks_q or class_teacher_q or who_teaches or roll_attr):
+                return None                                             # nothing we can act on: show the help text
             picks = kids                                                # other words are just chatter ("published", "upcoming" ...)
             qtoks = []
         else:
@@ -832,6 +948,9 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
         return _ok("For privacy, parent contact details are not shown in search. You can update them by contacting the school office.", [], [])
     if (attrs & {"events", "announcements"}) and not (class_teacher_q or who_teaches or roll_attr or marks_q or (attrs & {"attendance", "report_card", "timetable", "leave"})):
         return _school_info(A, attrs, p, kids)
+    if "special" in attrs:                                              # "my child's special subjects": only those, not every subject
+        attrs = set(attrs) - {"teaches"}
+        who_teaches = False
     items = []
     for k in picks[:3]:
         st = db.one("SELECT st.*, c.class_name, s.section_name FROM students st JOIN classes c ON c.classId=st.class_id JOIN sections s ON s.sectionId=st.section_id WHERE st.studentId=%s", (k["studentId"],))
@@ -852,7 +971,7 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
             sw = _subject_words(subj_tokens)
             if not sw:
                 facts.append(fact("Class teacher", ", ".join(r["nm"] for r in _class_teacher(st["class_id"], st["section_id"]))))
-            for r in _subject_teachers(st["class_id"], st["section_id"], sw or None):
+            for r in _subject_teachers(st["class_id"], st["section_id"], sw or None, st["studentId"]):
                 facts.append(fact(r["subject_name"], r["nm"]))
         if re.search(r"\b(classmates?|how many students|strength|total students)\b", ql):
             n = db.scalar("SELECT COUNT(*) FROM students WHERE class_id=%s AND section_id=%s AND isDelete='0'", (st["class_id"], st["section_id"])) or 0
@@ -871,6 +990,16 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
             facts.append(fact("Report card", "Published. Open it with the button below." if rel else "Not published yet"))
             if rel:
                 acts.append({"label": "Open report card", "url": url_for("parentpanel.card", child=st["studentId"])})
+        if "special" in attrs:
+            sp = _special_subjects(st["class_id"], st["section_id"], st["studentId"])
+            facts.append(fact("Special subjects", ", ".join(r["subject_name"] for r in sp)))
+        if "house" in attrs:
+            hn, hp = _house(st["studentId"])
+            facts.append(fact("House", hn))
+            if hn:
+                facts.append(fact("House points", hp))
+        if "fees" in attrs:
+            facts.append(fact("Fees", None))
         if "timetable" in attrs:
             acts.append({"label": "Open timetable", "url": url_for("parentpanel.timetable", child=st["studentId"])})
         if "events" in attrs or "announcements" in attrs:
@@ -888,6 +1017,11 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
             items.append(_item(st["student_name"], f"{st['class_name']} · {st['section_name']}", facts, "", acts))
     if not items:
         return None
-    return _ok("Here is what I found for your child." if len(items) == 1 else "Here is what I found for your children.", [{"title": "My child", "items": items}], ["My child"])
+    allfacts = [f for it in items for f in it["facts"]]
+    if allfacts and all(f["v"] is None for f in allfacts) and not any(it["actions"] for it in items):
+        say = "Fee details are not available in this system." if "fees" in attrs else "I don't have that information for your child."
+    else:
+        say = "Here is what I found for your child." if len(items) == 1 else "Here is what I found for your children."
+    return _ok(say, [{"title": "My child", "items": items}], ["My child"])
 
 
