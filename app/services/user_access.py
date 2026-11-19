@@ -7,6 +7,7 @@ _ready = False
 EXTRA = [
     ('Administration', 'account.users', 'Users & password resets'),
     ('Administration', 'admin.settings', 'School settings'),
+    ('Administration', 'admin.login_page', 'Sign-in page design'),
     ('Administration', 'security.admin_accounts', 'Create admin accounts'),
     ('Administration', 'security.permissions', 'Manage user permissions'),
     ('Administration', 'security.smtp', 'Mail / SMTP settings'),
@@ -131,12 +132,13 @@ ALIASES = {
  'layouts_admin.design_preview':'layouts_admin.designs','layouts_admin.builtin_preview':'layouts_admin.designs',
  'layouts_admin.designs_targets':'layouts_admin.designs','layouts_admin.builtin_apply':'layouts_admin.designs',
  'layouts_admin.students_json':'layouts_admin.designs',
+ 'admin.login_page_preview':'admin.login_page',
  'account.reset_password':'reset_passwords', 'account.reset_delegation':'security.permissions',
 }
 CSV_KEYS = {'marks':'marks.entry','special':'marks.special','attendance':'classteacher.attendance',
  'comments':'classteacher.comments','development':'classteacher.development','rank':'classteacher.rank',
  'house':'classteacher.house','average':'classteacher.average','students':'students.upload','parents':'parents.all_parents'}
-COMMON = {'static','main.index','main.dashboard','auth.login','auth.logout','account.change_password',
+COMMON = {'static','main.index','main.dashboard','auth.login','auth.logout','auth.brand_image','account.change_password',
           'account.profile','account.profile_image','search.api'}
 
 

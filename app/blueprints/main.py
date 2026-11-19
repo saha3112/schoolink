@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Blueprint, Response, abort, render_template, request, redirect, url_for, session, flash, jsonify
 from .. import db
 from ..auth import verify_password, current_user, login_required, ADMIN_TYPES, TEACHER_TYPES, teacher_scope
 
@@ -26,7 +26,23 @@ def login():
             nxt = request.args.get("next", "")
             return redirect(nxt if nxt.startswith("/") and not nxt.startswith("//") else url_for("main.dashboard"))
         flash("Invalid email/mobile or password.", "error")
-    return render_template("login.html")
+    from ..services import loginpage as LP
+    return render_template("login.html", lp=LP.view())
+
+
+@auth_bp.route("/brand/login/<slot>")
+def brand_image(slot):
+    """Pictures chosen for the sign-in page (logo, illustration, background). Public: the sign-in page needs them before anyone is logged in."""
+    from ..services import filestore, loginpage as LP
+    if slot not in LP.IMAGE_SLOTS:
+        abort(404)
+    f = filestore.get(f"login/{slot}")
+    if not f:
+        abort(404)
+    resp = Response(f["data"], mimetype=f["mime"] if f["mime"] in ("image/png", "image/jpeg", "image/webp", "image/gif") else "image/png")
+    resp.headers["Cache-Control"] = "public, max-age=31536000, immutable" if request.args.get("v") else "public, max-age=300"
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    return resp
 
 
 @auth_bp.route("/logout")

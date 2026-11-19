@@ -401,3 +401,5 @@ html[data-theme="dark"] .workspace .card .table-wrap{box-shadow:none;border-colo
 html[data-theme="dark"] .workspace .card-head{border-bottom-color:var(--line)}
 
 .workspace .sb-nav{overflow-x:hidden}
+/* clip instead of hide: same look, but the page stays the scroller so position:sticky works for side panels */
+body.workspace{overflow-x:clip}

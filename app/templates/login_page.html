@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% block heading %}Sign-in page{% endblock %}
+{% macro tf(name, label, multi=False, hint='') %}<label class="lp-field">{{ label }}{% if multi %}<textarea name="t_{{ name }}" rows="3" maxlength="{{ limits[name] }}">{{ cfg.texts[name] }}</textarea>{% else %}<input name="t_{{ name }}" value="{{ cfg.texts[name] }}" maxlength="{{ limits[name] }}" autocomplete="off">{% endif %}{% if hint %}<small>{{ hint }}</small>{% endif %}</label>{% endmacro %}
+{% macro cf(name, label) %}<label class="lp-color"><span>{{ label }}</span><span class="lp-sw"><input type="color" value="{{ cfg.colors[name] }}" data-pair="c_{{ name }}" aria-label="{{ label }} colour"><input name="c_{{ name }}" value="{{ cfg.colors[name] }}" data-default="{{ defaults.colors[name] }}" maxlength="7" pattern="#[0-9a-fA-F]{6}" spellcheck="false" autocomplete="off"></span></label>{% endmacro %}
+{% macro ip(field, current, list) %}<div class="lp-icons" role="radiogroup">{% for k in list %}<label class="lp-ic" title="{{ icons[k][0] }}"><input type="radio" name="{{ field }}" value="{{ k }}" {{ 'checked' if k == current }}><span><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ icons[k][1]|safe }}</svg></span></label>{% endfor %}</div>{% endmacro %}
+{% block content %}
+<div class="page-head"><div><h1>Sign-in page</h1><p>Change the texts, colours, icons and pictures of the login screen. The preview updates as you type; nothing is public until you press <b>Save</b>.</p></div></div>
+<div class="lp-layout">
+<form method="post" enctype="multipart/form-data" id="lpForm" class="lp-form" data-preview="{{ preview_url }}">
+ <div class="card lp-card"><h3>Brand</h3>
+  <div class="lp-grid">{{ tf('wordmark', 'Portal name') }}{{ tf('wordmark_sub', 'Portal subtitle') }}</div>
+  <div class="lp-row"><span class="lp-lab">Portal symbol</span>{{ ip('symbol', cfg.symbol, symbols) }}</div>
+  <div class="lp-grid">{{ tf('pill', 'Status badge text') }}{{ tf('school_line', 'Line under the school name', hint='The school name itself is set in School settings.') }}</div>
+  <div class="lp-checks"><label><input type="checkbox" name="s_pill" {{ 'checked' if cfg.show.pill }}> Show the status badge</label><label><input type="checkbox" name="s_school" {{ 'checked' if cfg.show.school }}> Show the school logo and name</label></div>
+ </div>
+ <div class="card lp-card"><h3>Headline</h3>
+  <div class="lp-grid">{{ tf('headline_1', 'Headline, first line') }}{{ tf('headline_2', 'Headline, highlighted line') }}</div>
+  {{ tf('intro', 'Short description', True) }}
+ </div>
+ <div class="card lp-card"><h3>Highlights</h3>
+  <div class="lp-checks"><label><input type="checkbox" name="s_features" {{ 'checked' if cfg.show.features }}> Show the three highlights</label></div>
+  {% for f in cfg.features %}{% set i = loop.index0 %}
+  <div class="lp-feature"><div class="lp-fn">{{ loop.index }}</div>
+   <div class="lp-fbody"><div class="lp-grid"><label class="lp-field">Label<input name="f{{ i }}_label" value="{{ f.label }}" maxlength="30" autocomplete="off"></label>
+    <label class="lp-color"><span>Icon colour</span><span class="lp-sw"><input type="color" value="{{ f.color }}" data-pair="f{{ i }}_color" aria-label="Icon colour"><input name="f{{ i }}_color" value="{{ f.color }}" maxlength="7" pattern="#[0-9a-fA-F]{6}" spellcheck="false" autocomplete="off"></span></label></div>
+    {{ ip('f' ~ i ~ '_icon', f.icon, icons.keys()|list) }}</div></div>
+  {% endfor %}
+ </div>
+ <div class="card lp-card"><h3>Sign-in box</h3>
+  <div class="lp-grid">{{ tf('kicker', 'Small heading') }}{{ tf('welcome', 'Welcome heading') }}</div>
+  {{ tf('welcome_sub', 'Welcome message', True, 'Use a new line to start a second line.') }}
+  <div class="lp-grid">{{ tf('email_label', 'Login field label') }}{{ tf('email_ph', 'Login field hint') }}{{ tf('password_label', 'Password label') }}{{ tf('password_ph', 'Password hint') }}{{ tf('remember', '“Remember me” text') }}{{ tf('button', 'Button text') }}{{ tf('help_title', 'Help heading') }}{{ tf('help_text', 'Help message') }}</div>
+ </div>
+ <div class="card lp-card"><h3>Colours</h3>
+  <p class="lp-note">The button, highlights and ribbons use a four-colour gradient. The background is a soft three-colour wash with two glows.</p>
+  <div class="lp-sub">Gradient</div><div class="lp-colors">{{ cf('grad1', 'Start') }}{{ cf('grad2', 'Blue') }}{{ cf('grad3', 'Violet') }}{{ cf('grad4', 'End') }}</div>
+  <div class="lp-sub">Background</div><div class="lp-colors">{{ cf('bg1', 'Light') }}{{ cf('bg2', 'Middle') }}{{ cf('bg3', 'Deep') }}{{ cf('glow1', 'Glow top right') }}{{ cf('glow2', 'Glow bottom left') }}</div>
+  <div class="lp-sub">Text and accent</div><div class="lp-colors">{{ cf('text', 'Main text') }}{{ cf('sub', 'Soft text') }}{{ cf('brand', 'Accent') }}</div>
+  <button type="button" class="btn sm" id="lpColorsReset">Reset colours to default</button>
+ </div>
+ <div class="card lp-card"><h3>Pictures</h3>
+  <p class="lp-note">PNG, JPG or WebP, up to 4 MB. Large pictures are resized automatically.</p>
+  {% for slot, title, hint in (('logo','School logo','Shown in the white card next to the school name. A transparent PNG looks best.'),('art','Illustration','Shown under the highlights on wide screens.'),('bg','Background picture','Optional. Covers the soft background; use the slider to keep text readable.')) %}
+  <div class="lp-img" data-slot="{{ slot }}">
+   <div class="lp-thumb {{ 'empty' if not images[slot].url }}">{% if images[slot].url %}<img src="{{ images[slot].url }}" alt="">{% else %}<span>None</span>{% endif %}</div>
+   <div class="lp-img-body"><b>{{ title }}</b><small>{{ hint }}</small>
+    <input type="file" name="{{ slot }}" accept="image/png,image/jpeg,image/webp" data-slot-file="{{ slot }}">
+    {% if images[slot].custom %}<label class="lp-inline"><input type="checkbox" name="reset_{{ slot }}"> Remove my picture{{ ' and use the default' if slot != 'bg' }}</label>{% endif %}
+    {% if slot == 'art' %}<label class="lp-inline"><input type="checkbox" name="s_art" {{ 'checked' if cfg.show.art }}> Show the illustration</label>{% endif %}
+    {% if slot == 'bg' %}<label class="lp-inline">Background strength <input type="range" name="bg_strength" min="0" max="100" value="{{ cfg.bg_strength }}"> <output>{{ cfg.bg_strength }}%</output></label>{% endif %}</div>
+  </div>
+  {% endfor %}
+ </div>
+ <div class="lp-actions"><button class="btn primary" type="submit">Save changes</button><a class="btn" href="{{ url_for('admin.login_page') }}">Discard changes</a>
+  <button class="btn danger" type="submit" name="form" value="reset" formnovalidate data-confirm="Reset the sign-in page to the original design? Your texts, colours and pictures will be removed." data-confirm-tone="danger" data-confirm-title="Reset the sign-in page?" data-confirm-ok="Reset to default">Reset to default</button></div>
+</form>
+<aside class="lp-preview-col"><div class="card lp-preview"><div class="lp-ph"><h3>Live preview</h3><div class="lp-modes" role="group" aria-label="Preview size"><button type="button" class="on" data-mode="desktop">Desktop</button><button type="button" data-mode="phone">Phone</button></div></div>
+ <div class="lp-frame" id="lpFrame" data-mode="desktop"><iframe id="lpPreview" title="Sign-in page preview" sandbox="allow-same-origin allow-scripts" tabindex="-1"></iframe></div>
+ <p class="lp-note">Pictures you pick appear in the preview straight away. They are stored when you press Save.</p></div></aside>
+</div>
+{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="{{ url_for('static', filename='css/loginpage.css', v='4') }}"><script src="{{ url_for('static', filename='js/loginpage.js', v='1') }}"></script>{% endblock %}

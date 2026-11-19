@@ -653,6 +653,44 @@ def assign_subtype():
                            secs_for_filter=db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0'", (cls,)) if cls else [], **_lookups())
 
 
+# ------------------------------------------------------------------ sign-in page editor
+@bp.route("/login-page", methods=["GET", "POST"])
+@admin_required
+def login_page():
+    from ..services import filestore, loginpage as LP, user_access as UA
+    u = current_user()
+    if request.method == "POST":
+        if request.form.get("form") == "reset":
+            LP.reset(u["id"]); UA.audit(u["id"], "login_page.reset", None, "Sign-in page reset to the default design")
+            flash("The sign-in page is back to the default design.", "success")
+            return redirect(url_for("admin.login_page"))
+        LP.save(LP.from_form(request.form), u["id"])
+        problems = []
+        for slot in LP.IMAGE_SLOTS:
+            if request.form.get("reset_" + slot):
+                filestore.delete(f"login/{slot}")
+            else:
+                err = LP.store_image(slot, request.files.get(slot), u["id"])
+                if err:
+                    problems.append(f"{slot.title()}: {err}")
+        UA.audit(u["id"], "login_page.save", None, "Sign-in page design saved")
+        for msg in problems:
+            flash(msg, "error")
+        flash("Sign-in page saved. It is live now." if not problems else "Saved, but some pictures were not changed.", "success" if not problems else "warning")
+        return redirect(url_for("admin.login_page"))
+    images = {slot: {"url": LP.image_url(slot), "custom": LP.has_custom(slot)} for slot in LP.IMAGE_SLOTS}
+    return render_template("login_page.html", cfg=LP.config(), defaults=LP.defaults(), icons=LP.ICONS, symbols=LP.SYMBOLS, limits=LP.TEXT_LIMITS, images=images,
+                           preview_url=url_for("admin.login_page_preview"))
+
+
+@bp.route("/login-page/preview", methods=["POST"])
+@admin_required
+def login_page_preview():
+    """Renders the sign-in page with the unsaved form values (nothing is stored)."""
+    from ..services import loginpage as LP
+    return render_template("login.html", lp=LP.view(LP.from_form(request.form)))
+
+
 # ------------------------------------------------------------------ settings
 @bp.route("/settings", methods=["GET", "POST"])
 @admin_required

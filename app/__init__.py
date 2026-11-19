@@ -131,7 +131,7 @@ def create_app():
         if u and u['is_admin']:
             administration = [{'label':label, 'endpoint':ep} for label,ep in (
                 ('Users & passwords','account.users'),('Create admin','security.admin_accounts'),
-                ('User permissions','security.permissions'),('Mail / SMTP','security.smtp'),('School settings','admin.settings'))
+                ('User permissions','security.permissions'),('Mail / SMTP','security.smtp'),('School settings','admin.settings'),('Sign-in page','admin.login_page'))
                 if UA.endpoint_allowed(u, ep)]
             if administration:
                 menu.append({'label':'Administration','endpoint':None,'icon':'shield','children':administration})
