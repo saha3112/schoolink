@@ -18,7 +18,13 @@ def _load_env(path):
         pass
 
 
-_load_env(os.path.join(BASE_DIR, ".env"))
+# Secrets live outside the project folder: $SCHOOLINK_ENV, else ~/.config/schoolink/.env, else ./.env
+for _p in (os.environ.get("SCHOOLINK_ENV"),
+           os.path.join(os.path.expanduser("~"), ".config", "schoolink", ".env"),
+           os.path.join(BASE_DIR, ".env")):
+    if _p and os.path.isfile(_p):
+        _load_env(_p)
+        break
 
 
 def _int(name, default):
