@@ -184,6 +184,10 @@ def run(user, q):
         res["groups"].extend(smart["groups"])
         res["understood"] += smart["chips"]
         return res
+    if p["tokens"] and all(t in SA.FILLER for t in p["tokens"]) and not (p["cls"] or p["roll"]):
+        res["say"] = ("Tell me what you need, for example “list of students of class 6 c”, “parents phone numbers of class 6 c”, "
+                      "“class teacher of 5 b” or “phone of <teacher name>”.")
+        return res
     if user.get("is_parent"):                              # parents only ever get answers about their own children
         res["say"] = (smart or {}).get("say") or ("I can answer questions about your child, for example “who is my child's class teacher”, "
                                                     "“attendance of my child” or “is the report card published”.")
@@ -322,4 +326,5 @@ def run(user, q):
                                   "url": url_for("parents.detail", pid=r["id"]), "actions": []} for r in prs]})
     if smart and not any(g.get("items") for g in res["groups"]):
         res["say"] = smart["say"]                           # asked a question but nothing matched
+        res["groups"] = []
     return res

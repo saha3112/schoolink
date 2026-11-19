@@ -58,7 +58,7 @@ FILLER = {"i", "need", "want", "needs", "give", "tell", "get", "find", "show", "
           "who", "whose", "which", "a", "an", "kindly", "ph", "nos", "n", "s", "in", "on", "at", "this", "that", "it", "be", "by", "from", "how", "many", "much",
           "total", "count", "strength", "list", "any", "there", "tomorrow", "today", "now", "his", "hers", "their", "them", "he", "she", "they", "was", "will", "when",
           "marks", "mark", "result", "results", "score", "scores", "report", "card", "exam", "term", "teacher", "teachers", "sir", "madam", "mam", "maam", "miss", "mr",
-          "mrs", "mak", "amak", "amake", "dao", "dau", "den", "dite", "dis", "koro", "korun", "er", "der", "ke", "ta", "gulo", "gula", "sob", "sobar", "shob", "sokol", "tader",
+          "mrs", "names", "lists", "listing", "everyone", "pupil", "pupils", "boys", "girls", "roster", "mak", "amak", "amake", "dao", "dau", "den", "dite", "dis", "koro", "korun", "er", "der", "ke", "ta", "gulo", "gula", "sob", "sobar", "shob", "sokol", "tader",
           "tar", "ja", "je", "ki", "kon", "koto", "ekta", "na", "hole", "bolo", "bol", "dekhao", "dekha", "dekhan", "chai", "chaye", "lagbe", "each", "every", "all", "with",
           "published", "publish", "released", "release", "available", "upcoming", "next", "coming", "latest", "new", "hello", "hi", "hey", "status", "update", "updates", "class", "section", "sec", "roll", "std", "standard", "get", "got", "obtained", "date", "birthdate", "details"} | ME_WORDS | CHILD_WORDS
 SUBJECT_ALIAS = {"maths": "math", "mathematics": "math", "eng": "english", "sci": "science", "comp": "computer", "gk": "general", "bangla": "bengali",
@@ -362,7 +362,8 @@ def answer(user, q, p):
     adm_tokens = [t for t in p["tokens"] if t.isdigit() and len(t) >= 3]
     subj_tokens = []
 
-    question = bool(has_parent_word or fields or (attrs - {"section", "profile"}) or class_teacher_q or who_teaches or count_q or roll_attr or is_me
+    student_list_q = p_cls and bool(re.search(r"\b(student|students|pupil|pupils|boys|girls|list|names?|roster|everyone|all)\b", ql))
+    question = bool(student_list_q or has_parent_word or fields or (attrs - {"section", "profile"}) or class_teacher_q or who_teaches or count_q or roll_attr or is_me
                     or re.search(r"\b(which|who|whose|when|how|where|what)\b", ql))
     if not question:
         return None
@@ -381,7 +382,8 @@ def answer(user, q, p):
 
     students, teachers = _load()
 
-    if sections and not qtoks and not adm_tokens and not (class_teacher_q or who_teaches) and (has_parent_word or fields or (attrs & {"admission", "dob", "code", "house"})):
+    if sections and not qtoks and not adm_tokens and not (class_teacher_q or who_teaches) and (
+            has_parent_word or fields or student_list_q or (attrs & {"admission", "dob", "code", "house"})):
         return _roster(A, sections, p, has_parent_word, fields, attrs)
 
     # ---------------- class / section questions ("class teacher of 5 b", "who teaches maths in class 6 a")
@@ -590,6 +592,9 @@ def _roster(A, sections, p, has_parent_word, fields, attrs):
             cols.append("Religion")
         if "second" in want:
             cols.append("Second parent")
+    plain = not wants_parent and not (attrs & {"admission", "dob", "code", "house"})
+    if plain:
+        attrs = set(attrs) | {"admission"}                       # a plain student list shows the admission number too
     if "admission" in attrs:
         cols.append("Adm no.")
     if "code" in attrs:
@@ -808,6 +813,11 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
     subj_tokens = [x for x in qtoks if len(SUBJECT_ALIAS.get(x, x)) >= 3 and any(w.startswith(SUBJECT_ALIAS.get(x, x)) for w in sw_all)]
     qtoks = [x for x in qtoks if x not in subj_tokens]               # "english" in "who teaches english" is a subject, not a name
     picks = kids
+    if p.get("cls"):
+        mine = {(k["class_id"], k["section_id"]) for k in kids}
+        secs = _find_sections(p)
+        if secs and not any((s["class_id"], s["sectionId"]) in mine for s in secs):
+            return _none("I can only share information about your own children.")
     if qtoks:
         ranked = _rank([dict(k, _toks=[norm(t) for t in re.findall(r"[a-z]+", (k["student_name"] or "").lower())]) for k in kids], qtoks, 0.72)
         if not ranked:
