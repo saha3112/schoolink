@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="Schoolink - Complete School Management Platform" width="100%">
+  <img src="docs/schoolink-banner.svg" alt="Schoolink - Complete School Management Platform" width="100%">
 </p>
 
 <p align="center">
