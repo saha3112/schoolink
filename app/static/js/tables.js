@@ -58,6 +58,16 @@
   function stickHead(){
     document.querySelectorAll('table.marks-grid').forEach(t=>{const r=t.tHead&&t.tHead.rows[0];if(r)t.style.setProperty('--hr1',r.getBoundingClientRect().height+'px');});
   }
-  addEventListener('resize',stickHead);addEventListener('load',stickHead);
-  window.slTables={init:()=>{init();align();stickHead();}};init();align();stickHead();addEventListener('sl:live-updated',()=>{init();align();stickHead();});document.addEventListener('DOMContentLoaded',()=>{align();stickHead();});
+  /* Other table boxes: as tall as the screen allows from where they start, so their own scrollbars stay on screen. */
+  function fit(){
+    document.querySelectorAll('.workspace .content .table-wrap').forEach(w=>{
+      if(w.querySelector('.marks-grid')||w.closest('.modal,.pv-box,[role=dialog]')||!w.querySelector('table'))return;
+      w.style.maxHeight='';
+      const top=w.getBoundingClientRect().top+window.scrollY;
+      const pager=w.nextElementSibling&&w.nextElementSibling.classList&&w.nextElementSibling.classList.contains('pager')?72:0;
+      w.style.maxHeight=Math.max(280,window.innerHeight-top-26-pager)+'px';
+    });
+  }
+  addEventListener('resize',()=>{stickHead();fit();});addEventListener('load',()=>{stickHead();fit();});
+  window.slTables={init:()=>{init();align();stickHead();fit();}};init();align();stickHead();fit();addEventListener('sl:live-updated',()=>{init();align();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{align();stickHead();fit();});
 })();

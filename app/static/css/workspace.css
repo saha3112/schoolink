@@ -258,3 +258,13 @@ html[data-theme="dark"] .workspace .t th{border-bottom-color:#4a4870}
 .workspace .table-wrap:has(.marks-grid)::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--brand) 38%,var(--line));border-radius:8px;border:3px solid transparent;background-clip:content-box}
 .workspace .table-wrap:has(.marks-grid)::-webkit-scrollbar-thumb:hover{background:var(--brand);background-clip:content-box}
 .workspace .table-wrap:has(.marks-grid)::-webkit-scrollbar-track{background:transparent}
+/* second header row, first cell: older rule made it static, which let body rows show through */
+.workspace .marks-grid thead tr:not(:first-child) th:first-child{position:sticky;left:auto;top:var(--hr1,58px);z-index:4}
+
+/* ---- Every other table: header stays on top, table scrolls inside its box, scrollbar always reachable ---- */
+.workspace .content .table-wrap:not(:has(.marks-grid)){overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.workspace .content .table-wrap>table:not(.marks-grid)>thead>tr>th{position:sticky;top:0;z-index:3;background:var(--surface2);box-shadow:0 1px 0 var(--line)}
+.workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar{height:12px;width:12px}
+.workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--brand) 38%,var(--line));border-radius:8px;border:3px solid transparent;background-clip:content-box}
+.workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar-thumb:hover{background:var(--brand);background-clip:content-box}
+.workspace .content .table-wrap:not(:has(.marks-grid))::-webkit-scrollbar-track{background:transparent}
