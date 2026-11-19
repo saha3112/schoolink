@@ -174,11 +174,17 @@ def reset(user_id):
 
 # ------------------------------------------------------------------ images
 def store_image(slot, file_storage, user_id):
-    """Validate, shrink and store an uploaded picture. Returns an error text or None."""
-    from PIL import Image
+    """Store an uploaded picture. Returns an error text or None."""
     if slot not in IMAGE_SLOTS or not file_storage or not file_storage.filename:
         return None
-    raw = file_storage.read(4 * 1024 * 1024 + 1)
+    return store_bytes(slot, file_storage.read(4 * 1024 * 1024 + 1), user_id)
+
+
+def store_bytes(slot, raw, user_id):
+    """Validate, shrink and store a picture (from an upload or the media library). Returns an error text or None."""
+    from PIL import Image
+    if slot not in IMAGE_SLOTS or not raw:
+        return None
     if len(raw) > 4 * 1024 * 1024:
         return "The picture is larger than 4 MB."
     try:

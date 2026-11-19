@@ -114,10 +114,17 @@ def profile():
             flash('Profile photo removed. Your initials will be shown.', 'success')
         else:
             file=request.files.get('photo')
-            if not file or not file.filename:
+            data=None
+            picked=request.form.getlist('media_ids')
+            if picked:                                          # chosen in the media library popup (staff)
+                from ..services import media as MD
+                got=MD.take(user,picked[:1])
+                data=got[0][2] if got else None
+            elif file and file.filename:
+                data=file.read(3*1024*1024+1)
+            if not data:
                 flash('Choose a JPG, PNG or WebP photo.', 'error')
             else:
-                data=file.read(3*1024*1024+1)
                 if len(data)>3*1024*1024:
                     flash('Choose a photo smaller than 3 MB.', 'error')
                 else:

@@ -19,16 +19,16 @@
   });
   const bg = form.elements.bg_strength; if (bg) bg.addEventListener('input', () => { bg.nextElementSibling.textContent = bg.value + '%'; });
 
-  /* pictures: show the chosen file at once (stored only when saved) */
-  form.querySelectorAll('input[type=file][data-slot-file]').forEach(inp => inp.addEventListener('change', () => {
-    const slot = inp.dataset.slotFile, f = inp.files && inp.files[0];
-    if (pending[slot]) URL.revokeObjectURL(pending[slot]); delete pending[slot];
-    if (f && /^image\//.test(f.type)) {
-      pending[slot] = URL.createObjectURL(f);
-      const th = inp.closest('.lp-img').querySelector('.lp-thumb'); th.classList.remove('empty'); th.innerHTML = '<img alt="">'; th.firstChild.src = pending[slot];
-    }
+  /* pictures: chosen in the media library popup; show them at once (stored only when saved) */
+  form.querySelectorAll('.lp-thumb').forEach(th => { th.dataset.orig = th.innerHTML; th.dataset.origEmpty = th.classList.contains('empty') ? '1' : ''; });
+  form.addEventListener('mp:change', e => {
+    const box = e.target.closest('[data-media-picker]'); if (!box) return;
+    const slot = (box.dataset.name || '').replace(/^pick_/, ''), it = (e.detail && e.detail.items && e.detail.items[0]) || null;
+    const th = box.closest('.lp-img').querySelector('.lp-thumb');
+    if (it) { pending[slot] = it.url; th.classList.remove('empty'); th.innerHTML = '<img alt="">'; th.firstChild.src = it.thumb || it.url; }
+    else { delete pending[slot]; th.innerHTML = th.dataset.orig; th.classList.toggle('empty', !!th.dataset.origEmpty); }
     applyPending();
-  }));
+  });
   function applyPending() {
     let d; try { d = iframe.contentDocument; } catch (e) { return; }
     if (!d) return;

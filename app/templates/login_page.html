@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'layout.html' %}{% from '_files.html' import media_picker %}
 {% block heading %}Sign-in page{% endblock %}
 {% macro tf(name, label, multi=False, hint='') %}<label class="lp-field">{{ label }}{% if multi %}<textarea name="t_{{ name }}" rows="3" maxlength="{{ limits[name] }}">{{ cfg.texts[name] }}</textarea>{% else %}<input name="t_{{ name }}" value="{{ cfg.texts[name] }}" maxlength="{{ limits[name] }}" autocomplete="off">{% endif %}{% if hint %}<small>{{ hint }}</small>{% endif %}</label>{% endmacro %}
 {% macro cf(name, label) %}<label class="lp-color"><span>{{ label }}</span><span class="lp-sw"><input type="color" value="{{ cfg.colors[name] }}" data-pair="c_{{ name }}" aria-label="{{ label }} colour"><input name="c_{{ name }}" value="{{ cfg.colors[name] }}" data-default="{{ defaults.colors[name] }}" maxlength="7" pattern="#[0-9a-fA-F]{6}" spellcheck="false" autocomplete="off"></span></label>{% endmacro %}
@@ -44,7 +44,7 @@
   <div class="lp-img" data-slot="{{ slot }}">
    <div class="lp-thumb {{ 'empty' if not images[slot].url }}">{% if images[slot].url %}<img src="{{ images[slot].url }}" alt="">{% else %}<span>None</span>{% endif %}</div>
    <div class="lp-img-body"><b>{{ title }}</b><small>{{ hint }}</small>
-    <input type="file" name="{{ slot }}" accept="image/png,image/jpeg,image/webp" data-slot-file="{{ slot }}">
+    {{ media_picker('pick_' ~ slot, '', 'image', False, 1, '', 'Choose from library or upload') }}
     {% if images[slot].custom %}<label class="lp-inline"><input type="checkbox" name="reset_{{ slot }}"> Remove my picture{{ ' and use the default' if slot != 'bg' }}</label>{% endif %}
     {% if slot == 'art' %}<label class="lp-inline"><input type="checkbox" name="s_art" {{ 'checked' if cfg.show.art }}> Show the illustration</label>{% endif %}
     {% if slot == 'bg' %}<label class="lp-inline">Background strength <input type="range" name="bg_strength" min="0" max="100" value="{{ cfg.bg_strength }}"> <output>{{ cfg.bg_strength }}%</output></label>{% endif %}</div>
@@ -59,4 +59,4 @@
  <p class="lp-note">Pictures you pick appear in the preview straight away. They are stored when you press Save.</p></div></aside>
 </div>
 {% endblock %}
-{% block scripts %}<link rel="stylesheet" href="{{ url_for('static', filename='css/loginpage.css', v='4') }}"><script src="{{ url_for('static', filename='js/loginpage.js', v='1') }}"></script>{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="{{ url_for('static', filename='css/loginpage.css', v='5') }}"><script src="{{ url_for('static', filename='js/loginpage.js', v='2') }}"></script>{% endblock %}

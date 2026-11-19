@@ -669,10 +669,17 @@ def login_page():
         for slot in LP.IMAGE_SLOTS:
             if request.form.get("reset_" + slot):
                 filestore.delete(f"login/{slot}")
-            else:
+                continue
+            picked = request.form.getlist("pick_" + slot)
+            err = None
+            if picked:                                              # chosen in the media library popup
+                from ..services import media as MD
+                got = MD.take(u, picked[:1])
+                err = LP.store_bytes(slot, got[0][2], u["id"]) if got else "That library item is not available."
+            else:                                                   # classic upload (kept as a fallback)
                 err = LP.store_image(slot, request.files.get(slot), u["id"])
-                if err:
-                    problems.append(f"{slot.title()}: {err}")
+            if err:
+                problems.append(f"{slot.title()}: {err}")
         UA.audit(u["id"], "login_page.save", None, "Sign-in page design saved")
         for msg in problems:
             flash(msg, "error")
