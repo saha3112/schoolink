@@ -55,3 +55,4 @@ app/views_py/   generated report templates (do not edit by hand)
 tools/          php2py transpiler + helpers
 subject_groups.json   hard coded subject groups per class/section, exported from the old MarksModel
 ```
+# schoolink
