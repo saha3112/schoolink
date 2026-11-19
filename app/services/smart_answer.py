@@ -206,7 +206,9 @@ class Access:
 
 # ------------------------------------------------------------------ small helpers
 def _clean(v):
-    v = (str(v).strip() if v is not None else "")
+    import html as _html
+    v = _html.unescape(re.sub(r"<[^>]*>", " ", str(v))) if v is not None else ""      # some stored addresses contain <p> tags
+    v = " ".join(v.split())
     return "" if v.lower() in ("", "none", "null", "n/a", "na", "-", "0", "not available", "0000-00-00") else v
 
 
@@ -338,6 +340,8 @@ def answer(user, q, p):
     is_me = any(w in ME_WORDS for w in words) or any(w in CHILD_WORDS for w in words)
     class_teacher_q = bool(re.search(r"\b(class|form)\s*teacher\b", ql))
     who_teaches = bool(re.search(r"\bwho\s+(teach|teaches|is teaching|takes)\b|\bteachers?\s+(of|for|in)\b|\bsubject\s*teachers?\b|\btaught by\b", ql)) and not class_teacher_q
+    teachers_q = bool(re.search(r"\bteach(?:er|ers|ing)?\b|\bfaculty\b|\bstaff\b|\bsirs?\b|\bmiss(?:es)?\b|\bmadams?\b", ql)) and not class_teacher_q
+    who_teaches = who_teaches or teachers_q
     count_q = bool(re.search(r"\b(how many|total|count|strength|number of)\b", ql)) and bool(re.search(r"\b(students?|pupils?|children|kids|teachers?|boys|girls|sections?|classes|parents?)\b", ql))
     roll_attr = bool(re.search(r"\broll\b", ql)) and not p.get("roll")
     p_cls = bool(p.get("cls"))
@@ -393,7 +397,9 @@ def answer(user, q, p):
             return _section_answer(A, sections, p, ql, words, class_teacher_q, who_teaches)
 
     if not qtoks and not adm_tokens:
-        if (class_teacher_q or who_teaches) and not p_cls:
+        if teachers_q and not p_cls and not class_teacher_q:
+            return _teacher_list(A)
+        if class_teacher_q and not p_cls:
             return _none("Tell me the class too, for example “who is the class teacher of class 5 b”.")
         return None
 
@@ -706,6 +712,30 @@ def _teacher_answer(A, cands, qtoks, attrs, fields, words):
     return _ok(say, [{"title": "Teacher details", "items": items}], ["Teacher details"])
 
 
+def _teacher_list(A):
+    """Names of teachers: everyone for an administrator, colleagues of the same sections for a teacher."""
+    scope = A.scope()
+    if scope is None:
+        rows = db.query("SELECT t.user_id, TRIM(CONCAT_WS(' ', t.fname, NULLIF(t.mname,''), t.lname)) nm, t.phone_1 FROM teachers t WHERE t.deleted_at IS NULL ORDER BY t.fname, t.lname")
+    else:
+        if not scope:
+            return _none("No classes are assigned to you yet.")
+        ph = " OR ".join(["(a.classId=%s AND a.sectionId=%s)"] * len(scope))
+        args = [x for pair in sorted(scope) for x in pair]
+        rows = db.query("SELECT DISTINCT t.user_id, TRIM(CONCAT_WS(' ', t.fname, NULLIF(t.mname,''), t.lname)) nm, t.phone_1 FROM assign_teacher a JOIN teachers t ON t.user_id=a.t_id "
+                        "WHERE a.isDelete='0' AND t.deleted_at IS NULL AND (" + ph + ") ORDER BY nm", args)
+    if not rows:
+        return _none("I could not find any teachers.")
+    cts = {}
+    for r in db.query("SELECT k.teacherId, c.class_name, s.section_name FROM classTeacher k JOIN classes c ON c.classId=k.classId JOIN sections s ON s.sectionId=k.sectionId WHERE k.isDelete='0'"):
+        cts.setdefault(r["teacherId"], []).append(f"{r['class_name']} {r['section_name']}")
+    show_phone = A.admin and A.can("teacher")
+    cols = ["Teacher", "Class teacher of"] + (["Phone"] if show_phone else [])
+    out = [[r["nm"], ", ".join(cts.get(r["user_id"], [])) or "-"] + ([_clean(r["phone_1"]) or "-"] if show_phone else []) for r in rows[:80]]
+    say = f"{len(rows)} teachers" + (". Showing the first 80." if len(rows) > 80 else ".") + " Add a class to see who teaches what, for example “teachers of class 5 a”."
+    return _ok(say, [{"title": "Teachers", "items": [], "table": {"cols": cols, "rows": out, "tel": [2] if show_phone else []}}], ["Teachers"])
+
+
 # ------------------------------------------------------------------ counts
 def _counts(A, p, ql):
     if re.search(r"\bteachers?\b", ql) and not p.get("cls"):
@@ -769,10 +799,14 @@ def _school_info(A, attrs, p, kids=None):
 
 # ------------------------------------------------------------------ parent login
 def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, marks_q, roll_attr, is_me):
+    ql = q.lower()
     from flask import url_for
     kids = A.kids
     if not kids:
         return _none("I could not find a child linked to your account. Please contact the school office.")
+    sw_all = {w for r in db.query("SELECT subject_name FROM subjects WHERE isDelete='0'") for w in re.findall(r"[a-z]+", r["subject_name"].lower())}
+    subj_tokens = [x for x in qtoks if len(SUBJECT_ALIAS.get(x, x)) >= 3 and any(w.startswith(SUBJECT_ALIAS.get(x, x)) for w in sw_all)]
+    qtoks = [x for x in qtoks if x not in subj_tokens]               # "english" in "who teaches english" is a subject, not a name
     picks = kids
     if qtoks:
         ranked = _rank([dict(k, _toks=[norm(t) for t in re.findall(r"[a-z]+", (k["student_name"] or "").lower())]) for k in kids], qtoks, 0.72)
@@ -794,7 +828,7 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
         if not st:
             continue
         facts, acts = [], []
-        full = not (attrs - {"section", "profile"}) and not (class_teacher_q or who_teaches or roll_attr or marks_q)
+        full = not (attrs - {"section", "profile"}) and not (class_teacher_q or who_teaches or roll_attr or marks_q or re.search(r"\b(classmates?|how many|strength|total)\b", ql))
         if full or roll_attr or "section" in attrs:
             facts += [fact("Class", f"{st['class_name']} · Section {st['section_name']}"), fact("Roll no.", st["student_rollNumber"])]
         if full or "admission" in attrs:
@@ -805,8 +839,14 @@ def _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, 
         if class_teacher_q or full:
             facts.append(fact("Class teacher", ", ".join(r["nm"] for r in _class_teacher(st["class_id"], st["section_id"]))))
         if who_teaches or "teaches" in attrs:
-            for r in _subject_teachers(st["class_id"], st["section_id"], _subject_words([t for t in qtoks]) or None):
+            sw = _subject_words(subj_tokens)
+            if not sw:
+                facts.append(fact("Class teacher", ", ".join(r["nm"] for r in _class_teacher(st["class_id"], st["section_id"]))))
+            for r in _subject_teachers(st["class_id"], st["section_id"], sw or None):
                 facts.append(fact(r["subject_name"], r["nm"]))
+        if re.search(r"\b(classmates?|how many students|strength|total students)\b", ql):
+            n = db.scalar("SELECT COUNT(*) FROM students WHERE class_id=%s AND section_id=%s AND isDelete='0'", (st["class_id"], st["section_id"])) or 0
+            facts.append(fact("Students in class", n))
         if "attendance" in attrs:
             tot, mon = _attendance(st["studentId"])
             if tot and tot["t"]:
