@@ -133,3 +133,9 @@ html[data-theme="dark"] .workspace .table-wrap{background:linear-gradient(135deg
 html[data-theme="dark"] .workspace .card .table-wrap{background:#ffffff0a!important;border:1px solid #ffffff14!important}
 html[data-theme="dark"] .workspace .stat,html[data-theme="dark"] .workspace .stat.c2,html[data-theme="dark"] .workspace .stat.c3,html[data-theme="dark"] .workspace .stat.c4{border-top:1px solid #ffffff1a!important}
 @supports not (backdrop-filter:blur(2px)){.workspace .card,.workspace .table-wrap{background:linear-gradient(135deg,#fffffff2,#f6f8ffe0)!important}}
+
+/* password reset in a table row: the field and its Reset button sit on one line */
+.workspace td .password-reset-form{display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center;justify-content:center;gap:8px;margin:0}
+.workspace td .password-reset-form .pw-wrap{width:200px;min-width:160px;flex:none}
+.workspace td .password-reset-form .pw-wrap input{min-height:34px;font-size:12px}
+.workspace td .password-reset-form .btn{flex:none;margin:0}

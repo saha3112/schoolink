@@ -41,6 +41,8 @@ class Config:
     DB_USER = os.environ.get("DB_USER", "")
     DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
     DB_NAME = os.environ.get("DB_NAME", "")
+    MAX_CONTENT_LENGTH = _int("MAX_UPLOAD_MB", 40) * 1024 * 1024          # one request can never exceed this (uploads, CSV, bulk forms)
+    ALLOWED_HOSTS = [h.strip().lower() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]   # public host names; empty = any
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"

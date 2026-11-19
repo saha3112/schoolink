@@ -108,6 +108,18 @@ role based menus and real-time updates.
 
 If you change data directly in the database, call `cache.bump()` (or wait for the short expiry) so the app picks it up at once.
 
+## 🔒 Security
+
+The app is built to be exposed on the internet (for example through a tunnel):
+
+- **Production server**: `run.py` serves with Waitress when `DEBUG=0` (no interactive debugger, bounded request size, trusted proxy only). Keep `DEBUG=0` in `.secrets/.env`.
+- **Sessions**: signed with a long random `SECRET_KEY`, `HttpOnly`, `SameSite=Lax`, and `Secure` automatically on HTTPS; HSTS is sent on HTTPS; plain-http requests from outside are redirected to https.
+- **Sign-in protection**: bcrypt hashes, a generic error message, equal timing for unknown logins, and a lock after repeated failures (6 per login+address, 25 per address, 40 per login; 15 minutes). Locks are written to the audit log.
+- **Headers**: Content-Security-Policy, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP / CORP; private pages are `no-store`.
+- **Requests**: CSRF token on every POST, `ALLOWED_HOSTS` (host-header check), upload limit `MAX_UPLOAD_MB`, whitelisted upload types (no HTML / SVG), images re-encoded before they are stored.
+- **Errors**: generic pages only; a failure never shows code, paths or a traceback.
+- **Data access**: parameterised SQL everywhere; role checks on every page and on search; secrets live in the git-ignored `.secrets/` folder.
+
 ## 🧰 Tech stack
 
 | Layer | Technology |

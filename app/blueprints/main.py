@@ -12,11 +12,21 @@ def login():
     if current_user():
         return redirect(url_for("main.dashboard"))
     if request.method == "POST":
+        from .. import hardening
+        from ..services import loginguard as LG, loginpage as LP0
         email = request.form.get("email", "").strip()
         pw = request.form.get("password", "")
+        ip = hardening.client_ip()
+        wait = LG.wait_seconds(email, ip)
+        if wait:                                                   # too many wrong passwords: no password is checked at all
+            flash(f"Too many sign-in attempts. Please wait {max(1, (wait + 59) // 60)} minute(s) and try again.", "error")
+            return render_template("login.html", lp=LP0.view()), 429
         u = db.one("SELECT id, email, password, user_type, active FROM new_users "
                    "WHERE email=%s AND deleted_at IS NULL", (email,))
+        if not u:
+            verify_password(pw, hardening.dummy_hash())            # same time as a real check: no guessing which logins exist
         if u and str(u["active"]) == "1" and verify_password(pw, u["password"]):
+            LG.succeeded(email, ip)
             session.clear()
             session.permanent = request.form.get("remember") == "1"
             session["uid"] = u["id"]
@@ -25,6 +35,7 @@ def login():
             session['auth_version'] = access['session_version'] if access else 0
             nxt = request.args.get("next", "")
             return redirect(nxt if nxt.startswith("/") and not nxt.startswith("//") else url_for("main.dashboard"))
+        LG.failed(email, ip)
         flash("Invalid email/mobile or password.", "error")
     from ..services import loginpage as LP
     return render_template("login.html", lp=LP.view())
