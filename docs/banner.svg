@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-label="Schoolink - Modern School Report Card Platform">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b3fd1"/>
+      <stop offset="0.55" stop-color="#5358ec"/>
+      <stop offset="1" stop-color="#8b6cf7"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.1" r="0.7">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#fff" fill-opacity=".14"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="320" rx="26" fill="url(#bg)"/>
+  <rect width="1200" height="320" rx="26" fill="url(#dots)"/>
+  <rect width="1200" height="320" rx="26" fill="url(#glow)"/>
+
+  <!-- logo mark -->
+  <rect x="90" y="86" width="148" height="148" rx="38" fill="#fff"/>
+  <path d="M164 122 L112 145 L164 168 L216 145 Z" fill="#5358ec"/>
+  <path d="M138 157 V180 C138 189 150 196 164 196 C178 196 190 189 190 180 V157 L164 168 Z" fill="#5358ec" fill-opacity=".8"/>
+  <rect x="210" y="146" width="6" height="34" rx="3" fill="#5358ec"/>
+
+  <!-- title -->
+  <text x="276" y="166" font-family="'Plus Jakarta Sans','DM Sans','Segoe UI',Helvetica,Arial,sans-serif" font-size="84" font-weight="800" fill="#fff" letter-spacing="-2">Schoolink</text>
+  <text x="280" y="212" font-family="'DM Sans','Segoe UI',Helvetica,Arial,sans-serif" font-size="29" font-weight="500" fill="#fff" fill-opacity=".92">Modern School Report Card Platform</text>
+
+  <!-- chips -->
+  <g font-family="'DM Sans','Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#fff">
+    <rect x="280" y="236" width="118" height="34" rx="17" fill="#fff" fill-opacity=".18"/><text x="339" y="258" text-anchor="middle">Marks &amp; Ranks</text>
+    <rect x="410" y="236" width="128" height="34" rx="17" fill="#fff" fill-opacity=".18"/><text x="474" y="258" text-anchor="middle">Report Cards</text>
+    <rect x="550" y="236" width="126" height="34" rx="17" fill="#fff" fill-opacity=".18"/><text x="613" y="258" text-anchor="middle">Parent Portal</text>
+    <rect x="688" y="236" width="100" height="34" rx="17" fill="#fff" fill-opacity=".18"/><text x="738" y="258" text-anchor="middle">Live Sync</text>
+  </g>
+</svg>
