@@ -284,3 +284,9 @@ html[data-theme="dark"] .workspace .t th{border-bottom-color:#4a4870}
 .workspace .table-wrap,.workspace .subject-page .table-wrap{border-radius:var(--table-radius)!important;clip-path:inset(0 round var(--table-radius))}
 .workspace .table-wrap::-webkit-scrollbar-corner{background:transparent}
 .workspace .table-wrap>table{border-radius:0}
+.ts-tbl{margin:6px 10px 8px;max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.ts-tbl table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.ts-tbl th{position:sticky;top:0;background:var(--surface2);color:var(--muted);font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;text-align:left;padding:8px 10px;white-space:nowrap;box-shadow:0 1px 0 var(--line)}
+.ts-tbl td{padding:7px 10px;border-bottom:1px solid var(--line);color:var(--text);white-space:nowrap}
+.ts-tbl tr:last-child td{border-bottom:0}
+.ts-tbl a{color:var(--brand);font-weight:750;text-decoration:none;font-variant-numeric:tabular-nums}

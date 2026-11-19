@@ -286,6 +286,12 @@ window.sectionSubjects = function (o) {
   const factsHtml = f => !f ? '' : '<div class="ts-facts">' + f.map(x => '<div class="ts-fact"><span>' + esc(x.k) + '</span>' + (x.v == null ? '<i>Not available</i>' : (x.tel ? '<a href="tel:' + esc(String(x.v).replace(/[^+\d]/g, '')) + '">' + esc(x.v) + '</a>' : '<b>' + esc(x.v) + '</b>')) + '</div>').join('') + '</div>';
   const itemHtml = it => '<div class="ts-item"><' + (it.url ? 'a class="ts-main" href="' + esc(it.url) + '"' : 'div class="ts-main"') + '><span class="ts-ico">' + (it.iconHtml || ICON[it.icon] || ICON.layers) + '</span><span class="ts-txt"><b>' + esc(it.title) + '</b><small>' + esc(it.sub || '') + '</small></span>' + (it.badge ? '<em>' + esc(it.badge) + '</em>' : '') + '</' + (it.url ? 'a' : 'div') + '>' +
     ((it.actions && it.actions.length) ? '<div class="ts-acts">' + it.actions.map(a => link(a, 'ts-act')).join('') + '</div>' : '') + factsHtml(it.facts) + marksHtml(it.marks) + '</div>';
+  const tableGroup = g => {
+    const tel = new Set((g.table.tel || []));
+    const head = '<tr>' + g.table.cols.map(c => '<th>' + esc(c) + '</th>').join('') + '</tr>';
+    const body = g.table.rows.map(r => '<tr>' + r.map((v, i) => '<td>' + (tel.has(i) && v && v !== '-' ? '<a href="tel:' + esc(String(v).replace(/[^+\d]/g, '')) + '">' + esc(v) + '</a>' : esc(v)) + '</td>').join('') + '</tr>').join('');
+    return '<div class="ts-group"><div class="ts-gh">' + esc(g.title) + '</div><div class="ts-tbl"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' + (g.more ? '<a class="ts-more" href="' + esc(g.more) + '">Open full list →</a>' : '') + '</div>';
+  };
   const group = (title, items, extra) => '<div class="ts-group"><div class="ts-gh">' + esc(title) + '</div>' + items.map(itemHtml).join('') + (extra || '') + '</div>';
   const render = (d, q) => {
     let html = '';
@@ -295,10 +301,16 @@ window.sectionSubjects = function (o) {
     const groups = (d && d.groups) || [];
     const pageHtml = pg.length ? group('Go to page', pg) : '';
     if (!groups.length || groups.every(g => !g.items.length)) html += pageHtml;
-    groups.forEach(g => { html += g.items.length ? group(g.title, g.items, g.more ? '<a class="ts-more" href="' + esc(g.more) + '">See all results →</a>' : '') : '<div class="ts-group"><div class="ts-gh">' + esc(g.title) + '</div><div class="ts-empty">' + esc(g.empty || 'Nothing found.') + '</div></div>'; });
-    if (groups.some(g => g.items.length)) html += pageHtml;
+    groups.forEach(g => { if (g.table) { html += tableGroup(g); return; } html += g.items.length ? group(g.title, g.items, g.more ? '<a class="ts-more" href="' + esc(g.more) + '">See all results →</a>' : '') : '<div class="ts-group"><div class="ts-gh">' + esc(g.title) + '</div><div class="ts-empty">' + esc(g.empty || 'Nothing found.') + '</div></div>'; });
+    if (groups.some(g => g.items.length || g.table)) html += pageHtml;
     if (!html.trim()) html = '<div class="ts-empty">No results for “' + esc(q) + '”. Try a student name, or something like <i>class 1 section a</i>.</div>';
     panel.innerHTML = html; cur = -1; open();
+    panel.style.width = '';                                   // wide answers (tables) grow leftwards, but never under the sidebar
+    if (panel.querySelector('.ts-tbl')) {
+      const sb = document.querySelector('.sidebar'), left = sb && sb.offsetWidth ? sb.getBoundingClientRect().right : 0;
+      const room = box.getBoundingClientRect().right - left - 16;
+      panel.style.width = Math.max(360, Math.min(780, room)) + 'px';
+    }
   };
   const idle = () => { panel.innerHTML = ''; panel.hidden = true; inp.setAttribute('aria-expanded', 'false'); cur = -1; };          // nothing is shown until something is typed
   const search = q => {

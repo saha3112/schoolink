@@ -58,11 +58,22 @@ FILLER = {"i", "need", "want", "needs", "give", "tell", "get", "find", "show", "
           "who", "whose", "which", "a", "an", "kindly", "ph", "nos", "n", "s", "in", "on", "at", "this", "that", "it", "be", "by", "from", "how", "many", "much",
           "total", "count", "strength", "list", "any", "there", "tomorrow", "today", "now", "his", "hers", "their", "them", "he", "she", "they", "was", "will", "when",
           "marks", "mark", "result", "results", "score", "scores", "report", "card", "exam", "term", "teacher", "teachers", "sir", "madam", "mam", "maam", "miss", "mr",
-          "mrs", "published", "publish", "released", "release", "available", "upcoming", "next", "coming", "latest", "new", "hello", "hi", "hey", "status", "update", "updates", "class", "section", "sec", "roll", "std", "standard", "get", "got", "obtained", "date", "birthdate", "details"} | ME_WORDS | CHILD_WORDS
+          "mrs", "mak", "amak", "amake", "dao", "dau", "den", "dite", "dis", "koro", "korun", "er", "der", "ke", "ta", "gulo", "gula", "sob", "sobar", "shob", "sokol", "tader",
+          "tar", "ja", "je", "ki", "kon", "koto", "ekta", "na", "hole", "bolo", "bol", "dekhao", "dekha", "dekhan", "chai", "chaye", "lagbe", "each", "every", "all", "with",
+          "published", "publish", "released", "release", "available", "upcoming", "next", "coming", "latest", "new", "hello", "hi", "hey", "status", "update", "updates", "class", "section", "sec", "roll", "std", "standard", "get", "got", "obtained", "date", "birthdate", "details"} | ME_WORDS | CHILD_WORDS
 SUBJECT_ALIAS = {"maths": "math", "mathematics": "math", "eng": "english", "sci": "science", "comp": "computer", "gk": "general", "bangla": "bengali",
                  "hist": "history", "geo": "geography", "phy": "physics", "chem": "chemistry", "bio": "biology"}
 
 _cache = {"t": 0, "stu": [], "tea": []}
+_STEMS = {"student", "parent", "teacher", "father", "mother", "class", "section", "guardian", "child", "children", "number", "phone", "mobile", "contact", "address", "email"}
+
+
+def _stem(w):
+    """'studenter' -> 'student', 'parenter' -> 'parent' (Bengali style possessive endings)."""
+    for suf in ("er", "der", "r", "s'", "'s"):
+        if w.endswith(suf) and w[: -len(suf)] in _STEMS:
+            return w[: -len(suf)]
+    return w
 
 
 # ------------------------------------------------------------------ name matching
@@ -188,7 +199,9 @@ class Access:
         return sc is not None and (st["class_id"], st["section_id"]) in sc
 
     def parent_contact_ok(self, st):
-        return self.admin and self.can("parent")
+        if self.admin:
+            return self.can("parent")
+        return self.teacher and (st["class_id"], st["section_id"]) in self.class_teacher_pairs()   # a class teacher sees their own section's parents
 
 
 # ------------------------------------------------------------------ small helpers
@@ -222,8 +235,18 @@ def _classes():
     return db.query("SELECT classId, class_name FROM classes WHERE isDelete='0' ORDER BY classId")
 
 
+def _sec_letter(ql, names):
+    pats = [r"\b(?:section|sec|sect)\s*[-:]?\s*([a-z0-9]{1,2})\b", r"\b([a-z0-9]{1,2})\s+(?:section|sec)\b",
+            r"\b(?:class|std|standard)\s*[-:]?\s*(?:\d{1,2}|[ivx]{1,4})\s*(?:st|nd|rd|th)?\s*(?:er|r)?\s*[-/]?\s*([a-e])\b", r"\b\d{1,2}\s*[-/]?\s*([a-e])\b"]
+    for pat in pats:
+        for m in re.finditer(pat, ql):
+            if m.group(1).upper() in names:
+                return m.group(1).upper()
+    return None
+
+
 def _find_sections(p):
-    """Sections named by the sentence ('class 5', 'class 5 b')."""
+    """Sections named by the sentence ('class 5', 'class 5 b', 'class 6 er c section')."""
     if not p.get("cls"):
         return []
     from . import search as S
@@ -233,8 +256,12 @@ def _find_sections(p):
     ids = [c["classId"] for c in cl]
     rows = db.query("SELECT s.sectionId, s.section_name, s.class_id, c.class_name FROM sections s JOIN classes c ON c.classId=s.class_id WHERE s.isDelete='0' AND s.class_id IN (%s) "
                     "ORDER BY s.class_id, s.section_name" % ",".join(["%s"] * len(ids)), ids)
-    if p.get("sec"):
-        rows = [r for r in rows if (r["section_name"] or "").upper() == p["sec"]]
+    names = {(r["section_name"] or "").upper() for r in rows}
+    sec = p.get("sec") if (p.get("sec") or "") in names else None
+    sec = sec or _sec_letter(p.get("_ql", ""), names)
+    p["sec"] = sec
+    if sec:
+        rows = [r for r in rows if (r["section_name"] or "").upper() == sec]
     return rows
 
 
@@ -293,13 +320,14 @@ def _dob_text(dob):
 def answer(user, q, p):
     """-> None (not a question we handle) | {"status": "ok"|"none", "say", "groups", "chips"}"""
     ql = q.lower()
-    words = [w.replace("'s", "").strip("'.,?!-") for w in re.findall(r"[a-z0-9'@.,-]+", ql)]
+    p["_ql"] = ql
+    words = [_stem(w.replace("'s", "").strip("'.,?!-")) for w in re.findall(r"[a-z0-9'@.,-]+", ql)]
     words = [w for w in words if w]
     A = Access(user)
     if not (A.admin or A.teacher or A.parent):
         return None
 
-    has_parent_word = any(w in PARENT_WORDS for w in words)
+    has_parent_word = any(w in PARENT_WORDS or w.startswith("parent") for w in words)
     fields = {WORD_FIELD[w] for w in words if w in WORD_FIELD and w != "no"}
     if "no" in words and "number" not in words and not fields and has_parent_word:
         fields.add("phone")
@@ -322,7 +350,7 @@ def answer(user, q, p):
 
     qtoks = []
     for t in p["tokens"]:
-        t = t.replace("'s", "").strip("'.,?!-")
+        t = _stem(t.replace("'s", "").strip("'.,?!-"))
         if not t or t in FILLER or t in PARENT_WORDS or t in WORD_FIELD or t in WORD_ATTR or t in TEACHER_HINT or t.isdigit():
             continue
         if len(norm(t)) >= 2:
@@ -342,12 +370,15 @@ def answer(user, q, p):
     if A.parent:
         return _parent_answer(A, q, p, qtoks, attrs, fields, class_teacher_q, who_teaches, marks_q, roll_attr, is_me)
 
+    sections = _find_sections(p)
     # ---------------- counts
     if count_q and not qtoks:
         return _counts(A, p, ql)
 
-    sections = _find_sections(p)
     students, teachers = _load()
+
+    if sections and not qtoks and not adm_tokens and not (class_teacher_q or who_teaches) and (has_parent_word or fields or (attrs & {"admission", "dob", "code", "house"})):
+        return _roster(A, sections, p, has_parent_word, fields, attrs)
 
     # ---------------- class / section questions ("class teacher of 5 b", "who teaches maths in class 6 a")
     section_intent = p_cls and (class_teacher_q or who_teaches or "teaches" in attrs)
@@ -403,8 +434,10 @@ def answer(user, q, p):
 # ------------------------------------------------------------------ student questions
 def _student_answer(A, picks, attrs, fields, has_parent_word, class_teacher_q, who_teaches, marks_q, roll_attr, p):
     wants_parent = bool(has_parent_word or fields)
-    if wants_parent and not A.parent_contact_ok(picks[0][1]):
-        return _ok("Parent details can only be viewed by an administrator.", [], [])
+    if wants_parent:
+        picks = [x for x in picks if A.parent_contact_ok(x[1])]
+        if not picks:
+            return _ok("Parent details can only be viewed by an administrator or by the class teacher of that student.", [], [])
     generic = not (wants_parent or class_teacher_q or who_teaches or roll_attr or (attrs - {"section", "profile"}) or marks_q)
     if marks_q and not (wants_parent or class_teacher_q or who_teaches or roll_attr or (attrs - {"section", "profile", "report_card"})):
         return None                                           # marks / report cards are handled by the regular search below
@@ -508,6 +541,93 @@ def _student_actions(A, st, wants_parent):
     except Exception:
         pass
     return acts
+
+
+# ------------------------------------------------------------------ whole section lists
+def _roster(A, sections, p, has_parent_word, fields, attrs):
+    from flask import url_for
+    wants_parent = bool(has_parent_word or fields)
+    scope = A.scope()
+    sections = [s for s in sections if scope is None or (s["class_id"], s["sectionId"]) in scope]
+    if not sections:
+        return _none("You do not have access to that class or section.")
+    if wants_parent:
+        allowed = [s for s in sections if A.admin and A.can("parent") or (s["class_id"], s["sectionId"]) in A.class_teacher_pairs()]
+        if not allowed:
+            return _ok("Parent details can only be viewed by an administrator or by the class teacher of that section.", [], [])
+        sections = allowed
+    ids = [(s["class_id"], s["sectionId"]) for s in sections]
+    rows = db.query("SELECT st.studentId, st.student_name, st.student_rollNumber, st.ADMNO, st.student_code, st.DOB, st.class_id, st.section_id, s.section_name, c.class_name, "
+                    "p.fname, p.mname, p.lname, p.phone_1, p.phone_2, p.email, p.address, p.occupation, p.religion, p.secondary_name, u.fname AS account_name "
+                    "FROM students st JOIN sections s ON s.sectionId=st.section_id JOIN classes c ON c.classId=st.class_id "
+                    "LEFT JOIN parents p ON p.id=st.parent_id AND p.deleted_at IS NULL LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL "
+                    "WHERE st.isDelete='0' AND (" + " OR ".join(["(st.class_id=%s AND st.section_id=%s)"] * len(ids)) + ") "
+                    "ORDER BY st.class_id, s.section_name, st.student_rollNumber, st.student_name", [x for pair in ids for x in pair])
+    if not rows:
+        return _none("There are no students in that section.")
+    cols, tel = ["Roll", "Student"], []
+    multi = len(sections) > 1
+    if multi:
+        cols.insert(0, "Sec")
+    if wants_parent:
+        cols.append("Parent")
+        want = fields or {"phone"}
+        if "phone" in want:
+            tel += [len(cols), len(cols) + 1]; cols += ["Phone", "Alt phone"]
+        if "email" in want:
+            cols.append("Email")
+        if "address" in want:
+            cols.append("Address")
+        if "occupation" in want:
+            cols.append("Occupation")
+        if "religion" in want:
+            cols.append("Religion")
+        if "second" in want:
+            cols.append("Second parent")
+    if "admission" in attrs:
+        cols.append("Adm no.")
+    if "code" in attrs:
+        cols.append("Student code")
+    if "dob" in attrs:
+        cols.append("Date of birth")
+    out, have, total = [], 0, len(rows)
+    for r in rows[:80]:
+        row = ([r["section_name"]] if multi else []) + [r["student_rollNumber"], r["student_name"]]
+        if wants_parent:
+            row.append(PI.name(r) or "-")
+            want = fields or {"phone"}
+            if "phone" in want:
+                p1, p2 = _clean(r["phone_1"]), _clean(r["phone_2"])
+                have += 1 if p1 else 0
+                row += [p1 or "-", p2 if p2 and _digits(p2) != _digits(p1) else "-"]
+            if "email" in want:
+                em = _clean(r["email"]); row.append(em if "@" in em else "-")
+            for key, name in (("address", "address"), ("occupation", "occupation"), ("religion", "religion")):
+                if key in want:
+                    row.append(_clean(r[name]) or "-")
+            if "second" in want:
+                row.append(_clean(r["secondary_name"]) or "-")
+        if "admission" in attrs:
+            row.append(_clean(r["ADMNO"]) or "-")
+        if "code" in attrs:
+            row.append(_clean(r["student_code"]) or "-")
+        if "dob" in attrs:
+            row.append(_dob_text(r["DOB"])[0] or "-")
+        out.append([str(x) if x is not None else "-" for x in row])
+    label = f"{sections[0]['class_name']}" + (f" · Section {sections[0]['section_name']}" if len(sections) == 1 else "")
+    more = None
+    try:
+        if A.admin or A.class_teacher_pairs():
+            more = url_for("parents.all_parents", class_id=sections[0]["class_id"], section_id=sections[0]["sectionId"] if len(sections) == 1 else None)
+    except Exception:
+        pass
+    say = f"{label}: {total} students" + (f", parent phone saved for {have} of {min(total, 80)} shown." if wants_parent and ("phone" in (fields or {"phone"})) else ".")
+    if total > 80:
+        say += " Showing the first 80. Open the full list for the rest."
+    grp = {"title": ("Parents of " if wants_parent else "Students of ") + label, "items": [], "table": {"cols": cols, "rows": out, "tel": tel}}
+    if more and wants_parent:
+        grp["more"] = more
+    return _ok(say, [grp], ["Parent details" if wants_parent else "Student details"])
 
 
 # ------------------------------------------------------------------ class / section questions
