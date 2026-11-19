@@ -1,8 +1,9 @@
 (() => {
-  const form=document.querySelector('[data-record-bulk]');if(!form)return;
-  const kind=form.dataset.recordKind,noun=kind==='student'?'student':'user account';
+  if(!document.querySelector('[data-record-bulk]'))return;
   const boxes=()=>Array.from(document.querySelectorAll('[data-record-id]:not(:disabled)'));
   function update(){
+    const form=document.querySelector('[data-record-bulk]');if(!form)return;           // looked up each time: the list can be swapped without a reload
+    const kind=form.dataset.recordKind,noun=kind==='student'?'student':'user account';
     const rows=boxes(),selected=rows.filter(box=>box.checked),all=document.querySelector('[data-record-all]');
     form.querySelector('[data-record-count]').textContent=selected.length+' selected';
     form.querySelector('[data-record-apply]').disabled=selected.length===0;

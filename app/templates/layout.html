@@ -8,7 +8,7 @@
 <meta name="csv-kind" content="{{ csv_kind }}">{% endif %}
 <title>{% block title %}{{ school_name }}{% endblock %} · Schoolink</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v='2') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/workspace.css', v='15') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/workspace.css', v='17') }}">
 <meta name="theme-color" content="#4930dc">
 <script>
  // restore sidebar state before paint (no flash)
@@ -16,7 +16,8 @@
  try { if (localStorage.getItem('sb-collapsed') === '1' && innerWidth > 992) document.documentElement.classList.add('sb-collapsed'); } catch(e){}
 </script>
 </head>
-<body class="workspace">
+{% set _page_scripts %}{% block scripts %}{% endblock %}{% endset %}
+<body class="workspace" data-soft="{{ '1' if (soft_safe or not _page_scripts|trim) else '' }}">
 <header class="topbar">
   <button class="icon-btn" id="sbToggle" aria-label="Toggle sidebar" title="Toggle sidebar">{{ icon('menu', 23) }}</button>
   <div class="page-path"><span class="path-sub">Workspace / {{ me.role_label }}</span><strong class="path-current">{% block heading %}{% endblock %}</strong></div>
@@ -104,13 +105,14 @@
   </div>
   <div class="vm-body"><div class="vm-loading" id="vmLoading">Loading…</div><iframe id="vmFrame" title="Document"></iframe></div>
 </div>
-<script src="{{ url_for('static', filename='js/app.js', v='8') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js', v='11') }}"></script>
 <script src="{{ url_for('static', filename='js/pw.js') }}"></script>
 <script src="{{ url_for('static', filename='js/live.js') }}"></script>
 <script src="{{ url_for('static', filename='js/media.js') }}"></script>
 <script src="{{ url_for('static', filename='js/csv.js') }}"></script>
-<script src="{{ url_for('static', filename='js/tables.js', v='4') }}"></script>
+<script src="{{ url_for('static', filename='js/tables.js', v='5') }}"></script>
+<script src="{{ url_for('static', filename='js/softnav.js', v='2') }}"></script>
 <script src="{{ url_for('static', filename='js/modal.js', v='2') }}"></script>
-{% block scripts %}{% endblock %}
+{{ _page_scripts|safe }}
 </body>
 </html>

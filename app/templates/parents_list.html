@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_form.html' import select %}
+{% extends 'layout.html' %}{% set soft_safe = true %}{% from '_pager.html' import pager %}{% from '_form.html' import select %}
 {% block heading %}All Parents{% endblock %}
 {% block content %}
 <div class="page-head"><div><h1>{{ 'Parent Trash' if trash else 'All parents' }}</h1><p>{{ p.total }} parent(s) · login is the parent's mobile number.</p></div>
@@ -38,4 +38,4 @@
 {% else %}<tr><td colspan="{{ 10 if me.is_admin else 9 }}" class="empty">No parents found.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
 {% endblock %}
 
-{% block scripts %}<script src="{{ url_for('static', filename='js/parents.js', v='2') }}"></script>{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/parents.js', v='3') }}"></script>{% endblock %}

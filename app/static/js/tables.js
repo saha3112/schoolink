@@ -54,6 +54,49 @@
       });
     });
   }
+  /* Long tables that are not already paged by the server: show a page at a time, entirely in the browser.
+     Every row stays in the page (so a marks form still saves all pages) - only the display changes. No reload, no request. */
+  const PG_SIZES = [10, 25, 50, 100, 0], PG_MIN = 25;
+  const pgSaved = () => { try { const v = parseInt(localStorage.getItem('sl.pagesize'), 10); return PG_SIZES.includes(v) ? v : 25; } catch (e) { return 25; } };
+  const pgRows = w => { const t = w.querySelector(':scope > table'); return t && t.tBodies[0] ? Array.from(t.tBodies[0].rows).filter(r => r.cells.length > 1 || (r.cells[0] && r.cells[0].colSpan < 2)) : []; };
+  function pgNums(page, pages) {
+    const keep = new Set([1, pages, page - 1, page, page + 1]); const out = []; let last = 0;
+    for (let n = 1; n <= pages; n++) if (keep.has(n)) { if (n - last > 1) out.push('…'); out.push(n); last = n; }
+    return out;
+  }
+  function pgDraw(w) {
+    const st = w._pg, rows = pgRows(w), n = rows.length;
+    let bar = w._pgBar; if (bar && !bar.isConnected) bar = w._pgBar = null;
+    if (n <= PG_MIN) { rows.forEach(r => r.classList.remove('pg-hide')); if (bar) bar.remove(), w._pgBar = null; return; }
+    const size = st.size || n, pages = Math.max(1, Math.ceil(n / size));
+    st.page = Math.min(Math.max(1, st.page), pages);
+    const from = (st.page - 1) * size, to = Math.min(n, from + size);
+    rows.forEach((r, i) => r.classList.toggle('pg-hide', !(i >= from && i < to)));
+    if (!bar) { bar = document.createElement('div'); bar.className = 'sl-pager no-print'; bar._wrap = w; w._pgBar = bar; }
+    if (w.nextElementSibling !== bar) w.after(bar);
+    const btn = (label, attrs, cls) => '<button type="button" class="' + (cls || '') + '" ' + attrs + '>' + label + '</button>';
+    bar.innerHTML = '<span class="sl-pg-info">Showing <b>' + (from + 1) + '–' + to + '</b> of <b>' + n + '</b></span>' +
+      (pages > 1 ? '<span class="sl-pg-nav">' + btn('‹ Prev', 'data-pg="' + (st.page - 1) + '"' + (st.page === 1 ? ' disabled' : '')) +
+        pgNums(st.page, pages).map(x => x === '…' ? '<span class="sl-pg-gap">…</span>' : btn(x, 'data-pg="' + x + '"', x === st.page ? 'cur' : '')).join('') +
+        btn('Next ›', 'data-pg="' + (st.page + 1) + '"' + (st.page === pages ? ' disabled' : '')) + '</span>' : '') +
+      '<span class="sl-pg-size">Rows ' + PG_SIZES.map(z => btn(z ? z : 'All', 'data-size="' + z + '"', z === st.size ? 'cur' : '')).join('') + '</span>';
+  }
+  function paginate() {
+    document.querySelectorAll('.workspace .content .table-wrap').forEach(w => {
+      if (w.closest('.sl-modal,.mp-modal,#viewer,#tsPanel,[role=dialog]') || !w.querySelector(':scope > table') || w.querySelector(':scope > table[data-no-paginate]')) return;
+      const nx = w.nextElementSibling; if (nx && nx.classList && nx.classList.contains('pager')) return;       // the server already pages this list
+      if (!w._pg) w._pg = { page: 1, size: pgSaved() };
+      pgDraw(w);
+    });
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.sl-pager button'); if (!b || b.disabled) return;
+    const bar = b.closest('.sl-pager'), w = bar && bar._wrap; if (!w || !w._pg) return;
+    if (b.hasAttribute('data-pg')) w._pg.page = parseInt(b.getAttribute('data-pg'), 10);
+    if (b.hasAttribute('data-size')) { w._pg.size = parseInt(b.getAttribute('data-size'), 10); w._pg.page = 1; try { localStorage.setItem('sl.pagesize', String(w._pg.size)); } catch (x) {} }
+    pgDraw(w); w.scrollTop = 0; fit();
+  });
+
   /* Second header row sticks right below the first one. */
   function stickHead(){
     document.querySelectorAll('table.marks-grid').forEach(t=>{const r=t.tHead&&t.tHead.rows[0];if(r)t.style.setProperty('--hr1',r.getBoundingClientRect().height+'px');});
@@ -64,10 +107,10 @@
       if(w.querySelector('.marks-grid')||w.closest('.modal,.pv-box,[role=dialog]')||!w.querySelector('table'))return;
       w.style.maxHeight='';
       const top=w.getBoundingClientRect().top+window.scrollY;
-      const pager=w.nextElementSibling&&w.nextElementSibling.classList&&w.nextElementSibling.classList.contains('pager')?72:0;
+      const nxs=w.nextElementSibling,pager=nxs&&nxs.classList&&(nxs.classList.contains('pager')||nxs.classList.contains('sl-pager'))?72:0;
       w.style.maxHeight=Math.max(280,window.innerHeight-top-26-pager)+'px';
     });
   }
   addEventListener('resize',()=>{stickHead();fit();});addEventListener('load',()=>{stickHead();fit();});
-  window.slTables={init:()=>{init();align();stickHead();fit();}};init();align();stickHead();fit();addEventListener('sl:live-updated',()=>{init();align();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{align();stickHead();fit();});
+  window.slTables={init:()=>{init();align();paginate();stickHead();fit();}};init();align();paginate();stickHead();fit();addEventListener('sl:live-updated',()=>{init();align();paginate();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{align();paginate();stickHead();fit();});
 })();

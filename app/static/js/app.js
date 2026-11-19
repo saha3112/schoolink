@@ -25,6 +25,41 @@ window.fillSelect = function (sel, items, valKey, textKey, placeholder) {
   if (placeholder !== null) { const o = document.createElement('option'); o.value = ''; o.textContent = placeholder || 'Select'; sel.appendChild(o); }
   items.forEach(i => { const o = document.createElement('option'); o.value = i[valKey]; o.textContent = i[textKey]; sel.appendChild(o); });
 };
+/* Audience picker for announcement / gallery style forms:
+   whole school <-> class / section. The section list follows the class, stays disabled until a class is chosen, is pre-filled when
+   there is only one choice, and is required for teachers (an administrator may leave it on "all sections"). */
+window.audiencePicker = function (o) {
+  const aud = o.aud, cls = o.cls, sec = o.sec, admin = !!o.admin, all = o.allLabel || 'All sections';
+  const fire = el => el.dispatchEvent(new Event('change', { bubbles: true }));
+  const box = el => el.closest('label') || el.parentElement;
+  const reset = (text, disabled) => { fillSelect(sec, [], 'sectionId', 'section_name', text); sec.disabled = disabled; sec.required = false; fire(sec); };
+  let seq = 0;
+  const load = () => {
+    if (!cls.value) { reset('Choose a class first', true); return; }
+    const my = ++seq; reset('Loading…', true);
+    getJSON('/school/api/sections?class_id=' + encodeURIComponent(cls.value)).then(r => {
+      if (my !== seq) return;
+      fillSelect(sec, r, 'sectionId', 'section_name', admin ? all : 'Select section');
+      sec.disabled = false; sec.required = !admin && !!r.length;
+      if (!r.length) reset('No sections', true);
+      else if (!admin && r.length === 1) sec.value = String(r[0].sectionId);
+      fire(sec);
+    }).catch(() => reset('Could not load sections', true));
+  };
+  const sync = () => {
+    const school = aud ? aud.value === 'school' : false;
+    [cls, sec].forEach(el => { box(el).style.display = school ? 'none' : ''; el.disabled = school || (el === sec && el.disabled); });
+    cls.required = !school && (aud ? true : !admin);
+    if (school) { sec.required = false; cls.value = ''; fire(cls); return; }
+    cls.disabled = false;
+    const real = Array.from(cls.options).filter(x => x.value);
+    if (!cls.value && real.length === 1 && (aud || !admin)) cls.value = real[0].value;      // a single class is chosen for you
+    fire(cls); load();
+  };
+  cls.addEventListener('change', load);
+  if (aud) aud.addEventListener('change', sync);
+  sync();
+};
 window.getJSON = (url) => fetch(url, { headers: { 'X-Requested-With': 'fetch' } }).then(r => r.json());
 window.confirmForm = (msg) => confirm(msg || 'Are you sure?');   // legacy; forms using confirm() are upgraded to the styled dialog below
 
@@ -62,14 +97,15 @@ window.bindCascade = function (o) {
   }));
 };
 
-/* CSRF: add the token to every POST form */
-(function () {
+/* CSRF: add the token to every POST form (also called again after a soft page update) */
+window.slAddCsrf = function (root) {
   const t = document.querySelector('meta[name=csrf]'); if (!t) return;
-  document.querySelectorAll('form').forEach(f => {
-    if ((f.method || '').toLowerCase() !== 'post') return;
+  (root || document).querySelectorAll('form').forEach(f => {
+    if ((f.method || '').toLowerCase() !== 'post' || f.querySelector('input[name=csrf_token]')) return;
     const i = document.createElement('input'); i.type = 'hidden'; i.name = 'csrf_token'; i.value = t.content; f.appendChild(i);
   });
-})();
+};
+window.slAddCsrf(document);
 
 /* ---- document viewer popup: <a data-popup="/url" data-title="..."> ---- */
 (function () {
@@ -301,7 +337,7 @@ window.sectionSubjects = function (o) {
     const groups = (d && d.groups) || [];
     const pageHtml = pg.length ? group('Go to page', pg) : '';
     if (!groups.length || groups.every(g => !g.items.length)) html += pageHtml;
-    groups.forEach(g => { if (g.table) { html += tableGroup(g); return; } html += g.items.length ? group(g.title, g.items, g.more ? '<a class="ts-more" href="' + esc(g.more) + '">See all results →</a>' : '') : '<div class="ts-group"><div class="ts-gh">' + esc(g.title) + '</div><div class="ts-empty">' + esc(g.empty || 'Nothing found.') + '</div></div>'; });
+    groups.forEach(g => { if (g.table) { html += tableGroup(g); return; } if (!g.items.length && pg.length) return; html += g.items.length ? group(g.title, g.items, g.more ? '<a class="ts-more" href="' + esc(g.more) + '">See all results →</a>' : '') : '<div class="ts-group"><div class="ts-gh">' + esc(g.title) + '</div><div class="ts-empty">' + esc(g.empty || 'Nothing found.') + '</div></div>'; });
     if (groups.some(g => g.items.length || g.table)) html += pageHtml;
     if (!html.trim()) html = '<div class="ts-empty">No results for “' + esc(q) + '”. Try a student name, or something like <i>class 1 section a</i>.</div>';
     panel.innerHTML = html; cur = -1; open();

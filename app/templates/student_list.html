@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_form.html' import select %}{% from '_record_actions.html' import row_actions,bulk_controls with context %}
+{% extends 'layout.html' %}{% set soft_safe = true %}{% from '_pager.html' import pager %}{% from '_form.html' import select %}{% from '_record_actions.html' import row_actions,bulk_controls with context %}
 {% block heading %}Students{% endblock %}
 {% block content %}
 <div class="page-head"><div><h1>{{ 'Student Trash' if trash else 'Students' }}</h1><p>{{ p.total }} {{ 'trashed' if trash else 'active' }} student(s)</p></div><div>{% if not trash %}{% if can_access('students.move') %}<a class="btn" href="{{ url_for('students.move') }}">Move / Leave</a>{% endif %} {% if can_access('students.upload') %}<a class="btn" href="{{ url_for('students.upload') }}">CSV upload</a>{% endif %}{% endif %}</div></div>
@@ -13,4 +13,4 @@
 <td class="num">{{ r.student_rollNumber }}</td><td>{{ r.student_name }}</td><td>{{ r.class_name }}</td><td>{{ r.section_name }}</td><td>{{ r.student_code }}</td><td>{{ r.ADMNO or '' }}</td><td><div class="parent-row-actions">{% if not trash %}<a class="btn sm" href="{{ url_for('students.edit',sid=r.studentId) }}" data-modal>Edit</a>{% endif %}{{ row_actions(r.studentId,r.student_name,trash,'student') }}</div></td></tr>
 {% else %}<tr><td colspan="8" class="empty">No students found.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static',filename='js/record-bulk.js',v='1') }}"></script>{% endblock %}
+{% block scripts %}<script src="{{ url_for('static',filename='js/record-bulk.js',v='2') }}"></script>{% endblock %}

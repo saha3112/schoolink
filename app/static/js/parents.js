@@ -1,9 +1,9 @@
 /* Page selection is explicit; no unselected / hidden pages are submitted. */
 (() => {
-  const form=document.querySelector('[data-parent-bulk]');
-  if(!form)return;
+  if(!document.querySelector('[data-parent-bulk]'))return;
   const rows=()=>Array.from(document.querySelectorAll('[data-parent-id]'));
   function update(){
+    const form=document.querySelector('[data-parent-bulk]');if(!form)return;            // looked up each time: the list can be swapped without a reload
     const boxes=rows(),selected=boxes.filter(box=>box.checked),all=document.querySelector('[data-parent-all]');
     form.querySelector('[data-parent-count]').textContent=selected.length+' selected';
     form.querySelector('[data-parent-apply]').disabled=selected.length===0;

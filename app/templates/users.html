@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}{% from '_pager.html' import pager %}{% from '_record_actions.html' import row_actions,bulk_controls with context %}
+{% extends 'layout.html' %}{% set soft_safe = true %}{% from '_pager.html' import pager %}{% from '_record_actions.html' import row_actions,bulk_controls with context %}
 {% block heading %}Users & passwords{% endblock %}
 {% block content %}
 <div class="page-head"><h1>{{ 'User Trash' if trash else 'Users & passwords' }}</h1><p>Manage accounts and reset passwords within your permission level. Your own account and super-admin accounts are protected.</p></div>
@@ -15,4 +15,4 @@
 {% if manage_accounts %}<td>{% if r.can_lifecycle %}{{ row_actions(r.id,r.fname ~ ' · ' ~ r.email,trash,'user') }}{% else %}<span class="muted">Protected</span>{% endif %}</td>{% endif %}</tr>
 {% else %}<tr><td colspan="{{ 8 if manage_accounts else 6 }}" class="empty">No matching users.</td></tr>{% endfor %}</tbody></table></div>{{ pager(p) }}
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static',filename='js/record-bulk.js',v='1') }}"></script>{% endblock %}
+{% block scripts %}<script src="{{ url_for('static',filename='js/record-bulk.js',v='2') }}"></script>{% endblock %}
