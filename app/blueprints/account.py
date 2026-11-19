@@ -55,7 +55,7 @@ def users():
     types="('0','1','2','3','9')" if actor['is_admin'] else "('2','3')"
     where, args = "WHERE deleted_at IS " + ("NOT NULL" if trash else "NULL") + " AND user_type IN " + types, []
     if q:
-        where += " AND (fname LIKE %s OR email LIKE %s OR EXISTS (SELECT 1 FROM parents px WHERE px.user_id=new_users.id AND px.deleted_at IS NULL AND CONCAT_WS(' ',px.fname,px.mname,px.lname) LIKE %s))"
+        where += " AND (fname LIKE %s OR email LIKE %s OR new_users.id IN (SELECT CAST(px.user_id AS UNSIGNED) FROM parents px WHERE px.deleted_at IS NULL AND CONCAT_WS(' ',px.fname,px.mname,px.lname) LIKE %s))"
         args += [f"%{q}%"] * 3
     total = db.scalar(f"SELECT COUNT(*) FROM new_users {where}", args)
     p = paginate(total, 20, page_arg())

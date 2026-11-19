@@ -35,11 +35,12 @@ def current_user():
     uid = session.get("uid")
     g.user = None
     if uid:
-        u = db.one("SELECT id, fname, email, user_type, active FROM new_users "
-                   "WHERE id=%s AND deleted_at IS NULL", (uid,))
+        from . import cache
+        u = cache.get(("auth.user", str(uid)), lambda: db.one("SELECT id, fname, email, user_type, active FROM new_users "
+                                                              "WHERE id=%s AND deleted_at IS NULL", (uid,)), 20)
         if u and str(u["active"]) in ("1", "true"):
             from .services import user_access as UA
-            u['_access'] = UA.record(u['id'])
+            u['_access'] = cache.get(("auth.access", u['id']), lambda: UA.record(u['id']), 20)
             version = u['_access']['session_version'] if u['_access'] else 0
             if session.get('auth_version', 0) != version:
                 session.clear()

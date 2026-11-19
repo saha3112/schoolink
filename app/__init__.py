@@ -70,6 +70,27 @@ def create_app():
             from flask import abort
             abort(403)
 
+    # ---- data version: any successful change invalidates every cached read at once (see app/cache.py)
+    NO_BUMP = ("static", "notify.", "live.", "search.", "auth.")
+
+    @app.after_request
+    def keep_cache_fresh(resp):
+        try:
+            ep = request.endpoint or ""
+            if request.method in ("POST", "PUT", "PATCH", "DELETE") and resp.status_code < 400 and not ep.startswith(NO_BUMP):
+                from . import cache
+                cache.bump(ep)
+        except Exception:
+            pass
+        return resp
+
+    @app.after_request
+    def static_caching(resp):
+        """Versioned assets (?v=...) never change under the same URL, so the browser may keep them for a year."""
+        if request.endpoint == "static" and resp.status_code == 200:
+            resp.headers["Cache-Control"] = "public, max-age=31536000, immutable" if request.args.get("v") else "public, max-age=3600"
+        return resp
+
     from .branding import branding
     from .services import live as live_svc
 

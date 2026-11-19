@@ -94,6 +94,20 @@ role based menus and real-time updates.
   </tr>
 </table>
 
+## ⚡ Performance and live data
+
+- **Smart read cache** (`app/cache.py`): menus, permissions, class / section / exam lists, dashboard figures and the search index are cached.
+  Every cached value is tied to a *data version* that is bumped on every successful write (saving marks, adding or editing records,
+  moving to Trash, restoring, permanent delete, permission changes). The version is stored in the database, so other processes notice
+  within a second, and every entry also expires on its own after a short time. Cached data is therefore never older than the last change.
+- **No full page reloads**: class / section / exam dropdowns, filters, search boxes and pager links update the page content in place
+  (`static/js/softnav.js`). Search boxes filter while you type.
+- **Pagination without reload**: long tables show 25 rows at a time (10 / 25 / 50 / 100 / All); every row stays in the page, so a marks
+  form still saves all pages together.
+- **Real-time sync** between open sessions (`static/js/live.js`) and long-lived caching of versioned static files.
+
+If you change data directly in the database, call `cache.bump()` (or wait for the short expiry) so the app picks it up at once.
+
 ## 🧰 Tech stack
 
 | Layer | Technology |

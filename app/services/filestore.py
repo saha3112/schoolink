@@ -54,9 +54,14 @@ def exists(path):
 
 
 def version(path):
-    ensure()
-    r = db.one("SELECT UNIX_TIMESTAMP(updated_at) AS v FROM app_files WHERE path=%s", (path,))
-    return int(r["v"]) if r else None
+    """Version stamp of a stored file (used to refresh browser copies). Cached; any upload / removal clears it."""
+    from .. import cache
+
+    def load():
+        ensure()
+        r = db.one("SELECT UNIX_TIMESTAMP(updated_at) AS v FROM app_files WHERE path=%s", (path,))
+        return int(r["v"]) if r else None
+    return cache.get(("filestore.version", path), load, 300)
 
 
 def delete(path):

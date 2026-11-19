@@ -1,43 +1,56 @@
 """Which classes / sections / subjects may the logged in user work with."""
-from .. import db
+from .. import cache, db
+
+TTL = 120      # seconds; every write also invalidates these at once (see app/cache.py)
+
+
+def _who(user):
+    return "admin" if user["is_admin"] else int(user["id"])
 
 
 def subject_pairs(user):
     """(classId, sectionId) pairs where the user can enter subject marks."""
-    if user["is_admin"]:
-        return db.query("SELECT DISTINCT class_id AS classId, section_id AS sectionId FROM assign_subject WHERE isDelete='0'")
-    return db.query("SELECT DISTINCT classId, sectionId FROM assign_teacher WHERE t_id=%s AND isDelete='0'", (user["id"],))
+    def load():
+        if user["is_admin"]:
+            return db.query("SELECT DISTINCT class_id AS classId, section_id AS sectionId FROM assign_subject WHERE isDelete='0'")
+        return db.query("SELECT DISTINCT classId, sectionId FROM assign_teacher WHERE t_id=%s AND isDelete='0'", (user["id"],))
+    return cache.get(("access.subject_pairs", _who(user)), load, TTL)
 
 
 def class_pairs(user):
     """(classId, sectionId) pairs where the user is class teacher (admin: every section)."""
-    if user["is_admin"]:
-        return db.query("SELECT s.class_id AS classId, s.sectionId FROM sections s JOIN classes c ON c.classId=s.class_id "
-                        "WHERE s.isDelete='0' AND c.isDelete='0'")
-    return db.query("SELECT DISTINCT classId, sectionId FROM classTeacher WHERE teacherId=%s AND isDelete='0'", (user["id"],))
+    def load():
+        if user["is_admin"]:
+            return db.query("SELECT s.class_id AS classId, s.sectionId FROM sections s JOIN classes c ON c.classId=s.class_id "
+                            "WHERE s.isDelete='0' AND c.isDelete='0'")
+        return db.query("SELECT DISTINCT classId, sectionId FROM classTeacher WHERE teacherId=%s AND isDelete='0'", (user["id"],))
+    return cache.get(("access.class_pairs", _who(user)), load, TTL)
 
 
 def classes_for(pairs):
     ids = sorted({p["classId"] for p in pairs})
     if not ids:
         return []
-    return db.query(f"SELECT classId, class_name FROM classes WHERE isDelete='0' AND classId IN ({','.join(['%s'] * len(ids))}) ORDER BY classId", ids)
+    return cache.get(("access.classes_for", tuple(ids)), lambda: db.query(
+        f"SELECT classId, class_name FROM classes WHERE isDelete='0' AND classId IN ({','.join(['%s'] * len(ids))}) ORDER BY classId", ids), TTL)
 
 
 def sections_for(pairs, cid):
     ids = sorted({p["sectionId"] for p in pairs if p["classId"] == cid})
     if not ids or not cid:
         return []
-    return db.query(f"SELECT sectionId, section_name FROM sections WHERE isDelete='0' AND class_id=%s AND sectionId IN ({','.join(['%s'] * len(ids))}) ORDER BY section_name", [cid] + ids)
+    return cache.get(("access.sections_for", cid, tuple(ids)), lambda: db.query(
+        f"SELECT sectionId, section_name FROM sections WHERE isDelete='0' AND class_id=%s AND sectionId IN ({','.join(['%s'] * len(ids))}) ORDER BY section_name", [cid] + ids), TTL)
 
 
 def exams():
-    return db.query("SELECT examId, exam_name FROM exams WHERE isDelete='0' ORDER BY examId")
+    return cache.get(("access.exams",), lambda: db.query("SELECT examId, exam_name FROM exams WHERE isDelete='0' ORDER BY examId"), TTL)
 
 
 def students(cid, sid):
-    return db.query("SELECT studentId, student_name, student_rollNumber FROM students WHERE class_id=%s AND section_id=%s AND isDelete='0' "
-                    "ORDER BY student_rollNumber, student_name", (cid, sid))
+    return cache.get(("access.students", cid, sid), lambda: db.query(
+        "SELECT studentId, student_name, student_rollNumber FROM students WHERE class_id=%s AND section_id=%s AND isDelete='0' "
+        "ORDER BY student_rollNumber, student_name", (cid, sid)), TTL)
 
 
 def allowed_subjects(user, cid, sid, special=False):
@@ -61,22 +74,32 @@ def allowed_subjects(user, cid, sid, special=False):
 
 
 def subtypes(cid, sid, exam_id, subject_id):
-    return db.query("SELECT x.id AS subtype_id, x.exam_type AS name, a.fullmarsks AS fullmarks FROM assign_exam_subtype a "
-                    "JOIN exam_subtype x ON x.id=a.exam_subtype_id "
-                    "WHERE a.classId=%s AND a.sectionId=%s AND a.examId=%s AND a.subjectId=%s AND a.isDelete='0' AND x.isDelete='0' "
-                    "ORDER BY CAST(a.fullmarsks AS UNSIGNED), x.id", (cid, sid, exam_id, subject_id))
+    return cache.get(("access.subtypes", cid, sid, exam_id, subject_id), lambda: db.query(
+        "SELECT x.id AS subtype_id, x.exam_type AS name, a.fullmarsks AS fullmarks FROM assign_exam_subtype a "
+        "JOIN exam_subtype x ON x.id=a.exam_subtype_id "
+        "WHERE a.classId=%s AND a.sectionId=%s AND a.examId=%s AND a.subjectId=%s AND a.isDelete='0' AND x.isDelete='0' "
+        "ORDER BY CAST(a.fullmarsks AS UNSIGNED), x.id", (cid, sid, exam_id, subject_id)), TTL)
 
 
 def editing_enabled():
-    return db.scalar("SELECT setting_value FROM system_settings WHERE setting_key='marks_entry_editing_enabled'", None, "1") != "0"
+    return cache.get(("access.editing_enabled",), lambda: db.scalar(
+        "SELECT setting_value FROM system_settings WHERE setting_key='marks_entry_editing_enabled'", None, "1") != "0", TTL)
+
+
+def _exam_map():
+    """{(classId, sectionId): [exams that have a sub-type configured]} for every section, in one query."""
+    out = {}
+    for r in db.query("SELECT DISTINCT a.classId, a.sectionId, e.examId, e.exam_name FROM exams e JOIN assign_exam_subtype a ON a.examId=e.examId "
+                      "WHERE e.isDelete='0' AND a.isDelete='0' ORDER BY e.examId"):
+        out.setdefault((str(r["classId"]), str(r["sectionId"])), []).append({"examId": r["examId"], "exam_name": r["exam_name"]})
+    return out
 
 
 def exams_for(cid, sid):
     """Exams that have at least one exam sub-type configured for the section."""
     if not (cid and sid):
         return exams()
-    return db.query("SELECT DISTINCT e.examId, e.exam_name FROM exams e JOIN assign_exam_subtype a ON a.examId=e.examId "
-                    "WHERE e.isDelete='0' AND a.isDelete='0' AND a.classId=%s AND a.sectionId=%s ORDER BY e.examId", (str(cid), str(sid)))
+    return list(cache.get(("access.exam_map",), _exam_map, TTL, copy_result=False).get((str(cid), str(sid)), []))
 
 
 def autopick(pairs, classes, cls, sec, exam, exams_list=None):

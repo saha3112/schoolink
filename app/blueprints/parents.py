@@ -44,7 +44,7 @@ def _where(scope):
     if q:
         like = f"%{q}%"
         where.append("(" + PI.sql_name() + " LIKE %s OR p.phone_1 LIKE %s OR p.phone_2 LIKE %s OR p.email LIKE %s OR p.code LIKE %s OR p.address LIKE %s "
-                     "OR EXISTS (SELECT 1 FROM students st3 WHERE st3.parent_id=p.id AND st3.isDelete='0' AND st3.student_name LIKE %s))")
+                     "OR p.id IN (SELECT st3.parent_id FROM students st3 WHERE st3.isDelete='0' AND st3.student_name LIKE %s))")
         args += [like] * 7
     return " AND ".join(where), args, cls, sec, q
 

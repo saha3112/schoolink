@@ -102,5 +102,6 @@ def highlights(exam_id):
 
 
 def all_for(exam_id):
-    return {"counts": counts(), "bars": class_bars(exam_id), "progress": progress(exam_id),
-            "activity": activity(), "hl": highlights(exam_id)}
+    from .. import cache
+    return cache.get(("dash.all_for", exam_id), lambda: {"counts": counts(), "bars": class_bars(exam_id), "progress": progress(exam_id),
+                                                         "activity": activity(), "hl": highlights(exam_id)}, 30)

@@ -2,7 +2,7 @@
 
 A feature that does not exist for a class (e.g. house points outside classes I-V, report cards for classes without a
 design, development skills that were never configured) must not offer that class or section anywhere."""
-from .. import db
+from .. import cache, db
 from . import layouts
 
 def card_supported(cid, sid):
@@ -19,6 +19,10 @@ _NAMES = ("entry", "special", "development", "house", "attendance", "comments", 
 
 def sections_for(feature):
     """Set of (classId, sectionId) where the feature makes sense, every active section of the school considered."""
+    return cache.get(("features.sections_for", feature), lambda: _sections_for(feature), 120, copy_result=False)
+
+
+def _sections_for(feature):
     if feature == "entry":          # at least one exam sub-type with full marks is configured
         return _set("SELECT DISTINCT classId c, sectionId s FROM assign_exam_subtype WHERE isDelete='0'")
     if feature == "special":
@@ -52,6 +56,10 @@ def pairs(feature, user):
 
 def available(user):
     """Feature names the user has at least one section for - used to hide menu entries."""
+    return cache.get(("features.available", "admin" if user["is_admin"] else int(user["id"])), lambda: _available(user), 90, copy_result=False)
+
+
+def _available(user):
     from flask import g,has_app_context
     cache=g.setdefault('_feature_available',{}) if has_app_context() else {}
     key=(int(user['id']),bool(user['is_admin']))
@@ -61,6 +69,10 @@ def available(user):
 
 def mark_contexts(user,feature='entry'):
     """Actual writable subject/exam contexts, not just any subject in a section."""
+    return cache.get(("features.mark_contexts","admin" if user["is_admin"] else int(user["id"]),feature), lambda: _mark_contexts(user,feature), 120, copy_result=False)
+
+
+def _mark_contexts(user,feature='entry'):
     from flask import g,has_app_context
     from . import enrollment
     enrollment.ensure()

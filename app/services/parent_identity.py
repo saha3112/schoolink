@@ -26,9 +26,14 @@ def fill(parent):
 
 
 def for_users(ids):
-    """Resolve parent-login names in one query, without overwriting stored data."""
-    ids=list({int(uid) for uid in ids if uid})
+    """Resolve parent-login names in one query, without overwriting stored data. Cached until anything is written."""
+    ids=sorted({int(uid) for uid in ids if uid})
     if not ids:return {}
+    from .. import cache
+    return cache.get(("parent_identity.for_users",tuple(ids)),lambda:_for_users(ids),120)
+
+
+def _for_users(ids):
     marks=','.join(['%s']*len(ids))
     rows=db.query(f'''SELECT p.user_id,p.fname,p.mname,p.lname,u.fname AS account_name
         FROM parents p LEFT JOIN new_users u ON u.id=p.user_id AND u.deleted_at IS NULL
