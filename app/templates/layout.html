@@ -21,10 +21,10 @@
   <button class="icon-btn" id="sbToggle" aria-label="Toggle sidebar" title="Toggle sidebar">{{ icon('menu', 23) }}</button>
   <div class="page-path"><span class="path-sub">Workspace / {{ me.role_label }}</span><strong class="path-current">{% block heading %}{% endblock %}</strong></div>
   <div class="header-spacer"></div>
-  {% if me.is_admin or me.is_teacher %}
+  {% if me.is_admin or me.is_teacher or me.is_parent %}
   <div class="top-search" id="ts" role="search">
     {{ icon('search', 16) }}
-    <input id="tsInput" type="search" placeholder="Search students, classes, marks, pages…" autocomplete="off" spellcheck="false" aria-label="Search" aria-controls="tsPanel" aria-expanded="false" maxlength="100">
+    <input id="tsInput" type="search" placeholder="{{ 'Ask anything about your child…' if me.is_parent else 'Search or ask: students, parents, teachers, classes, marks…' }}" autocomplete="off" spellcheck="false" aria-label="Search" aria-controls="tsPanel" aria-expanded="false" maxlength="100">
     <button type="button" class="ts-clear" id="tsClear" hidden aria-label="Clear search">×</button>
     <div class="ts-panel" id="tsPanel" role="listbox" hidden></div>
   </div>
@@ -104,7 +104,7 @@
   </div>
   <div class="vm-body"><div class="vm-loading" id="vmLoading">Loading…</div><iframe id="vmFrame" title="Document"></iframe></div>
 </div>
-<script src="{{ url_for('static', filename='js/app.js', v='5') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js', v='6') }}"></script>
 <script src="{{ url_for('static', filename='js/pw.js') }}"></script>
 <script src="{{ url_for('static', filename='js/live.js') }}"></script>
 <script src="{{ url_for('static', filename='js/media.js') }}"></script>

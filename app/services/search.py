@@ -42,7 +42,7 @@ def parse(q):
     m = re.search(r"\broll\s*(?:no\.?|number|#)?\s*[-:]?\s*(\d{1,4})\b", ql)
     if m:
         out["roll"] = int(m.group(1)); cut(m)
-    m = re.search(r"\b(?:class|std|standard|cl)\s*[-:]?\s*(\d{1,2}|[ivx]{1,4})(?:st|nd|rd|th)?(?:\s*[-/]?\s*([a-e])(?![a-z0-9]))?", ql) \
+    m = re.search(r"\b(?:class|std|standard|cl)\s*[-:]?\s*(\d{1,2}|[ivx]{1,4}(?![a-z]))(?:st|nd|rd|th)?(?:\s*[-/]?\s*([a-e])(?![a-z0-9]))?", ql) \
         or re.search(r"\b(\d{1,2})(?:st|nd|rd|th)?\s*(?:class|std)\b", ql)
     if m and _num(m.group(1)):
         out["cls"] = _num(m.group(1))
@@ -178,12 +178,15 @@ def run(user, q):
     scope = _scope(user)
     p = parse(q)
     from . import smart_answer as SA
-    smart = SA.answer(user, q, p)                          # "parents number of <student>", "email of <student>" ...
+    smart = SA.answer(user, q, p)                          # free-form questions, answered within the account's own access
     if smart and smart["status"] == "ok":
         res["say"] = smart["say"]
-        if smart["group"]:
-            res["groups"].append(smart["group"])
+        res["groups"].extend(smart["groups"])
         res["understood"] += smart["chips"]
+        return res
+    if user.get("is_parent"):                              # parents only ever get answers about their own children
+        res["say"] = (smart or {}).get("say") or ("I can answer questions about your child, for example “who is my child's class teacher”, "
+                                                    "“attendance of my child” or “is the report card published”.")
         return res
     classes = _classes()
     cls_ids, sec_ids, sec_rows = [], [], []
@@ -318,5 +321,5 @@ def run(user, q):
             res["groups"].append({"title": "Parents", "items": [{"title": r["nm"], "icon": "users", "sub": "Parent" + (f" · {r['phone_1']}" if r["phone_1"] else ""),
                                   "url": url_for("parents.detail", pid=r["id"]), "actions": []} for r in prs]})
     if smart and not any(g.get("items") for g in res["groups"]):
-        res["say"] = smart["say"]                           # asked for details but no student (or parent) matched
+        res["say"] = smart["say"]                           # asked a question but nothing matched
     return res
