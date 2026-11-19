@@ -29,6 +29,19 @@
       }));
     });
   }
+  /* A header cell with no text above a column of Edit / Delete / Restore buttons is the actions column: name it. */
+  function labelActions(root=document){
+    root.querySelectorAll('table.t').forEach(table=>{
+      if(table.classList.contains('marks-grid')||table.hasAttribute('data-no-actions-label')||!table.tHead||table.tHead.rows.length!==1||!table.tBodies[0])return;
+      const heads=Array.from(table.tHead.rows[0].cells),rows=Array.from(table.tBodies[0].rows).filter(r=>r.cells.length===heads.length);
+      if(!rows.length)return;
+      heads.forEach((th,i)=>{
+        if(th.colSpan>1||th.textContent.replace(/\s+/g,'').length||th.querySelector('input,svg,img'))return;
+        const withControls=rows.filter(r=>r.cells[i].querySelector('.btn,button,a[href],form')).length;
+        if(withControls&&withControls>=rows.length*0.5){th.textContent='Actions';th.classList.add('col-actions');rows.forEach(r=>r.cells[i].classList.add('col-actions'));}
+      });
+    });
+  }
   /* Columns that only hold short numbers (#, counts, ids) shrink to fit instead of taking a full share of the width. */
   const NUM_HEAD=/^(#|no\.?|sl\.?(\s*no\.?)?|sr\.?(\s*no\.?)?|s\.?\s*no\.?|id|order|sort|count|total|students?|sections?|classes|subjects?|teachers?|max|rank|age|year|%|days|sessions)$/i;
   const NUM_CELL=/^[\d.,\-–\/%\s]{1,9}$/;
@@ -146,5 +159,5 @@
     });
   }
   addEventListener('resize',()=>{stickHead();fit();});addEventListener('load',()=>{stickHead();fit();});
-  window.slTables={init:()=>{init();narrow();align();paginate();stickHead();fit();}};init();narrow();align();paginate();stickHead();fit();addEventListener('sl:live-updated',()=>{init();narrow();align();paginate();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{narrow();align();paginate();stickHead();fit();});
+  window.slTables={init:()=>{labelActions();init();narrow();align();paginate();stickHead();fit();}};labelActions();init();narrow();align();paginate();stickHead();fit();addEventListener('sl:live-updated',()=>{labelActions();init();narrow();align();paginate();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{labelActions();narrow();align();paginate();stickHead();fit();});
 })();

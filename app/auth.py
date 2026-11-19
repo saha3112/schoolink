@@ -32,7 +32,7 @@ def hash_password(plain):
 def current_user():
     if "user" in g:
         return g.user
-    uid = session.get("uid")
+    uid = session.get("uid") or g.get("api_uid")      # mobile app: bearer token sets g.api_uid
     g.user = None
     if uid:
         from . import cache
@@ -42,7 +42,10 @@ def current_user():
             from .services import user_access as UA
             u['_access'] = cache.get(("auth.access", u['id']), lambda: UA.record(u['id']), 20)
             version = u['_access']['session_version'] if u['_access'] else 0
-            if session.get('auth_version', 0) != version:
+            if g.get("api_uid") and not session.get("uid"):
+                if g.get("api_version", 0) != version:
+                    return None
+            elif session.get('auth_version', 0) != version:
                 session.clear()
                 return None
             u["user_type"] = str(u["user_type"])

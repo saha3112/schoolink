@@ -25,8 +25,8 @@ def create_app():
     app.config.from_object(Config)
     app.teardown_appcontext(dbm.close_db)
 
-    from .blueprints import main, account, admin, students, marks, classteacher, leave, parentpanel, parents, reports, school, signatures, layouts_admin, search, live as live_bp, media, csvio, security
-    for bp in (main.bp, account.bp, admin.bp, students.bp, marks.bp, classteacher.bp, reports.bp, signatures.admin_bp, signatures.bp, school.bp, parents.bp, leave.bp, parentpanel.bp, layouts_admin.bp, search.bp, live_bp.bp, media.bp, csvio.bp, security.bp):
+    from .blueprints import main, account, admin, students, marks, classteacher, leave, parentpanel, parents, reports, school, signatures, layouts_admin, search, live as live_bp, media, csvio, security, api as api_bp
+    for bp in (main.bp, account.bp, admin.bp, students.bp, marks.bp, classteacher.bp, reports.bp, signatures.admin_bp, signatures.bp, school.bp, parents.bp, leave.bp, parentpanel.bp, layouts_admin.bp, search.bp, live_bp.bp, media.bp, csvio.bp, security.bp, api_bp.bp):
         app.register_blueprint(bp)
     app.register_blueprint(main.auth_bp)
     app.register_blueprint(main.notify_bp)
@@ -47,16 +47,24 @@ def create_app():
     from flask import abort
 
     @app.before_request
+    def api_token_auth():
+        """Mobile app: `Authorization: Bearer <token>` identifies the user for /api/ requests (no cookie, no CSRF)."""
+        if request.path.startswith("/api/"):
+            api_bp.load_token()
+
+    @app.before_request
     def csrf_protect():
         if "csrf" not in session:
             session["csrf"] = secrets.token_hex(16)
+        if request.path.startswith("/api/"):
+            return
         if request.method == "POST" and request.endpoint != "auth.login":
             if request.form.get("csrf_token") != session.get("csrf") and request.headers.get("X-CSRF-Token") != session.get("csrf"):
                 abort(400, "Invalid or missing CSRF token. Reload the page and try again.")
 
     @app.before_request
     def enforce_page_access():
-        if request.endpoint == 'static' or not request.endpoint:
+        if request.endpoint == 'static' or not request.endpoint or request.path.startswith("/api/"):
             return
         from .services import user_access as UA
         u = current_user()
