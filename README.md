@@ -149,7 +149,7 @@ Settings come from environment variables or a local `.env` file.
 | `CHROME_BIN` | Path to Google Chrome for PDF export |
 | `HOST`, `PORT`, `DEBUG` | Server options |
 
-## 🔐 Roles &amp; access
+## 🔐 Roles & access
 
 | Role | Access |
 |:--|:--|
