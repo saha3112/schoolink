@@ -72,28 +72,43 @@
     st.page = Math.min(Math.max(1, st.page), pages);
     const from = (st.page - 1) * size, to = Math.min(n, from + size);
     rows.forEach((r, i) => r.classList.toggle('pg-hide', !(i >= from && i < to)));
-    if (!bar) { bar = document.createElement('div'); bar.className = 'sl-pager no-print'; bar._wrap = w; w._pgBar = bar; }
+    if (!bar) {                                                              // one bar per table: counter | page numbers | rows per page
+      bar = document.createElement('div'); bar.className = 'sl-pager no-print'; bar._wrap = w; w._pgBar = bar;
+      bar.innerHTML = '<span class="sl-pg-info"></span><span class="sl-pg-nav"></span><label class="sl-pg-size"><span>Rows per page</span><select aria-label="Rows per page">' +
+        PG_SIZES.map(z => '<option value="' + z + '">' + (z || 'All') + '</option>').join('') + '</select></label>';
+    }
     if (w.nextElementSibling !== bar) w.after(bar);
     const btn = (label, attrs, cls) => '<button type="button" class="' + (cls || '') + '" ' + attrs + '>' + label + '</button>';
-    bar.innerHTML = '<span class="sl-pg-info">Showing <b>' + (from + 1) + '–' + to + '</b> of <b>' + n + '</b></span>' +
-      (pages > 1 ? '<span class="sl-pg-nav">' + btn('‹ Prev', 'data-pg="' + (st.page - 1) + '"' + (st.page === 1 ? ' disabled' : '')) +
-        pgNums(st.page, pages).map(x => x === '…' ? '<span class="sl-pg-gap">…</span>' : btn(x, 'data-pg="' + x + '"', x === st.page ? 'cur' : '')).join('') +
-        btn('Next ›', 'data-pg="' + (st.page + 1) + '"' + (st.page === pages ? ' disabled' : '')) + '</span>' : '') +
-      '<span class="sl-pg-size">Rows ' + PG_SIZES.map(z => btn(z ? z : 'All', 'data-size="' + z + '"', z === st.size ? 'cur' : '')).join('') + '</span>';
+    bar.querySelector('.sl-pg-info').innerHTML = 'Showing <b>' + (from + 1) + '–' + to + '</b> of <b>' + n + '</b>';
+    bar.querySelector('.sl-pg-nav').innerHTML = pages > 1 ? btn('‹ Prev', 'data-pg="' + (st.page - 1) + '"' + (st.page === 1 ? ' disabled' : '')) +
+      pgNums(st.page, pages).map(x => x === '…' ? '<span class="sl-pg-gap">…</span>' : btn(x, 'data-pg="' + x + '"', x === st.page ? 'cur' : '')).join('') +
+      btn('Next ›', 'data-pg="' + (st.page + 1) + '"' + (st.page === pages ? ' disabled' : '')) : '';
+    const sel = bar.querySelector('select'); if (sel.value !== String(st.size)) { sel.value = String(st.size); sel.dispatchEvent(new Event('input', { bubbles: false })); }
+    if (window.slPretty) slPretty.refresh();
   }
   function paginate() {
     document.querySelectorAll('.workspace .content .table-wrap').forEach(w => {
       if (w.closest('.sl-modal,.mp-modal,#viewer,#tsPanel,[role=dialog]') || !w.querySelector(':scope > table') || w.querySelector(':scope > table[data-no-paginate]')) return;
-      const nx = w.nextElementSibling; if (nx && nx.classList && nx.classList.contains('pager')) return;       // the server already pages this list
+      const nx = w.nextElementSibling, serverPaged = (nx && nx.classList && nx.classList.contains('pager')) || (w.parentElement && w.parentElement.querySelector(':scope > .pager'));
+      if (serverPaged) { if (w._pgBar) { w._pgBar.remove(); w._pgBar = null; } w.querySelectorAll('.pg-hide').forEach(r => r.classList.remove('pg-hide')); return; }   // the server already pages this list
       if (!w._pg) w._pg = { page: 1, size: pgSaved() };
       pgDraw(w);
     });
+    document.querySelectorAll('.sl-pager').forEach(bar => {                    // drop bars whose table is gone / replaced, and any duplicate
+      if (!bar._wrap || !bar._wrap.isConnected || bar._wrap._pgBar !== bar || bar.previousElementSibling !== bar._wrap) bar.remove();
+    });
   }
+  document.addEventListener('change', e => {
+    const sel = e.target.closest && e.target.closest('.sl-pager select'); if (!sel) return;
+    const w = sel.closest('.sl-pager')._wrap; if (!w || !w._pg) return;
+    w._pg.size = parseInt(sel.value, 10); w._pg.page = 1;
+    try { localStorage.setItem('sl.pagesize', String(w._pg.size)); } catch (x) {}
+    pgDraw(w); w.scrollTop = 0; fit();
+  });
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('.sl-pager button'); if (!b || b.disabled) return;
     const bar = b.closest('.sl-pager'), w = bar && bar._wrap; if (!w || !w._pg) return;
     if (b.hasAttribute('data-pg')) w._pg.page = parseInt(b.getAttribute('data-pg'), 10);
-    if (b.hasAttribute('data-size')) { w._pg.size = parseInt(b.getAttribute('data-size'), 10); w._pg.page = 1; try { localStorage.setItem('sl.pagesize', String(w._pg.size)); } catch (x) {} }
     pgDraw(w); w.scrollTop = 0; fit();
   });
 
