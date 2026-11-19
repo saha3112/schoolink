@@ -54,5 +54,10 @@
       });
     });
   }
-  window.slTables={init:()=>{init();align();}};init();align();addEventListener('sl:live-updated',()=>{init();align();});document.addEventListener('DOMContentLoaded',()=>align());
+  /* Second header row sticks right below the first one. */
+  function stickHead(){
+    document.querySelectorAll('table.marks-grid').forEach(t=>{const r=t.tHead&&t.tHead.rows[0];if(r)t.style.setProperty('--hr1',r.getBoundingClientRect().height+'px');});
+  }
+  addEventListener('resize',stickHead);addEventListener('load',stickHead);
+  window.slTables={init:()=>{init();align();stickHead();}};init();align();stickHead();addEventListener('sl:live-updated',()=>{init();align();stickHead();});document.addEventListener('DOMContentLoaded',()=>{align();stickHead();});
 })();
