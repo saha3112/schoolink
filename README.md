@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="Schoolink - Modern School Report Card Platform" width="100%">
+  <img src="docs/banner.svg" alt="Schoolink - Complete School Management Platform" width="100%">
 </p>
 
 <p align="center">
-  <b>A modern, role-based school management and report card platform built with Flask.</b><br>
-  Marks, ranks, attendance, report cards, parent portal and live updates in one clean interface.
+  <b>A complete, role-based school management platform built with Flask.</b><br>
+  Academics, marks, attendance, report cards, timetable, parent portal and live updates in one clean interface.
 </p>
 
 <p align="center">
@@ -24,9 +24,10 @@
 
 ## 📖 About
 
-**Schoolink** is a complete rewrite of the legacy CodeIgniter report card panel. It keeps the same database
-structure, the same calculations and the same printed report designs, and adds a responsive admin UI,
-role based menus, real-time updates and a parent portal.
+**Schoolink** is a school management platform that covers academics, marks and ranking, attendance, report cards,
+timetable, events, announcements, leave requests and a parent portal. It is a complete rewrite of a legacy CodeIgniter
+panel: same database structure, same calculations and same printed report designs, now with a responsive UI,
+role based menus and real-time updates.
 
 ## ✨ Features
 
