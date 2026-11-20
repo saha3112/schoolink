@@ -37,7 +37,7 @@ def student_list():
     base = f"FROM students st LEFT JOIN classes c ON c.classId=st.class_id LEFT JOIN sections s ON s.sectionId=st.section_id {where}"
     total = db.scalar(f"SELECT COUNT(*) {base}", args)
     p = paginate(total, 25, page_arg())
-    rows = db.query(f"SELECT st.*, c.class_name, s.section_name {base} ORDER BY st.class_id, st.section_id, st.student_rollNumber LIMIT %s OFFSET %s", args + [25, p["offset"]])
+    rows = db.query(f"SELECT st.*, c.class_name, s.section_name {base} ORDER BY st.class_id, st.section_id, st.student_rollNumber LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
     return render_template("student_list.html", rows=rows, p=p, cls=cls, sec=sec, q=q, classes=_classes(), sections=_sections(cls), trash=trash, n_trash=db.scalar("SELECT COUNT(*) FROM students WHERE isDelete='1'"))
 
 

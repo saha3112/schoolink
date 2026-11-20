@@ -256,7 +256,7 @@ def _master(key):
         args = [f"%{q}%"] * len(fields)
     total = db.scalar(f"SELECT COUNT(*) FROM {t} {where}", args)
     p = paginate(total, PER, page_arg())
-    rows = db.query(f"SELECT * FROM {t} {where} ORDER BY {pk} DESC LIMIT %s OFFSET %s", args + [PER, p["offset"]])
+    rows = db.query(f"SELECT * FROM {t} {where} ORDER BY {pk} DESC LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
     edit = db.one(f"SELECT * FROM {t} WHERE {pk}=%s", (to_int(request.args.get("edit")),)) if request.args.get("edit") else None
     return render_template("master.html", m=m, rows=rows, p=p, q=q, edit=edit, extra=None, trash=trash, n_trash=n_trash)
 
@@ -320,7 +320,7 @@ def sections():
     base = f"FROM sections s JOIN classes c ON c.classId=s.class_id {where}"
     total = db.scalar(f"SELECT COUNT(*) {base}", args)
     p = paginate(total, PER, page_arg())
-    rows = db.query(f"SELECT s.*, c.class_name {base} ORDER BY s.class_id, s.section_name LIMIT %s OFFSET %s", args + [PER, p["offset"]])
+    rows = db.query(f"SELECT s.*, c.class_name {base} ORDER BY s.class_id, s.section_name LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
     edit = db.one("SELECT * FROM sections WHERE sectionId=%s", (to_int(request.args.get("edit")),)) if request.args.get("edit") else None
     return render_template("sections.html", rows=rows, p=p, q=q, cls=cls, edit=edit, trash=trash, n_trash=n_trash, **_lookups())
 
@@ -369,7 +369,7 @@ def class_subjects():
     total = db.scalar(f"SELECT COUNT(*) {base}", args)
     p = paginate(total, 20, page_arg())
     rows = db.query(f"SELECT a.assignSubjectId, a.isSpecialSubject, c.class_name, s.section_name, sb.subject_name {base} "
-                    "ORDER BY a.class_id, a.section_id, sb.subject_name LIMIT %s OFFSET %s", args + [20, p["offset"]])
+                    "ORDER BY a.class_id, a.section_id, sb.subject_name LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
     all_subjects = db.query("SELECT subjectId, subject_name FROM subjects WHERE isDelete='0' ORDER BY subject_name")
     secs_for_filter = db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0'", (cls,)) if cls else []
     return render_template("class_subjects.html", rows=rows, p=p, cls=cls, sec=sec, all_subjects=all_subjects, trash=trash, n_trash=_n_trash("assign_subject"),
@@ -410,7 +410,7 @@ def teacher_mapping():
         total = db.scalar(f"SELECT COUNT(*) {base}", args)
         p = paginate(total, 20, page_arg())
         rows = db.query(f"SELECT a.id, TRIM(CONCAT_WS(' ', t.fname, NULLIF(t.mname,''), t.lname)) AS teacher, c.class_name, s.section_name, sb.subject_name {base} "
-                        "ORDER BY t.fname, c.classId, s.section_name, sb.subject_name LIMIT %s OFFSET %s", args + [20, p["offset"]])
+                        "ORDER BY t.fname, c.classId, s.section_name, sb.subject_name LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
         return render_template("teacher_mapping.html", rows=rows, p=p, q=q, tid=tid, cls=cls, sec=sec, sub=sub, trash=True, n_trash=_n_trash("assign_teacher"),
                                teachers=_teachers(), all_subjects=db.query("SELECT subjectId, subject_name FROM subjects WHERE isDelete='0' ORDER BY subject_name"),
                                secs_for_filter=db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0'", (cls,)) if cls else [], **_lookups())
@@ -422,7 +422,7 @@ def teacher_mapping():
                GROUP_CONCAT(DISTINCT c.class_name ORDER BY c.classId SEPARATOR ', ') AS classes,
                COUNT(*) AS total
         {base} GROUP BY a.t_id, t.fname, t.mname, t.lname, u.email
-        ORDER BY t.fname, t.lname LIMIT %s OFFSET %s""", args + [12, p["offset"]])
+        ORDER BY t.fname, t.lname LIMIT %s OFFSET %s""", args + [p["per_page"], p["offset"]])
     ids = [r["t_id"] for r in rows]
     by_teacher = {}
     if ids:
@@ -579,7 +579,7 @@ def assign_exam():
             f"JOIN subjects sb ON sb.subjectId=a.subjectId JOIN exams e ON e.examId=a.examId {where}")
     total = db.scalar(f"SELECT COUNT(*) {base}", args)
     p = paginate(total, 20, page_arg())
-    rows = db.query(f"SELECT a.id, c.class_name, s.section_name, sb.subject_name, e.exam_name {base} ORDER BY a.classId, a.sectionId, sb.subject_name LIMIT %s OFFSET %s", args + [20, p["offset"]])
+    rows = db.query(f"SELECT a.id, c.class_name, s.section_name, sb.subject_name, e.exam_name {base} ORDER BY a.classId, a.sectionId, sb.subject_name LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
     return render_template("assign_exam.html", rows=rows, p=p, cls=cls, sec=sec, exam=exam, trash=trash, n_trash=_n_trash("assign_exam"),
                            secs_for_filter=db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0'", (cls,)) if cls else [], **_lookups())
 
@@ -647,7 +647,7 @@ def assign_subtype():
             f"JOIN exam_subtype x ON x.id=a.exam_subtype_id {where}")
     total = db.scalar(f"SELECT COUNT(*) {base}", args)
     p = paginate(total, 20, page_arg())
-    rows = db.query(f"SELECT a.id, a.fullmarsks, c.class_name, s.section_name, sb.subject_name, e.exam_name, x.exam_type {base} ORDER BY a.classId, a.sectionId, sb.subject_name, e.examId LIMIT %s OFFSET %s", args + [20, p["offset"]])
+    rows = db.query(f"SELECT a.id, a.fullmarsks, c.class_name, s.section_name, sb.subject_name, e.exam_name, x.exam_type {base} ORDER BY a.classId, a.sectionId, sb.subject_name, e.examId LIMIT %s OFFSET %s", args + [p["per_page"], p["offset"]])
     return render_template("assign_subtype.html", rows=rows, p=p, cls=cls, sec=sec, exam=exam, trash=trash, n_trash=_n_trash("assign_exam_subtype"),
                            subtypes=db.query("SELECT id, exam_type FROM exam_subtype WHERE isDelete='0' ORDER BY id"),
                            secs_for_filter=db.query("SELECT sectionId, section_name FROM sections WHERE class_id=%s AND isDelete='0'", (cls,)) if cls else [], **_lookups())

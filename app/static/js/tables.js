@@ -86,10 +86,9 @@
       });
     });
   }
-  /* Long tables that are not already paged by the server: show a page at a time, entirely in the browser.
-     Every row stays in the page (so a marks form still saves all pages) - only the display changes. No reload, no request. */
-  const PG_SIZES = [10, 25, 50, 100, 0], PG_MIN = 25;
-  const pgSaved = () => { try { const v = parseInt(localStorage.getItem('sl.pagesize'), 10); return PG_SIZES.includes(v) ? v : 25; } catch (e) { return 25; } };
+  /* Long tables that the server does not page: ten rows at a time, entirely in the browser.
+     Every row stays in the page (a marks form still saves all pages) - only the display changes. No reload, no request. */
+  const PG_SIZE = 10;
   const pgRows = w => { const t = w.querySelector(':scope > table'); return t && t.tBodies[0] ? Array.from(t.tBodies[0].rows).filter(r => r.cells.length > 1 || (r.cells[0] && r.cells[0].colSpan < 2)) : []; };
   function pgNums(page, pages) {
     const keep = new Set([1, pages, page - 1, page, page + 1]); const out = []; let last = 0;
@@ -99,65 +98,48 @@
   function pgDraw(w) {
     const st = w._pg, rows = pgRows(w), n = rows.length;
     let bar = w._pgBar; if (bar && !bar.isConnected) bar = w._pgBar = null;
-    if (n <= PG_MIN) { rows.forEach(r => r.classList.remove('pg-hide')); if (bar) bar.remove(), w._pgBar = null; return; }
-    const size = st.size || n, pages = Math.max(1, Math.ceil(n / size));
+    if (n <= PG_SIZE) { rows.forEach(r => r.classList.remove('pg-hide')); w.classList.toggle('is-paged', n >= PG_SIZE); if (bar) bar.remove(), w._pgBar = null; return; }   // a full page (10 rows) gets the same height as the longer lists
+    const pages = Math.ceil(n / PG_SIZE);
     st.page = Math.min(Math.max(1, st.page), pages);
-    const from = (st.page - 1) * size, to = Math.min(n, from + size);
+    const from = (st.page - 1) * PG_SIZE, to = Math.min(n, from + PG_SIZE);
     rows.forEach((r, i) => r.classList.toggle('pg-hide', !(i >= from && i < to)));
-    if (!bar) {                                                              // one bar per table: counter | page numbers | rows per page
-      bar = document.createElement('div'); bar.className = 'sl-pager no-print'; bar._wrap = w; w._pgBar = bar;
-      bar.innerHTML = '<span class="sl-pg-info"></span><span class="sl-pg-nav"></span><label class="sl-pg-size"><span>Rows per page</span><select aria-label="Rows per page">' +
-        PG_SIZES.map(z => '<option value="' + z + '">' + (z || 'All') + '</option>').join('') + '</select></label>';
-    }
+    w.classList.add('is-paged');
+    if (!bar) { bar = document.createElement('div'); bar.className = 'sl-pager no-print'; bar.setAttribute('data-client', '1'); bar._wrap = w; w._pgBar = bar; bar.innerHTML = '<span class="sl-pg-info"></span><span class="sl-pg-nav"></span>'; }
     if (w.nextElementSibling !== bar) w.after(bar);
     const btn = (label, attrs, cls) => '<button type="button" class="' + (cls || '') + '" ' + attrs + '>' + label + '</button>';
     bar.querySelector('.sl-pg-info').innerHTML = 'Showing <b>' + (from + 1) + '–' + to + '</b> of <b>' + n + '</b>';
-    bar.querySelector('.sl-pg-nav').innerHTML = pages > 1 ? btn('‹ Prev', 'data-pg="' + (st.page - 1) + '"' + (st.page === 1 ? ' disabled' : '')) +
+    bar.querySelector('.sl-pg-nav').innerHTML = btn('‹ Prev', 'data-pg="' + (st.page - 1) + '"' + (st.page === 1 ? ' disabled' : '')) +
       pgNums(st.page, pages).map(x => x === '…' ? '<span class="sl-pg-gap">…</span>' : btn(x, 'data-pg="' + x + '"', x === st.page ? 'cur' : '')).join('') +
-      btn('Next ›', 'data-pg="' + (st.page + 1) + '"' + (st.page === pages ? ' disabled' : '')) : '';
-    const sel = bar.querySelector('select'); if (sel.value !== String(st.size)) { sel.value = String(st.size); sel.dispatchEvent(new Event('input', { bubbles: false })); }
-    if (window.slPretty) slPretty.refresh();
+      btn('Next ›', 'data-pg="' + (st.page + 1) + '"' + (st.page === pages ? ' disabled' : ''));
   }
   function paginate() {
     document.querySelectorAll('.workspace .content .table-wrap').forEach(w => {
       if (w.closest('.sl-modal,.mp-modal,#viewer,#tsPanel,[role=dialog]') || !w.querySelector(':scope > table') || w.querySelector(':scope > table[data-no-paginate]')) return;
-      const nx = w.nextElementSibling, serverPaged = (nx && nx.classList && nx.classList.contains('pager')) || (w.parentElement && w.parentElement.querySelector(':scope > .pager'));
-      if (serverPaged) { if (w._pgBar) { w._pgBar.remove(); w._pgBar = null; } w.querySelectorAll('.pg-hide').forEach(r => r.classList.remove('pg-hide')); return; }   // the server already pages this list
-      if (!w._pg) w._pg = { page: 1, size: pgSaved() };
+      const nx = w.nextElementSibling, isServer = e => e && e.classList && e.classList.contains('sl-pager') && !e.hasAttribute('data-client');
+      const serverPaged = isServer(nx) || (w.parentElement && Array.from(w.parentElement.children).some(isServer));
+      if (serverPaged) {                                                         // the server already pages this list: same height as every other paged table
+        if (w._pgBar) { w._pgBar.remove(); w._pgBar = null; }
+        w.querySelectorAll('.pg-hide').forEach(r => r.classList.remove('pg-hide')); w.classList.add('is-paged'); return;
+      }
+      if (!w._pg) w._pg = { page: 1 };
       pgDraw(w);
     });
-    document.querySelectorAll('.sl-pager').forEach(bar => {                    // drop bars whose table is gone / replaced, and any duplicate
+    document.querySelectorAll('.sl-pager[data-client]').forEach(bar => {         // drop bars whose table is gone / replaced, and any duplicate
       if (!bar._wrap || !bar._wrap.isConnected || bar._wrap._pgBar !== bar || bar.previousElementSibling !== bar._wrap) bar.remove();
     });
   }
-  document.addEventListener('change', e => {
-    const sel = e.target.closest && e.target.closest('.sl-pager select'); if (!sel) return;
-    const w = sel.closest('.sl-pager')._wrap; if (!w || !w._pg) return;
-    w._pg.size = parseInt(sel.value, 10); w._pg.page = 1;
-    try { localStorage.setItem('sl.pagesize', String(w._pg.size)); } catch (x) {}
-    pgDraw(w); w.scrollTop = 0; fit();
-  });
   document.addEventListener('click', e => {
-    const b = e.target.closest && e.target.closest('.sl-pager button'); if (!b || b.disabled) return;
+    const b = e.target.closest && e.target.closest('.sl-pager[data-client] button'); if (!b || b.disabled) return;
     const bar = b.closest('.sl-pager'), w = bar && bar._wrap; if (!w || !w._pg) return;
     if (b.hasAttribute('data-pg')) w._pg.page = parseInt(b.getAttribute('data-pg'), 10);
-    pgDraw(w); w.scrollTop = 0; fit();
+    pgDraw(w); w.scrollTop = 0;
   });
 
   /* Second header row sticks right below the first one. */
   function stickHead(){
     document.querySelectorAll('table.marks-grid').forEach(t=>{const r=t.tHead&&t.tHead.rows[0];if(r)t.style.setProperty('--hr1',r.getBoundingClientRect().height+'px');});
   }
-  /* Other table boxes: as tall as the screen allows from where they start, so their own scrollbars stay on screen. */
-  function fit(){
-    document.querySelectorAll('.workspace .content .table-wrap').forEach(w=>{
-      if(w.querySelector('.marks-grid')||w.closest('.modal,.pv-box,[role=dialog]')||!w.querySelector('table'))return;
-      w.style.maxHeight='';
-      const top=w.getBoundingClientRect().top+window.scrollY;
-      const nxs=w.nextElementSibling,pager=nxs&&nxs.classList&&(nxs.classList.contains('pager')||nxs.classList.contains('sl-pager'))?72:0;
-      w.style.maxHeight=Math.max(280,window.innerHeight-top-26-pager)+'px';
-    });
-  }
+  function fit(){ document.querySelectorAll('.workspace .content .table-wrap').forEach(w=>{ if(w.style.maxHeight) w.style.maxHeight=''; }); }   /* height is set in CSS (--table-h) */
   addEventListener('resize',()=>{stickHead();fit();});addEventListener('load',()=>{stickHead();fit();});
   window.slTables={init:()=>{labelActions();init();narrow();align();paginate();stickHead();fit();}};labelActions();init();narrow();align();paginate();stickHead();fit();addEventListener('sl:live-updated',()=>{labelActions();init();narrow();align();paginate();stickHead();fit();});document.addEventListener('DOMContentLoaded',()=>{labelActions();narrow();align();paginate();stickHead();fit();});
 })();

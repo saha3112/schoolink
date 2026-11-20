@@ -86,7 +86,7 @@ def all_parents():
     where, args, cls, sec, q = _where(scope)
     total = db.scalar(f"SELECT COUNT(*) FROM parents p LEFT JOIN new_users u ON u.id=p.user_id WHERE {where}", args)
     pg = paginate(total, 25, page_arg())
-    rows = db.query(f"SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id WHERE {where} ORDER BY p.id LIMIT %s OFFSET %s", args + [25, pg["offset"]])
+    rows = db.query(f"SELECT p.*, u.fname AS account_name FROM parents p LEFT JOIN new_users u ON u.id=p.user_id WHERE {where} ORDER BY p.id LIMIT %s OFFSET %s", args + [pg["per_page"], pg["offset"]])
     kids = _children([r["id"] for r in rows])
     for r in rows:
         _fill_parent_name(r)

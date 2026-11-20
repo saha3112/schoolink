@@ -2,7 +2,11 @@ import math
 from flask import request, url_for
 
 
+PAGE_SIZE = 10          # every list in the application shows the same number of rows per page
+
+
 def paginate(total, per_page, page):
+    per_page = PAGE_SIZE    # the per-page value passed by older callers is ignored on purpose: one size everywhere
     pages = max(1, math.ceil(total / per_page))
     page = min(max(1, page), pages)
     return {"page": page, "pages": pages, "offset": (page - 1) * per_page, "per_page": per_page, "total": total}

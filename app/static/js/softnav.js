@@ -93,7 +93,7 @@
 
   /* page links of a list (1 2 3 ...) */
   document.addEventListener('click', e => {
-    const a = e.target.closest && e.target.closest('.pager a[href]');
+    const a = e.target.closest && e.target.closest('.pager a[href],.sl-pager a[href]');
     if (!a || e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.shiftKey || a.target || !main.contains(a) || !eligible(document)) return;
     const u = new URL(a.href, location.href); if (u.origin !== location.origin || u.pathname !== location.pathname) return;
     e.preventDefault(); go(u.pathname + u.search, 'push');

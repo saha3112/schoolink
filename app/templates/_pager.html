@@ -1,11 +1,13 @@
 {% macro pager(p) %}
 {% if p.pages > 1 %}
-<div class="pager no-print">
-  {% if p.page > 1 %}<a href="{{ page_url(p.page-1) }}">‹ Prev</a>{% endif %}
-  {% for n in range([1,p.page-3]|max, [p.pages,p.page+3]|min + 1) %}
-    {% if n == p.page %}<span class="cur">{{ n }}</span>{% else %}<a href="{{ page_url(n) }}">{{ n }}</a>{% endif %}
-  {% endfor %}
-  {% if p.page < p.pages %}<a href="{{ page_url(p.page+1) }}">Next ›</a>{% endif %}
+<div class="sl-pager no-print">
+  <span class="sl-pg-info">Showing <b>{{ p.offset + 1 }}–{{ [p.offset + p.per_page, p.total]|min }}</b> of <b>{{ p.total }}</b></span>
+  <span class="sl-pg-nav">
+    {% if p.page > 1 %}<a href="{{ page_url(p.page-1) }}">‹ Prev</a>{% else %}<span class="dis">‹ Prev</span>{% endif %}
+    {% set keep = [1, p.pages, p.page-1, p.page, p.page+1] %}{% set ns = namespace(last=0) %}
+    {% for n in range(1, p.pages + 1) %}{% if n in keep %}{% if n - ns.last > 1 %}<span class="sl-pg-gap">…</span>{% endif %}{% if n == p.page %}<span class="cur">{{ n }}</span>{% else %}<a href="{{ page_url(n) }}">{{ n }}</a>{% endif %}{% set ns.last = n %}{% endif %}{% endfor %}
+    {% if p.page < p.pages %}<a href="{{ page_url(p.page+1) }}">Next ›</a>{% else %}<span class="dis">Next ›</span>{% endif %}
+  </span>
 </div>
 {% endif %}
 {% endmacro %}
